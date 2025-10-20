@@ -57,7 +57,7 @@ export default function Index({ auth, docentes, success }) {
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
                                         <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">DNI</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Legajo</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre Completo</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dedicación</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
@@ -66,7 +66,7 @@ export default function Index({ auth, docentes, success }) {
                                     <tbody className="bg-white divide-y divide-gray-200">
                                         {docentesList.map((docente) => (
                                             <tr key={docente.id}>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{docente.dni}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{docente.legajo}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{`${docente.apellido}, ${docente.nombre}`}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{docente.dedicacion}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-2">

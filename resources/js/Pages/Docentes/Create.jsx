@@ -1,26 +1,24 @@
 // resources/js/Pages/Docentes/Create.jsx
 
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'; // Asumo que necesitas este layout
 import { Head, useForm, Link } from '@inertiajs/react';
 
 export default function Create({ auth }) {
     
-    // 1. Inicialización del estado del formulario
+    // 1. Inicialización del estado del formulario con los NUEVOS CAMPOS
     const { data, setData, post, processing, errors } = useForm({
-        dni: '',
+        legajo: '', // Nuevo: integer
         nombre: '',
         apellido: '',
-        caracter: '',
-        dedicacion: '',
-        modalidad_desempeno: '',
+        modalidad_desempeño: 'Investigador', // Nuevo: ENUM con valor inicial
+        carga_horaria: '', // Nuevo: integer
+        es_activo: true, // Nuevo: boolean (valor inicial true)
         telefono: '',
         email: '',
     });
 
-    // 2. Función para manejar el envío del formulario
     const submit = (e) => {
         e.preventDefault();
-        // Envía la petición POST a la ruta 'docentes.store'
         post(route('docentes.store')); 
     };
 
@@ -36,23 +34,22 @@ export default function Create({ auth }) {
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <form onSubmit={submit} className="p-6 space-y-6">
                             
-                            {/* DNI */}
+                            {/* Legajo (Nuevo) */}
                             <div>
-                                <label htmlFor="dni" className="block text-sm font-medium text-gray-700">DNI</label>
+                                <label htmlFor="legajo" className="block text-sm font-medium text-gray-700">Legajo</label>
                                 <input
-                                    id="dni"
-                                    type="text"
-                                    value={data.dni}
-                                    onChange={(e) => setData('dni', e.target.value)}
+                                    id="legajo"
+                                    type="number" // Tipo number para forzar enteros
+                                    value={data.legajo}
+                                    onChange={(e) => setData('legajo', e.target.value)}
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                                     required
                                 />
-                                {errors.dni && <div className="text-red-600 mt-1 text-sm">{errors.dni}</div>}
+                                {errors.legajo && <div className="text-red-600 mt-1 text-sm">{errors.legajo}</div>}
                             </div>
-                            
+
                             {/* Nombre y Apellido */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                {/* Nombre */}
                                 <div>
                                     <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre</label>
                                     <input
@@ -65,7 +62,6 @@ export default function Create({ auth }) {
                                     />
                                     {errors.nombre && <div className="text-red-600 mt-1 text-sm">{errors.nombre}</div>}
                                 </div>
-                                {/* Apellido */}
                                 <div>
                                     <label htmlFor="apellido" className="block text-sm font-medium text-gray-700">Apellido</label>
                                     <input
@@ -80,44 +76,51 @@ export default function Create({ auth }) {
                                 </div>
                             </div>
                             
-                            {/* Caracter, Dedicación y Modalidad */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div>
-                                    <label htmlFor="caracter" className="block text-sm font-medium text-gray-700">Carácter</label>
-                                    <input
-                                        id="caracter"
-                                        type="text"
-                                        value={data.caracter}
-                                        onChange={(e) => setData('caracter', e.target.value)}
-                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                                        required
-                                    />
-                                    {errors.caracter && <div className="text-red-600 mt-1 text-sm">{errors.caracter}</div>}
-                                </div>
-                                <div>
-                                    <label htmlFor="dedicacion" className="block text-sm font-medium text-gray-700">Dedicación</label>
-                                    <input
-                                        id="dedicacion"
-                                        type="text"
-                                        value={data.dedicacion}
-                                        onChange={(e) => setData('dedicacion', e.target.value)}
-                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                                        required
-                                    />
-                                    {errors.dedicacion && <div className="text-red-600 mt-1 text-sm">{errors.dedicacion}</div>}
-                                </div>
+                            {/* Modalidad Desempeño (ENUM) y Carga Horaria (Integer) */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label htmlFor="modalidad_desempeno" className="block text-sm font-medium text-gray-700">Modalidad Desempeño</label>
-                                    <input
+                                    <select
                                         id="modalidad_desempeno"
-                                        type="text"
-                                        value={data.modalidad_desempeno}
-                                        onChange={(e) => setData('modalidad_desempeno', e.target.value)}
+                                        value={data.modalidad_desempeño}
+                                        onChange={(e) => setData('modalidad_desempeño', e.target.value)}
+                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                        required
+                                    >
+                                        <option value="Investigador">Investigador</option>
+                                        <option value="Desarrollo">Desarrollo</option>
+                                    </select>
+                                    {errors.modalidad_desempeño && <div className="text-red-600 mt-1 text-sm">{errors.modalidad_desempeño}</div>}
+                                </div>
+                                <div>
+                                    <label htmlFor="carga_horaria" className="block text-sm font-medium text-gray-700">Carga Horaria (Hrs)</label>
+                                    <input
+                                        id="carga_horaria"
+                                        type="number" // Tipo number para horas
+                                        value={data.carga_horaria}
+                                        onChange={(e) => setData('carga_horaria', e.target.value)}
                                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                                         required
                                     />
-                                    {errors.modalidad_desempeno && <div className="text-red-600 mt-1 text-sm">{errors.modalidad_desempeno}</div>}
+                                    {errors.carga_horaria && <div className="text-red-600 mt-1 text-sm">{errors.carga_horaria}</div>}
                                 </div>
+                            </div>
+
+                            {/* Es Activo (Boolean) */}
+                            <div>
+                                <div className="flex items-center">
+                                    <input
+                                        id="es_activo"
+                                        type="checkbox"
+                                        checked={data.es_activo} // Usamos checked en lugar de value para checkboxes
+                                        onChange={(e) => setData('es_activo', e.target.checked)} // Usamos e.target.checked
+                                        className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                    />
+                                    <label htmlFor="es_activo" className="ml-2 block text-sm font-medium text-gray-700">
+                                        Docente Activo
+                                    </label>
+                                </div>
+                                {errors.es_activo && <div className="text-red-600 mt-1 text-sm">{errors.es_activo}</div>}
                             </div>
                             
                             {/* Email y Teléfono */}

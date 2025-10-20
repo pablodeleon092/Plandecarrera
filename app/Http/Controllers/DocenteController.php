@@ -18,9 +18,9 @@ class DocenteController extends Controller
         if (env('APP_ENV') === 'local' && !config('database.connections.mysql.host')) {
             $mockData = [
                 'data' => [
-                    ['id' => 1, 'dni' => '12345678', 'nombre' => 'Juan', 'apellido' => 'Pérez', 'dedicacion' => 'Exclusiva'],
-                    ['id' => 2, 'dni' => '87654321', 'nombre' => 'Ana', 'apellido' => 'García', 'dedicacion' => 'Semiexclusiva'],
-                    ['id' => 3, 'dni' => '11223344', 'nombre' => 'Pedro', 'apellido' => 'Gómez', 'dedicacion' => 'Simple'],
+                    ['id' => 1, 'legajo' => '12345678', 'nombre' => 'Juan', 'apellido' => 'Pérez', 'dedicacion' => 'Exclusiva'],
+                    ['id' => 2, 'legajo' => '87654321', 'nombre' => 'Ana', 'apellido' => 'García', 'dedicacion' => 'Semiexclusiva'],
+                    ['id' => 3, 'legajo' => '11223344', 'nombre' => 'Pedro', 'apellido' => 'Gómez', 'dedicacion' => 'Simple'],
                 ],
                 'links' => [], // Simulación de links de paginación
                 'current_page' => 1,
@@ -70,13 +70,15 @@ class DocenteController extends Controller
         if (env('APP_ENV') === 'local' && !config('database.connections.mysql.host')) {
              // 1. Solo validamos, no intentamos guardar.
             $request->validate([
-                'dni' => ['required', 'string', 'max:20'],
-                'nombre' => ['required', 'string', 'max:255'],
-                'apellido' => ['required', 'string', 'max:255'],
-                'caracter' => ['required', 'string', 'max:50'], 
-                'dedicacion' => ['required', 'string', 'max:50'],
-                'modalidad_desempeno' => ['required', 'string', 'max:50'],
-            ]);
+                    'legajo' => ['required', 'integer', 'unique:docentes,legajo'],
+                    'nombre' => ['required', 'string', 'max:255'],
+                    'apellido' => ['required', 'string', 'max:255'],
+                    'modalidad_desempeño' => ['required', 'in:Investigador,Desarrollo'],
+                    'carga_horaria' => ['required', 'integer'],
+                    'es_activo' => ['boolean'],
+                    'email' => ['nullable', 'email', 'max:255', 'unique:docentes,email'],
+                    'telefono' => ['nullable', 'string', 'max:50'],
+                ]);
             
              // 2. Simulamos la redirección con mensaje de éxito
             return redirect()->route('docentes.index')->with('success', '¡Docente SIMULADO guardado exitosamente!');
@@ -88,7 +90,7 @@ class DocenteController extends Controller
         
         // 1. Validación de Datos (incluye reglas únicas, etc.)
         $validated = $request->validate([
-            'dni' => ['required', 'string', 'max:20', 'unique:docentes,dni'],
+            'legajo' => ['required', 'string', 'max:20', 'unique:docentes,legajo'],
             'nombre' => ['required', 'string', 'max:255'],
             'apellido' => ['required', 'string', 'max:255'],
             'caracter' => ['required', 'string', 'max:50'], 
