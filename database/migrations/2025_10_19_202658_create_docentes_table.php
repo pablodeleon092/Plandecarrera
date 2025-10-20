@@ -17,8 +17,11 @@ return new class extends Migration
             $table->string('nombre');
             $table->string('apellido');
             $table->enum('modalidad_desempeño', ['Investigador', 'Desarrollo']);
+            $table->integer('carga_horaria')
             $table->boolean('es_activo');
             $table->timestamps();
+            $table->string('telefono', 50)->nullable();
+            $table->string('email', 255)->unique()->nullable();
         });
     }
 
