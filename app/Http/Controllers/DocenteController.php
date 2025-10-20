@@ -11,7 +11,7 @@ class DocenteController extends Controller
     /**
      * Muestra la lista de docentes.
      */
-    public function index(Request $request)
+    public function Index(Request $request)
     {
         // 🚨 Simulación de Datos (Mock Data) para trabajar sin DB activa
         // **IMPORTANTE:** Cuando la DB esté activa, borra este bloque 'if'
@@ -31,6 +31,13 @@ class DocenteController extends Controller
                 'docentes' => $mockData,
                 'success' => $request->session()->get('success'),
             ]);
+        }else{
+            $docentes = Docente::paginate(10); // Ejemplo: consulta normal a la DB
+
+            return Inertia::render('Docentes/Index', [
+                'docentes' => $docentes,
+                'success' => $request->session()->get('success'),
+                    ]);
         }
     }
 
