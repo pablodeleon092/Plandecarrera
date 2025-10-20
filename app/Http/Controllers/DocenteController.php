@@ -46,5 +46,53 @@ class DocenteController extends Controller
         ]);
     }
 
-    // Los métodos create, store, edit, update, destroy van aquí
+    public function create()
+    {
+        // 1. Simplemente renderiza la vista de React
+        return Inertia::render('Docentes/Create');
+    }
+
+    /**
+     * Almacena un docente recién creado en la base de datos.
+     */
+    public function store(Request $request)
+    {
+        // 🚨 Simulación de Guardado (para trabajar sin DB activa)
+        if (env('APP_ENV') === 'local' && !config('database.connections.mysql.host')) {
+             // 1. Solo validamos, no intentamos guardar.
+            $request->validate([
+                'dni' => ['required', 'string', 'max:20'],
+                'nombre' => ['required', 'string', 'max:255'],
+                'apellido' => ['required', 'string', 'max:255'],
+                'caracter' => ['required', 'string', 'max:50'], 
+                'dedicacion' => ['required', 'string', 'max:50'],
+                'modalidad_desempeno' => ['required', 'string', 'max:50'],
+            ]);
+            
+             // 2. Simulamos la redirección con mensaje de éxito
+            return redirect()->route('docentes.index')->with('success', '¡Docente SIMULADO guardado exitosamente!');
+        }
+
+        // -----------------------------------------------------------
+        // ✅ CÓDIGO REAL (Una vez que la base de datos esté activa)
+        // -----------------------------------------------------------
+        
+        // 1. Validación de Datos (incluye reglas únicas, etc.)
+        $validated = $request->validate([
+            'dni' => ['required', 'string', 'max:20', 'unique:docentes,dni'],
+            'nombre' => ['required', 'string', 'max:255'],
+            'apellido' => ['required', 'string', 'max:255'],
+            'caracter' => ['required', 'string', 'max:50'], 
+            'dedicacion' => ['required', 'string', 'max:50'], 
+            'modalidad_desempeno' => ['required', 'string', 'max:50'],
+            'telefono' => ['nullable', 'string', 'max:50'],
+            'email' => ['nullable', 'email', 'max:255', 'unique:docentes,email'],
+        ]);
+
+        // 2. Creación del Modelo (gracias al $fillable que definiste)
+        Docente::create($validated);
+
+        // 3. Redirección al listado con mensaje flash
+        return redirect()->route('docentes.index')->with('success', '¡El Docente ha sido creado exitosamente!');
+    }
 }

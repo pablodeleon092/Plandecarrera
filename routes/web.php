@@ -22,8 +22,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('docentes', DocenteController::class);// Esto crea las rutas: docentes.index, docentes.create, docentes.store, etc.
+
+    // Rutas para la gestión de Docentes
+    Route::resource('docentes', DocenteController::class);
 });
 
 require __DIR__.'/auth.php';
