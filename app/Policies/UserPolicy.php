@@ -7,8 +7,6 @@ use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
-
-
     /**
      * Si el usuario puede llegar al index de User
      */
