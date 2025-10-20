@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, hasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -18,9 +19,15 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'name',      // username para login
         'email',
         'password',
+        'dni',
+        'nombre',    // nombre real
+        'apellido',
+        'is_activo',
+        'cargo',
+        'instituto_id',
     ];
 
     /**
@@ -44,5 +51,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    
+    public function materias()
+    {
+        return $this->belongsToMany(Materia::class, 'coordinador_materias', 'user_id', 'materia_id')
+                    ->withTimestamps();
     }
 }
