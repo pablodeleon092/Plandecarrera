@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\ProfileController, DocenteController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DocenteController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;

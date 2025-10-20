@@ -16,7 +16,7 @@ class DocenteController extends Controller
         // 🚨 Simulación de Datos (Mock Data) para trabajar sin DB activa
         // **IMPORTANTE:** Cuando la DB esté activa, borra este bloque 'if'
         if (env('APP_ENV') === 'local' && !config('database.connections.mysql.host')) {
-             $mockData = [
+            $mockData = [
                 'data' => [
                     ['id' => 1, 'dni' => '12345678', 'nombre' => 'Juan', 'apellido' => 'Pérez', 'dedicacion' => 'Exclusiva'],
                     ['id' => 2, 'dni' => '87654321', 'nombre' => 'Ana', 'apellido' => 'García', 'dedicacion' => 'Semiexclusiva'],
@@ -32,7 +32,9 @@ class DocenteController extends Controller
                 'success' => $request->session()->get('success'),
             ]);
         }
-        
+    }
+
+/**
         // -----------------------------------------------------------
         // ✅ CÓDIGO REAL (Una vez que la base de datos esté activa y con registros)
         // -----------------------------------------------------------
@@ -45,7 +47,7 @@ class DocenteController extends Controller
             'success' => $request->session()->get('success'),
         ]);
     }
-
+*/
     public function create()
     {
         // 1. Simplemente renderiza la vista de React
