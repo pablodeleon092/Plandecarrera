@@ -7,7 +7,7 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## Toquetie para tener un cambio y hacer un commit
+## Toquetie para tener un cambio y hacer un commit para la branch
 
 ## About Laravel
 
