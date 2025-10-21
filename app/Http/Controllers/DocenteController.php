@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreDocenteRequest;
 use App\Models\Docente;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
@@ -36,24 +37,13 @@ class DocenteController extends Controller
     /**
      * Almacena un docente recién creado en la base de datos (STORE).
      */
-    public function store(Request $request)
+    public function store(StoreDocenteRequest $request)
     {
-        // 1. Validación de Datos (Sincronizado con Create.jsx y tu Migración)
-        $validated = $request->validate([
-            // Validamos que sea un entero y que sea único en la tabla
-            'legajo' => ['required', 'integer', 'unique:docentes,legajo'], 
-            'nombre' => ['required', 'string', 'max:255'],
-            'apellido' => ['required', 'string', 'max:255'],
-            // Usamos la regla 'Rule::in' para validar el ENUM
-            'modalidad_desempeño' => ['required', Rule::in(['Investigador', 'Desarrollo'])],
-            'carga_horaria' => ['required', 'integer'],
-            'es_activo' => ['boolean'], 
-            'telefono' => ['nullable', 'string', 'max:50'],
-            'email' => ['nullable', 'email', 'max:255', 'unique:docentes,email'],
-        ]);
+        // 1. La validación ahora es manejada por StoreDocenteRequest.
+        // Si la validación falla, Laravel redirige automáticamente.
 
-        // 2. Creación del Modelo
-        Docente::create($validated);
+        // 2. Creación del Modelo con los datos ya validados.
+        Docente::create($request->validated());
 
         // 3. Redirección al listado con mensaje flash (Resuelve el problema de redirección)
         return redirect()->route('docentes.index')->with('success', '¡El Docente ha sido creado exitosamente!');
@@ -74,24 +64,12 @@ class DocenteController extends Controller
     /**
      * Actualiza el docente en la base de datos (UPDATE).
      */
-    public function update(Request $request, Docente $docente)
+    public function update(StoreDocenteRequest $request, Docente $docente)
     {
-        // 1. Validación de Datos (Ajustamos 'unique' para ignorar el registro actual)
-        $validated = $request->validate([
-            // Ignorar el legajo actual del check de unicidad
-            'legajo' => ['required', 'integer', 'unique:docentes,legajo,' . $docente->id],
-            'nombre' => ['required', 'string', 'max:255'],
-            'apellido' => ['required', 'string', 'max:255'],
-            'modalidad_desempeño' => ['required', Rule::in(['Investigador', 'Desarrollo'])],
-            'carga_horaria' => ['required', 'integer'],
-            'es_activo' => ['boolean'], 
-            'telefono' => ['nullable', 'string', 'max:50'],
-            // Ignorar el email actual del check de unicidad
-            'email' => ['nullable', 'email', 'max:255', 'unique:docentes,email,' . $docente->id],
-        ]);
+        // 1. La validación también es manejada por StoreDocenteRequest.
 
         // 2. Actualización del Modelo
-        $docente->update($validated);
+        $docente->update($request->validated());
 
         // 3. Redirección
         return redirect()->route('docentes.index')->with('success', '¡El Docente ha sido actualizado exitosamente!');
