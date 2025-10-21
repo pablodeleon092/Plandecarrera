@@ -6,20 +6,23 @@ import { Head, Link, useForm } from '@inertiajs/react';
 // import Pagination from '@/Components/Pagination'; 
 
 export default function Index({ auth, docentes, success }) {
-    
+
     // docs.data contiene el array de docentes.
     const docentesList = docentes.data;
-    
+
     // Necesitamos useForm para la funcionalidad de BORRAR (DELETE)
     const { delete: inertiaDelete } = useForm({});
 
     // Función que maneja la eliminación de un docente
     const handleDelete = (id, nombre, apellido) => {
         if (confirm(`¿Estás seguro de eliminar a ${nombre} ${apellido}? Esta acción no se puede deshacer.`)) {
-            // Envía una petición DELETE a la ruta 'docentes.destroy'
-            inertiaDelete(route('docentes.destroy', id));
+            inertiaDelete(route('docentes.destroy', id), {
+                preserveScroll: true,
+                onSuccess: () => { },
+            });
         }
     };
+
 
     return (
         <AuthenticatedLayout
@@ -39,10 +42,10 @@ export default function Index({ auth, docentes, success }) {
 
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 bg-white border-b border-gray-200">
-                            
+
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-lg font-medium text-gray-900">Listado de Docentes</h3>
-                                
+
                                 {/* Botón para ir a la vista de creación */}
                                 <Link
                                     href={route('docentes.create')}
@@ -69,15 +72,15 @@ export default function Index({ auth, docentes, success }) {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{`${docente.apellido}, ${docente.nombre}`}</td>
 
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-2">
-                                                    
+
                                                     {/* Botón EDITAR */}
-                                                    <Link 
-                                                        href={route('docentes.edit', docente.id)} 
+                                                    <Link
+                                                        href={route('docentes.edit', docente.id)}
                                                         className="text-indigo-600 hover:text-indigo-900"
                                                     >
                                                         Editar
                                                     </Link>
-                                                    
+
                                                     {/* Botón ELIMINAR (usando useForm para DELETE) */}
                                                     <button
                                                         onClick={() => handleDelete(docente.id, docente.nombre, docente.apellido)}
@@ -91,7 +94,7 @@ export default function Index({ auth, docentes, success }) {
                                     </tbody>
                                 </table>
                             </div>
-                            
+
                             {/* Paginación de Inertia (Si tienes un componente Pagination) */}
                             {/* {docentes.links && <div className="mt-4"><Pagination links={docentes.links} /></div>} */}
 
