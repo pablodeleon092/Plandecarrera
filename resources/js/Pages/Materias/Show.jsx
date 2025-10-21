@@ -1,17 +1,20 @@
 import React from 'react';
-import Layout from '@/Layouts/Layout'; // Asegúrate de que la ruta a tu layout es correcta
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 
-export default function Show({ materia }) {
+export default function Show({ auth, materia }) {
     return (
-        <Layout>
+        <AuthenticatedLayout
+            user={auth.user}
+            header={<h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">Materia: {materia.nombre}</h2>}
+        >
             <Head title={`Materia: ${materia.nombre}`} />
             
             <div className="bg-gray-50 py-8">
                 <div className="container mx-auto px-4 max-w-5xl">
                     <div className="mb-6">
                         <Link 
-                            href={route('materias.index')} // MEJORA: Usar helper de rutas
+                            href={route('materias.index')} 
                             className="text-blue-600 hover:text-blue-800 flex items-center gap-2 transition"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,14 +51,14 @@ export default function Show({ materia }) {
                                 </div>
                                 <div className="flex gap-3">
                                     <Link
-                                        href={route('materias.edit', materia.id)} // MEJORA: Usar helper de rutas
+                                        href={route('materias.edit', materia.id)} 
                                         className="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition flex items-center gap-2 font-semibold"
                                     >
                                         {/* Icono de Editar */}
                                         Editar
                                     </Link>
                                     <Link
-                                        href={route('materias.destroy', materia.id)} // MEJORA: Usar helper de rutas
+                                        href={route('materias.destroy', materia.id)} 
                                         method="delete"
                                         as="button"
                                         onBefore={() => confirm('¿Estás seguro de que deseas eliminar esta materia?')}
@@ -135,6 +138,6 @@ export default function Show({ materia }) {
                     </div>
                 </div>
             </div>
-        </Layout>
+        </AuthenticatedLayout>
     );
 }

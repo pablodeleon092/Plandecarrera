@@ -1,7 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
-export default function Index({ materias }) {
+export default function Index({ auth, materias }) {
     const [search, setSearch] = useState('');
     const [filterRegimen, setFilterRegimen] = useState('');
     const [filterEstado, setFilterEstado] = useState('');
@@ -22,11 +23,14 @@ export default function Index({ materias }) {
     });
 
     return (
-        <>
+        <AuthenticatedLayout
+            user={auth.user}
+            header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Gestión de Materias</h2>}
+        >
             <Head title="Materias" />
             
-            <div className="min-h-screen bg-gray-50 py-8">
-                <div className="container mx-auto px-4">
+            <div className="py-12">
+                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center mb-8">
                         <div>
                             <h1 className="text-4xl font-bold text-gray-900">Gestión de Materias</h1>
@@ -230,6 +234,6 @@ export default function Index({ materias }) {
                     </div>
                 </div>
             </div>
-        </>
+        </AuthenticatedLayout>
     );
 }

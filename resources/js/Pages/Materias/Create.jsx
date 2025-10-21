@@ -1,7 +1,8 @@
 import { Head, useForm, Link } from '@inertiajs/react';
 import { useEffect } from 'react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
-export default function Create() {
+export default function Create({ auth }) {
     const { data, setData, post, processing, errors } = useForm({
         nombre: '',
         codigo: '',
@@ -26,11 +27,14 @@ export default function Create() {
     };
 
     return (
-        <>
+        <AuthenticatedLayout
+            user={auth.user}
+            header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Crear Nueva Materia</h2>}
+        >
             <Head title="Crear Materia" />
             
-            <div className="min-h-screen bg-gray-50 py-8">
-                <div className="container mx-auto px-4 max-w-3xl">
+            <div className="py-12">
+                <div className="mx-auto max-w-3xl sm:px-6 lg:px-8">
                     {/* Breadcrumb */}
                     <div className="mb-6">
                         <Link 
@@ -244,6 +248,6 @@ export default function Create() {
                     </form>
                 </div>
             </div>
-        </>
+        </AuthenticatedLayout>
     );
 }

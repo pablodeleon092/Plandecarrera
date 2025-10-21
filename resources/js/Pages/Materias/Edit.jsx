@@ -1,7 +1,8 @@
 import { Head, useForm, Link } from '@inertiajs/react';
 import { useEffect } from 'react';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
-export default function Edit({ materia }) {
+export default function Edit({ auth, materia }) {
     const { data, setData, put, processing, errors } = useForm({
         nombre: materia.nombre,
         codigo: materia.codigo,
@@ -25,11 +26,14 @@ export default function Edit({ materia }) {
     };
 
     return (
-        <>
+        <AuthenticatedLayout
+            user={auth.user}
+            header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Editar Materia</h2>}
+        >
             <Head title="Editar Materia" />
             
-            <div className="min-h-screen bg-gray-50 py-8">
-                <div className="container mx-auto px-4 max-w-3xl">
+            <div className="py-12">
+                <div className="mx-auto max-w-3xl sm:px-6 lg:px-8">
                     <div className="mb-6">
                         <Link 
                             href="/materias" 
@@ -230,6 +234,6 @@ export default function Edit({ materia }) {
                     </div>
                 </div>
             </div>
-        </>
+        </AuthenticatedLayout>
     );
 }
