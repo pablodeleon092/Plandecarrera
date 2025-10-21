@@ -26,25 +26,25 @@ class UserController extends Controller
     {
         $this->authorize('index', User::class);
 
+        $users = User::orderBy('id', 'desc')->paginate(15)->withQueryString();
+
         return Inertia::render('Users/Index', [
-            'users' => User::all(),
+            'users' => $users,
         ]);
     }
 
     public function create(Request $request)
     {
 
-    try {
-        $this->authorize('create', User::class);
-    } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
-        return redirect()->route('dashboard')->with('error', 'No tienes permisos para crear usuarios.');
-    }
+        try {
+            $this->authorize('create', User::class);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return redirect()->route('dashboard')->with('error', 'No tienes permisos para crear usuarios.');
+        }
 
-    return Inertia('Users/Auth/Register', [
-        'institutos' => Instituto::select('id', 'siglas')->get(),
-    ]);
-
-
+        return Inertia('Users/Auth/Register', [
+            'institutos' => Instituto::select('id', 'siglas')->get(),
+        ]);
     }
 
     /**
@@ -87,8 +87,20 @@ class UserController extends Controller
 
         #event(new Registered($user));
 
-        return redirect(route('dashboard'))->with('success', 'Usuario creado exitosamente.');
+        return redirect(route('users.index'))->with('success', 'Usuario creado exitosamente.');
     }
+
+    public function show(User $user)
+    {
+        // Provide the list of institutos so the profile edit form can show a select
+        $institutos = Instituto::select('id', 'siglas')->get();
+
+        return inertia('Users/Profile/Show', [
+            'user' => $user,
+            'institutos' => $institutos,
+        ]);
+    }
+
 
     private function getDefaultRoleForCargo($cargo)
     {

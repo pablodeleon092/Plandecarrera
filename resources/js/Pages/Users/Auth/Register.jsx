@@ -20,7 +20,7 @@ export default function Register({ institutos }) {
     const submit = (e) => {
         e.preventDefault();
 
-        post(route('register'), {
+        post(route('users.store'), {
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };
