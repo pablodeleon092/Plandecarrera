@@ -20,10 +20,7 @@ return new class extends Migration
             $table->foreignId('materia_id')
                   ->constrained('materias')
                   ->onDelete('cascade');
-<<<<<<< HEAD
-=======
                   
->>>>>>> 08f566039f5abecd8ff6a3b37c5e51b5809629c0
             $table->primary(['plan_id', 'materia_id']);
 
         });
