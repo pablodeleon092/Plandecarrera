@@ -1,24 +1,23 @@
-// resources/js/Pages/Docentes/Create.jsx
-
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'; // Asumo que necesitas este layout
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 
 export default function Create({ auth }) {
     
     // 1. Inicialización del estado del formulario con los NUEVOS CAMPOS
     const { data, setData, post, processing, errors } = useForm({
-        legajo: '', // Nuevo: integer
+        legajo: '', // integer
         nombre: '',
         apellido: '',
-        modalidad_desempeño: 'Investigador', // Nuevo: ENUM con valor inicial
-        carga_horaria: '', // Nuevo: integer
-        es_activo: true, // Nuevo: boolean (valor inicial true)
+        modalidad_desempeño: 'Investigador', // ENUM
+        carga_horaria: '', // integer
+        es_activo: true, // boolean
         telefono: '',
         email: '',
     });
 
     const submit = (e) => {
         e.preventDefault();
+        // Envía la petición POST. Inertia maneja la redirección o los errores 422.
         post(route('docentes.store')); 
     };
 
@@ -34,12 +33,12 @@ export default function Create({ auth }) {
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <form onSubmit={submit} className="p-6 space-y-6">
                             
-                            {/* Legajo (Nuevo) */}
+                            {/* Legajo */}
                             <div>
                                 <label htmlFor="legajo" className="block text-sm font-medium text-gray-700">Legajo</label>
                                 <input
                                     id="legajo"
-                                    type="number" // Tipo number para forzar enteros
+                                    type="number" 
                                     value={data.legajo}
                                     onChange={(e) => setData('legajo', e.target.value)}
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
@@ -79,9 +78,9 @@ export default function Create({ auth }) {
                             {/* Modalidad Desempeño (ENUM) y Carga Horaria (Integer) */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label htmlFor="modalidad_desempeno" className="block text-sm font-medium text-gray-700">Modalidad Desempeño</label>
+                                    <label htmlFor="modalidad_desempeño" className="block text-sm font-medium text-gray-700">Modalidad Desempeño</label>
                                     <select
-                                        id="modalidad_desempeno"
+                                        id="modalidad_desempeño"
                                         value={data.modalidad_desempeño}
                                         onChange={(e) => setData('modalidad_desempeño', e.target.value)}
                                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
@@ -96,7 +95,7 @@ export default function Create({ auth }) {
                                     <label htmlFor="carga_horaria" className="block text-sm font-medium text-gray-700">Carga Horaria (Hrs)</label>
                                     <input
                                         id="carga_horaria"
-                                        type="number" // Tipo number para horas
+                                        type="number" 
                                         value={data.carga_horaria}
                                         onChange={(e) => setData('carga_horaria', e.target.value)}
                                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
@@ -112,8 +111,8 @@ export default function Create({ auth }) {
                                     <input
                                         id="es_activo"
                                         type="checkbox"
-                                        checked={data.es_activo} // Usamos checked en lugar de value para checkboxes
-                                        onChange={(e) => setData('es_activo', e.target.checked)} // Usamos e.target.checked
+                                        checked={data.es_activo}
+                                        onChange={(e) => setData('es_activo', e.target.checked)}
                                         className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
                                     />
                                     <label htmlFor="es_activo" className="ml-2 block text-sm font-medium text-gray-700">
