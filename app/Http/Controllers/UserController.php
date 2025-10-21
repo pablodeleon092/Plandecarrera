@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -15,13 +15,22 @@ use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class RegisteredUserController extends Controller
+class UserController extends Controller
 {
 
 
     /**
      * Display the registration view.
      */
+    public function index()
+    {
+        $this->authorize('index', User::class);
+
+        return Inertia::render('Users/Index', [
+            'users' => User::all(),
+        ]);
+    }
+
     public function create(Request $request)
     {
 
@@ -31,7 +40,7 @@ class RegisteredUserController extends Controller
         return redirect()->route('dashboard')->with('error', 'No tienes permisos para crear usuarios.');
     }
 
-    return Inertia('Auth/Register', [
+    return Inertia('Users/Auth/Register', [
         'institutos' => Instituto::select('id', 'siglas')->get(),
     ]);
 
