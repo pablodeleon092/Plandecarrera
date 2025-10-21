@@ -72,7 +72,7 @@ export default function Index({ auth, docentes, success }) {
                                             <tr key={docente.id}>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{docente.legajo}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{`${docente.apellido}, ${docente.nombre}`}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{`${docente.carga_horaria} horas`}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{docente.carga_horaria}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{docente.modalidad_desempeño}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-2">
 
