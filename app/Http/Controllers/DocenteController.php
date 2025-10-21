@@ -6,7 +6,6 @@ use App\Http\Requests\StoreDocenteRequest;
 use App\Models\Docente;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class DocenteController extends Controller
 {
