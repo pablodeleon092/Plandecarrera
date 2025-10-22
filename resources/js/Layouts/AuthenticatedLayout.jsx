@@ -7,6 +7,12 @@ import { useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
+    const { auth } = usePage().props;
+
+
+    const canViewUsers =
+        auth?.user?.roles?.includes('admin') ||
+        auth?.user?.permissions?.includes('consultar_usuario');
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -43,12 +49,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Carreras
                                 </NavLink
                                 >
-                                <NavLink
-                                    href={route('users.index')}
-                                    active={route().current('users.index')}
-                                >
+                            {canViewUsers && (
+                                <NavLink href={route('users.index')} active={route().current('users.index')}>
                                     Usuarios
-                                </NavLink>                                    
+                                </NavLink>
+                            )}                         
                             </div>
                         </div>
 

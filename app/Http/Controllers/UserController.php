@@ -35,12 +35,7 @@ class UserController extends Controller
 
     public function create(Request $request)
     {
-
-        try {
-            $this->authorize('create', User::class);
-        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
-            return redirect()->route('dashboard')->with('error', 'No tienes permisos para crear usuarios.');
-        }
+        $this->authorize('create', User::class);
 
         return Inertia('Users/Auth/Register', [
             'institutos' => Instituto::select('id', 'siglas')->get(),
@@ -92,7 +87,8 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        // Provide the list of institutos so the profile edit form can show a select
+        $this->authorize('show', $user);
+
         $institutos = Instituto::select('id', 'siglas')->get();
 
         return inertia('Users/Profile/Show', [
@@ -101,11 +97,49 @@ class UserController extends Controller
         ]);
     }
 
+    public function update(Request $request, User $user)
+    {
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'dni' => 'required|integer|unique:users,dni,' . $user->id,
+            'nombre' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+            'cargo' => 'required|string|max:255',
+            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
+            'instituto_id' => 'nullable|integer|exists:institutos,id',
+        ]);
+
+        try {
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'dni' => $request->dni,
+                'nombre' => $request->nombre,
+                'apellido' => $request->apellido,
+                'cargo' => $request->cargo,
+                'instituto_id' => $request->instituto_id ?: null,
+                'password' => $request->password ? Hash::make($request->password) : $user->password,
+            ]);
+            $user->syncRoles($this->getDefaultRoleForCargo($request->cargo));
+        } catch (\Exception $e) {
+            \Log::error('Error actualizando usuario: ' . $e->getMessage());
+            return back()->with('error', 'Hubo un problema al actualizar el usuario.');
+        }
+
+        return Inertia::render('Users/Profile/Show', [
+            'user' => $user,
+            'institutos' => Instituto::select('id','siglas')->get(),
+            'flash' => ['success' => 'Usuario actualizado correctamente.'],
+        ]);
+}
+
 
     private function getDefaultRoleForCargo($cargo)
     {
         $cargoRoleMap = [
-            'Administrador' => 'admin',
+            'Administrador' => 'Admin',
             'Administrativo de Secretaria Academica' => 'Admin_global',
             'Administrativo de instituto' => 'Admin_instituto',
             'Coordinador de Carrera' => 'Coord_carrera',

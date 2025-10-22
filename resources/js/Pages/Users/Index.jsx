@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Index ({ auth, users, sucess})
+export default function Index ({ auth, users})
 {
     const userList = users?.data || [];
 
@@ -16,7 +16,8 @@ export default function Index ({ auth, users, sucess})
             <Head title="Usuarios" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                            
+                {/* Alerta de éxito */}
+
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-medium text-gray-900">Listado de Docentes</h3>
                         <Link
@@ -56,8 +57,7 @@ export default function Index ({ auth, users, sucess})
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.is_activo ? 'Sí' : 'No'}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.cargo ?? '-'}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <Link href={route('users.edit', user.id)} className="text-indigo-600 hover:text-indigo-900 mr-3">Editar</Link>
-                                    <Link href={route('users.show', user.id)} className="text-gray-600 hover:text-gray-900 mr-3">Ver</Link>
+                                    <Link href={route('users.show', user.id)} className="text-indigo-600 hover:text-indigo-900 mr-3">Actualizar</Link>
                                     <button
                                         onClick={() => {
                                             if (confirm('¿Eliminar usuario?')) {

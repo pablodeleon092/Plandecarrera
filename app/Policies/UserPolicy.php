@@ -20,9 +20,9 @@ class UserPolicy
     /**
      * Si el usuario puede llegar al show de User
      */
-    public function view(User $user, User $model): bool
+    public function show(User $user, User $model): bool
     {
-        return ($user->hasRole('admin')) or (($user->can('consultar_usuario')) or ($user->id === $model->id));
+        return ($user->hasRole('admin')) or ($user->can('consultar_usuario'));
 
     }
 
