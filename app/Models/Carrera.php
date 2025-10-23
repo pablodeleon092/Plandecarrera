@@ -40,4 +40,15 @@ class Carrera extends Model
     {
         return $this->belongsTo(Instituto::class, 'instituto_id');
     }
+
+    public function planes()
+    {
+        return $this->hasMany(Plan::class, 'carrera_id');
+    }
+
+    public function planActual()
+    {
+        $planes = $this->hasMany(Plan::class, 'carrera_id');
+        return $planes->whereNull('anio_fin')->first();
+    }
 }

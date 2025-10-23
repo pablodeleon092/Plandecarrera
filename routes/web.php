@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CarreraController;
+
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use Illuminate\Foundation\Application;
@@ -17,6 +18,7 @@ Route::get('/', function () {
 Route::middleware('auth')->group(function () {
     #UsuariusCrud
     Route::resource('users', UserController::class);
+
     Route::resource('carreras', CarreraController::class);
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

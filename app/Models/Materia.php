@@ -30,6 +30,11 @@ class Materia extends Model
 
     //Relacion con Plan
 
+    public function planes()
+    {
+        return $this->belongsToMany(Plan::class, 'plan_materia', 'plan_id', 'materia_id');
+    }
+
     //Relacion con las Comisiones
 
     //Accessors y Mutators
