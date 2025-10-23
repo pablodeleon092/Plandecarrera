@@ -26,7 +26,8 @@ class UserController extends Controller
     {
         $this->authorize('index', User::class);
 
-        $users = User::orderBy('id', 'desc')->paginate(15)->withQueryString();
+
+        $users = User::with('instituto')->orderBy('id', 'desc')->paginate(15)->withQueryString();
 
         return Inertia::render('Users/Index', [
             'users' => $users,

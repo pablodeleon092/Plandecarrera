@@ -11,7 +11,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, hasRoles;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -57,5 +57,10 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Materia::class, 'coordinador_materias', 'user_id', 'materia_id')
                     ->withTimestamps();
+    }
+
+    public function instituto()
+    {
+        return $this->belongsTo(Instituto::class);
     }
 }
