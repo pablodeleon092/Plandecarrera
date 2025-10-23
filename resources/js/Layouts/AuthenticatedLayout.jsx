@@ -37,7 +37,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Dashboard
                                 </NavLink>
                                 <NavLink
-                                    href="#"
+                                    href={route('docentes.index')}
                                 >
                                     Docentes
                                 </NavLink>
