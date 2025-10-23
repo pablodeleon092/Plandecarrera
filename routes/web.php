@@ -2,10 +2,35 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DocenteController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\CarreraController;
+use App\Http\Controllers\MateriaController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+Route::get('/', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+
+Route::middleware('auth')->group(function () {
+    #UsuariusCrud
+    Route::resource('users', UserController::class);
+
+    Route::resource('carreras', CarreraController::class);
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Rutas para la gestión de Docentes
+    Route::resource('docentes', DocenteController::class);
+    Route::resource('materias', MateriaController::class);
+});
+Route::get('/test', fn () => Inertia::render('Test'))->name('test');
+
+/*
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -14,18 +39,6 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
-
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Rutas para la gestión de Docentes
-    Route::resource('docentes', DocenteController::class);
-});
+*/
 
 require __DIR__.'/auth.php';
