@@ -23,7 +23,4 @@ RUN composer install --no-dev --optimize-autoloader
 # Instalar dependencias de Node (React)
 RUN npm install && npm run build
 
-# Permisos
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
 CMD ["php-fpm"]
