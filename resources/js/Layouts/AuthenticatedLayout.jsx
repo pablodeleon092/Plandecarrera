@@ -43,12 +43,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Docentes
                                 </NavLink>
                                 <NavLink
-                                    href="#"
-                                    
+                                    href={route('materias.index')}
+                                    active={route().current('materias.index')}
                                 >
                                     Carreras
-                                </NavLink
-                                >
+                                </NavLink>
                             {canViewUsers && (
                                 <NavLink href={route('users.index')} active={route().current('users.index')}>
                                     Usuarios

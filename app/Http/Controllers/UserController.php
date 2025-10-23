@@ -133,10 +133,29 @@ class UserController extends Controller
             'institutos' => Instituto::select('id','siglas')->get(),
             'flash' => ['success' => 'Usuario actualizado correctamente.'],
         ]);
-}
+    }
+
+    public function destroy(User $user)
+    {
+        $this->authorize('update', $user);
+
+        // Prevent deleting the currently authenticated user from the user-management UI
+        if (Auth::id() === $user->id) {
+            return redirect(route('users.index'))->with('error', 'No puedes eliminar tu propio usuario desde aquí.');
+        }
+
+        try {
+            $user->delete();
+        } catch (\Exception $e) {
+            \Log::error('Error eliminando usuario: ' . $e->getMessage());
+            return back()->with('error', 'Hubo un problema al eliminar el usuario.');
+        }
+
+        return redirect(route('users.index'))->with('success', 'Usuario eliminado correctamente.');
+    }
 
 
-    private function getDefaultRoleForCargo($cargo)
+    private function getDefaultRoleForCargo(string $cargo)
     {
         $cargoRoleMap = [
             'Administrador' => 'Admin',

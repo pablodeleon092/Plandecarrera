@@ -13,7 +13,7 @@ class UserPolicy
 
     public function index(User $user): bool
     {
-        return ($user->hasRole('admin')) or (($user->can('consultar_usuario')));
+        return ($user->hasRole('Admin')) or (($user->can('consultar_usuario')));
 
     }
 
@@ -22,7 +22,7 @@ class UserPolicy
      */
     public function show(User $user, User $model): bool
     {
-        return ($user->hasRole('admin')) or ($user->can('consultar_usuario'));
+        return ($user->hasRole('Admin')) or ($user->can('consultar_usuario'));
 
     }
 
@@ -31,7 +31,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return ($user->hasRole('admin')) or ($user->can('modificar_usuario'));
+        return ($user->hasRole('Admin')) or ($user->can('modificar_usuario'));
     }
 
     /**
@@ -39,7 +39,7 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return ($user->hasRole('admin')) or (($user->can('modificar_usuario')) and ($user->id === $model->id));
+        return ($user->hasRole('Admin'));
     }
 
 }
