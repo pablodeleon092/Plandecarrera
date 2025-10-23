@@ -1,9 +1,9 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CarreraController;
-
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use Illuminate\Foundation\Application;
@@ -23,10 +23,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Rutas para la gestión de Docentes
+    Route::resource('docentes', DocenteController::class);
     Route::resource('materias', MateriaController::class);
 });
 Route::get('/test', fn () => Inertia::render('Test'))->name('test');
-
 
 /*
 Route::get('/', function () {
