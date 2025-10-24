@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\Instituto;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,14 +18,9 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
-        $user = $request->user();
-        $institutos = Instituto::select('id', 'siglas')->get(); // si quieres mostrar instituto
-
-        return Inertia::render('Users/Profile/Edit', [
-            'mustVerifyEmail' => $user instanceof MustVerifyEmail,
+        return Inertia::render('Profile/Edit', [
+            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
-            'user' => $user,             // usuario logueado
-            'institutos' => $institutos, // lista de institutos para mostrar siglas
         ]);
     }
 

@@ -19,8 +19,7 @@ return new class extends Migration
 
             $table->foreignId('materia_id')
                   ->constrained('materias')
-                  ->onDelete('cascade');     
-          
+                  ->onDelete('cascade');            
             $table->primary(['plan_id', 'materia_id']);
 
         });

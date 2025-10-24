@@ -13,18 +13,15 @@ return new class extends Migration
     {
         Schema::create('materias', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('codigo')->unique();
-            $table->boolean('estado')->default(true);
+            $table->string('codigo')->unique;
+            $table->boolean('estado');
             $table->enum('regimen', ['anual', 'cuatrimestral']);
-            $table->integer('cuatrimestre')->nullable();;
+            $table->integer('cuatrimestre'); #definir
             $table->integer('horas_semanales'); 
             $table->integer('horas_totales'); #definir
             $table->timestamps();
         });
     }
-
-    //Definir la Relacion con el Plan
 
     /**
      * Reverse the migrations.
