@@ -3,6 +3,7 @@ services:
     build: .
     container_name: laravel_app
     user: "${MY_UID}:${MY_GID}"
+    command: composer install
     volumes:
       - .:/var/www/html
     depends_on:

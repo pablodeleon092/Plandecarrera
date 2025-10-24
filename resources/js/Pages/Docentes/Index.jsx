@@ -1,11 +1,11 @@
 // resources/js/Pages/Docentes/Index.jsx
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm} from '@inertiajs/react';
 // Si tienes un componente de paginación, impórtalo:
 // import Pagination from '@/Components/Pagination'; 
 
-export default function Index({ auth, docentes, success }) {
+export default function Index({ auth, docentes, flash }) {
 
     // docs.data contiene el array de docentes.
     const docentesList = docentes.data;
@@ -31,14 +31,21 @@ export default function Index({ auth, docentes, success }) {
         >
             <Head title="Docentes" />
 
+
+            {flash?.error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    {flash?.error}
+                </div>
+            )}
+
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     {/* Mensaje Flash de Éxito */}
-                    {success && (
-                        <div className="mb-4 font-medium text-sm text-green-600 bg-green-100 p-4 rounded-md">
-                            {success}
-                        </div>
-                    )}
+                {flash?.success && (
+                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                        {flash?.success}
+                    </div>
+                )}
 
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 bg-white border-b border-gray-200">
@@ -64,6 +71,7 @@ export default function Index({ auth, docentes, success }) {
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre Completo</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Carga Horaria</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modalidad de Desempeño</th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cargos</th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                                         </tr>
                                     </thead>
@@ -74,6 +82,21 @@ export default function Index({ auth, docentes, success }) {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{`${docente.apellido}, ${docente.nombre}`}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{docente.carga_horaria}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{docente.modalidad_desempeño}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {docente.cargos.length > 0
+                                                        ? docente.cargos
+                                                            .map(cargo => (
+                                                                <Link 
+                                                                    key={cargo.id}
+                                                                    href={route('cargos.show', cargo.id)}
+                                                                    className="text-indigo-600 hover:underline"
+                                                                >
+                                                                    {cargo.nombre}
+                                                                </Link>
+                                                            ))
+                                                            .reduce((prev, curr) => [prev, ', ', curr])  // ✅ ahora sí no se rompe
+                                                        : '—'}
+                                                </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-2">
 
                                                     {/* Botón EDITAR */}

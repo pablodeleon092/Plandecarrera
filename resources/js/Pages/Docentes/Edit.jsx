@@ -2,7 +2,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Edit({ auth, docente }) {
+export default function Edit({ auth, docente,flash }) {
     const { data, setData, put, processing, errors } = useForm({
         legajo: docente.legajo ?? '',
         nombre: docente.nombre ?? '',
@@ -25,7 +25,17 @@ export default function Edit({ auth, docente }) {
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Editar Docente</h2>}
         >
             <Head title="Editar Docente" />
-
+            {flash?.success && (
+                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                        {flash?.success}
+                    </div>
+            )}
+            
+            {flash?.error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    {flash?.error}
+                </div>
+            )}
             <div className="py-12">
                 <div className="max-w-3xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -131,20 +141,29 @@ export default function Edit({ auth, docente }) {
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-end space-x-3">
+
+                                <div className="flex items-center justify-between space-x-3">
                                     <Link
-                                        href={route('docentes.index')}
+                                        href={route('docentes.addcargo', docente.id)}
                                         className="px-4 py-2 rounded-md border border-gray-300 text-gray-700"
                                     >
-                                        Cancelar
+                                        Agregar Cargo
                                     </Link>
-                                    <button
-                                        type="submit"
-                                        disabled={processing}
-                                        className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
-                                    >
-                                        Guardar cambios
-                                    </button>
+                                    <div className="flex space-x-3">
+                                        <Link
+                                            href={route('docentes.index')}
+                                            className="px-4 py-2 rounded-md border border-gray-300 text-gray-700"
+                                        >
+                                            Cancelar
+                                        </Link>
+                                        <button
+                                            type="submit"
+                                            disabled={processing}
+                                            className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
+                                        >
+                                            Guardar cambios
+                                        </button>                                        
+                                    </div>
                                 </div>
                             </form>
                         </div>

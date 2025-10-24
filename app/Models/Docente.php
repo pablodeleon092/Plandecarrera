@@ -21,4 +21,9 @@ class Docente extends Model
         'email',
     ];
     protected $table = 'docentes'; 
+
+    public function cargos()
+    {
+        return $this->hasMany(Cargo::class, 'docente_id');
+    }
 }

@@ -1,7 +1,7 @@
 <?php
-
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DocenteController;
+use App\Http\Controllers\CargoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CarreraController;
 use App\Http\Controllers\MateriaController;
@@ -26,6 +26,9 @@ Route::middleware('auth')->group(function () {
 
     // Rutas para la gestión de Docentes
     Route::resource('docentes', DocenteController::class);
+    Route::resource('cargos', CargoController::class);
+    Route::get('docentes/{docente}/cargo', [DocenteController::class, 'addCargo'])->name('docentes.addcargo');
+    Route::post('docentes/storecargo', [DocenteController::class, 'storeCargo'])->name('docentes.storecargo');
     Route::resource('materias', MateriaController::class);
 });
 Route::get('/test', fn () => Inertia::render('Test'))->name('test');
