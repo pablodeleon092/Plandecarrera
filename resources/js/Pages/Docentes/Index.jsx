@@ -5,6 +5,11 @@ import { Head, Link, useForm} from '@inertiajs/react';
 // Si tienes un componente de paginación, impórtalo:
 // import Pagination from '@/Components/Pagination'; 
 
+import ListHeader from '@/Components/ListHeader';
+import DataTable from '@/Components/DataTable';
+import TableFilters from '@/Components/TableFilters';
+import PaginatorButtons from '@/Components/PaginatorButtons';
+
 export default function Index({ auth, docentes, flash }) {
 
     // docs.data contiene el array de docentes.
@@ -119,11 +124,12 @@ export default function Index({ auth, docentes, flash }) {
                                         ))}
                                     </tbody>
                                 </table>
+                               <PaginatorButtons meta={docentes.meta} paginator={docentes} routeName={'docentes.index'} />
+                               
                             </div>
 
-                            {/* Paginación de Inertia (Si tienes un componente Pagination) */}
-                            {/* {docentes.links && <div className="mt-4"><Pagination links={docentes.links} /></div>} */}
-
+                       
+                         
                         </div>
                     </div>
                 </div>
