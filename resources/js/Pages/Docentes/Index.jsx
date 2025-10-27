@@ -94,7 +94,7 @@ export default function Index({ auth, docentes, flash }) {
                                                                     {cargo.nombre}
                                                                 </Link>
                                                             ))
-                                                            .reduce((prev, curr) => [prev, ', ', curr])  // ✅ ahora sí no se rompe
+                                                            .reduce((prev, curr) => [prev, ', ', curr])  
                                                         : '—'}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-2">

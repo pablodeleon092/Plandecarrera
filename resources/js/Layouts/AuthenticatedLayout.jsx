@@ -68,11 +68,14 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 </span>
                                             </Dropdown.Trigger>
                                                 <Dropdown.Content>
+                                                    <Dropdown.Link href={route('carreras.index')}>
+                                                        Carreras
+                                                    </Dropdown.Link>                                                
                                                     <Dropdown.Link href={route('materias.index')}>
                                                         Materias
                                                     </Dropdown.Link>
-                                                    <Dropdown.Link href={route('carreras.index')}>
-                                                        Carreras
+                                                    <Dropdown.Link href={route('comisiones.index')}>
+                                                        Comisiones
                                                     </Dropdown.Link>
                                                 </Dropdown.Content>
                                         </Dropdown>
