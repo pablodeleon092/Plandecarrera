@@ -25,6 +25,18 @@ class ComisionController extends Controller
         ]);
     }
 
+    public function show($id)
+    {
+        $comision = Comision::with('materia')->findOrFail($id);
+        $docentes = $comision->dictas()->exists() 
+            ? $comision->docentes_with_cargo
+            : collect(); // colección vacía
+        return Inertia::render('Comisiones/Show', [
+            'comision' => $comision,
+            'docentes' => $docentes,
+        ]);
+    }
+
     public function create()
     {
         $materias = \App\Models\Materia::where('estado', true)->get()->map(function ($materia) {
@@ -158,5 +170,15 @@ class ComisionController extends Controller
                     ->withInput();
         }
     
-    }  
+    }
+
+    public function destroy(Comision $comision)
+    {
+        try {
+            $comision->delete();
+            return redirect()->route('comisiones.index')->with('success', 'Comision eliminada.');
+        } catch (\Exception $e) {
+            return redirect()->route('comisiones.index')->with('error', 'No se puede eliminar la comision.');
+        }
+    }
 }

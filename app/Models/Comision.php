@@ -33,4 +33,32 @@ class Comision extends Model
         return $this->belongsTo(Materia::class, 'id_materia');
     }
 
+    public function docentes()
+    {
+        return $this->belongsToMany(Docente::class, 'dictas', 'comision_id', 'docente_id')
+                    ->withPivot('cargo_id', 'ano_inicio', 'año_fin', 'modalidad_presencia', 'horas_frente_aula', 'funcion_aulica_id')
+                    ->withTimestamps();
+    }
+
+    public function dictas()
+    {
+        return $this->hasMany(Dicta::class, 'comision_id');
+    }
+
+    public function getDocentesWithCargoAttribute()
+    {
+        return $this->dictas()->with(['docente', 'cargo'])->get()->map(function($dicta) {
+            return [
+                'id' => $dicta->docente->id,
+                'nombre' => $dicta->docente->nombre,
+                'apellido' => $dicta->docente->apellido,
+                'cargo' => $dicta->cargo->nombre ?? null,
+                'ano_inicio' => $dicta->ano_inicio,
+                'año_fin' => $dicta->año_fin,
+                'modalidad_presencia' => $dicta->modalidad_presencia,
+                'horas_frente_aula' => $dicta->horas_frente_aula,
+            ];
+        });
+    }
+
 }
