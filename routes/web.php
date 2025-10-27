@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DocenteController;
+use App\Http\Controllers\DictaController;
 use App\Http\Controllers\CargoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CarreraController;
@@ -28,6 +29,8 @@ Route::middleware('auth')->group(function () {
     // Rutas para la gestión de Docentes
     Route::resource('docentes', DocenteController::class);
     Route::resource('cargos', CargoController::class);
+    Route::resource('dictas', DictaController::class);
+
     Route::resource('comisiones', ComisionController::class);
     Route::get('docentes/{docente}/cargo', [DocenteController::class, 'addCargo'])->name('docentes.addcargo');
     Route::post('docentes/storecargo', [DocenteController::class, 'storeCargo'])->name('docentes.storecargo');

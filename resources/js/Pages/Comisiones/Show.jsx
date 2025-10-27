@@ -2,7 +2,7 @@ import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 
-export default function ShowComision({ auth, comision, materia, docentes }) {
+export default function ShowComision({ auth, comision, docentes }) {
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -128,6 +128,14 @@ export default function ShowComision({ auth, comision, materia, docentes }) {
                                             </table>
                                         )}
                                     </div>
+                                <div className="mb-4">
+                                    <Link
+                                     href={route('dictas.create', { comision_id: comision.id })}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-semibold transition"
+                                    >
+                                    Agregar Docente
+                                    </Link>
+                                </div>
                                 </div>
                             </div>
                         </div>

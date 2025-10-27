@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Dicta extends Model
 {
-    protected $fillabe = [
-        'id_comision',
-        'id_docente',
-        'id_cargo',
+    protected $fillable  = [
+        'comision_id',
+        'docente_id',
+        'cargo_id',
         'ano_inicio',
         'año_fin',
         'modalidad_presencia',
@@ -19,17 +19,17 @@ class Dicta extends Model
 
     public function comision()
     {
-        return $this->belongsTo(Comision::class, 'id_comision');
+        return $this->belongsTo(Comision::class, 'comision_id');
     }
 
     public function docente()
     {
-        return $this->belongsTo(Docente::class, 'id_docente');
+        return $this->belongsTo(Docente::class, 'docente_id');
     }
 
     public function cargo()
     {
-        return $this->belongsTo(Cargo::class, 'id_cargo');
+        return $this->belongsTo(Cargo::class, 'cargo_id');
     }
 
     public function funcionAulica()

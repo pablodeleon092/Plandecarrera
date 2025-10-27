@@ -135,16 +135,16 @@ class MateriaController extends Controller
             ->with('success', 'Materia actualizada exitosamente');
     }
 
-    public function destroy(Comision $comision)
+    public function destroy(Materia $materia)
     {
-        dd($comision);
         try {
-            $comision->delete();
-            return redirect()->route('comisiones.index')
-                ->with('success', 'comision eliminada exitosamente');
+            $materia->delete();
+            
+            return redirect()->route('materias.index')
+                ->with('success', 'Materia eliminada exitosamente');
         } catch (\Exception $e) {
-            return redirect()->route('comisiones.index')
-                ->with('error', 'No se puede eliminar la comision porque tiene registros asociados');
+            return redirect()->route('materias.index')
+                ->with('error', 'No se puede eliminar la materia porque tiene registros asociados');
         }
     }
 }
