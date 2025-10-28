@@ -15,8 +15,8 @@ export default function Create({ auth, docente, dedicaciones,flash}) {
 
     const submit = (e) => {
         e.preventDefault();
-        // Envía la petición POST. Inertia maneja la redirección o los errores 422.
-        post(route('docentes.storecargo')); 
+        // Envía la petición POST a la ruta correcta, pasando el ID del docente.
+        post(route('docentes.cargo.store', { docente: docente.id }));
     };
 
     return (

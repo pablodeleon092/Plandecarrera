@@ -32,8 +32,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('dictas', DictaController::class);
 
     Route::resource('comisiones', ComisionController::class);
-    Route::get('docentes/{docente}/cargo', [DocenteController::class, 'addCargo'])->name('docentes.addcargo');
-    Route::post('docentes/storecargo', [DocenteController::class, 'storeCargo'])->name('docentes.storecargo');
+    Route::get('docentes/{docente}/cargo/create', [DocenteController::class, 'createCargo'])->name('docentes.cargo.create');
+    Route::post('docentes/{docente}/cargo', [DocenteController::class, 'addCargo'])->name('docentes.cargo.store');
     Route::resource('materias', MateriaController::class);
 });
 Route::get('/test', fn () => Inertia::render('Test'))->name('test');
