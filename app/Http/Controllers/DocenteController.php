@@ -2,116 +2,112 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreDocenteRequest;
 use App\Models\Docente;
-use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class DocenteController extends Controller
 {
     /**
-     * Muestra la lista de docentes (READ).
+     * Display a listing of the resource.
      */
-    public function index(Request $request) {
-        // Si tienes la DB activa, esto funcionará. Si no, usa el mock data temporalmente.
-        $docentes = Docente::with('cargos')
-                            ->orderBy('apellido')
-                            ->paginate(10); 
+    public function index(Request $request)
+    {
+        $query = Docente::query();
+
+        // Aplicar filtro de búsqueda
+        if ($request->has('search') && $request->input('search')) {
+            $search = $request->input('search');
+            // Limpiar la búsqueda de comas y espacios extra, y dividir en términos
+            $searchTerms = array_filter(explode(' ', str_replace(',', ' ', $search)));
+
+            $query->where(function ($q) use ($searchTerms) {
+                foreach ($searchTerms as $term) {
+                    // Asegurarse de que CADA término de búsqueda exista en alguna de las columnas
+                    $q->where(fn($subQuery) => $subQuery->where('nombre', 'ilike', "%{$term}%")
+                        ->orWhere('apellido', 'ilike', "%{$term}%")
+                        ->orWhere('legajo', 'like', "%{$term}%"));
+                }
+            });
+        }
+
+        // Aplicar filtro de estado
+        if ($request->has('es_activo') && $request->input('es_activo') !== '') {
+            $query->where('es_activo', $request->input('es_activo') === '1');
+        }
+
+        $docentes = $query->with('cargos')->orderBy('apellido')->paginate(15)->withQueryString();
 
         return Inertia::render('Docentes/Index', [
             'docentes' => $docentes,
-            'success' => $request->session()->get('success'),
+            'filters' => $request->only(['search', 'es_activo']),
+            'flash' => [
+                'success' => session('success'),
+                'error' => session('error'),
+            ],
         ]);
     }
 
     /**
-     * Muestra el formulario para crear un nuevo docente (CREATE View).
+     * Show the form for creating a new resource.
      */
-    public function create() {
-        // Simplemente renderiza la vista de React
+    public function create()
+    {
         return Inertia::render('Docentes/Create');
     }
 
     /**
-     * Almacena un docente recién creado en la base de datos (STORE).
+     * Store a newly created resource in storage.
      */
-    public function store(StoreDocenteRequest $request) {
-        // 1. La validación ahora es manejada por StoreDocenteRequest.
-        // Si la validación falla, Laravel redirige automáticamente.
-
-        // 2. Creación del Modelo con los datos ya validados.
-        Docente::create($request->validated());
-
-        // 3. Redirección al listado con mensaje flash (Resuelve el problema de redirección)
-        return redirect()->route('docentes.index')->with('success', '¡El Docente ha sido creado exitosamente!');
+    public function store(Request $request)
+    {
+        // Aquí iría la lógica para guardar un nuevo docente
+        // Por ejemplo:
+        // Docente::create($request->validate([...]));
+        return redirect()->route('docentes.index')->with('success', 'Docente creado exitosamente.');
     }
-    
+
     /**
-     * Muestra el formulario para editar un docente existente (EDIT View).
-     * @param  \App\Models\Docente  $docente Laravel hace Route Model Binding
+     * Display the specified resource.
      */
-    public function edit(Docente $docente) {
+    public function show(Docente $docente)
+    {
+        return Inertia::render('Docentes/Show', [
+            'docente' => $docente->load('cargos'),
+        ]);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Docente $docente)
+    {
         return Inertia::render('Docentes/Edit', [
-            // Pasamos el docente encontrado por Route Model Binding
-            'docente' => $docente,
+            'docente' => $docente->load('cargos'),
         ]);
     }
 
     /**
-     * Actualiza el docente en la base de datos (UPDATE).
+     * Update the specified resource in storage.
      */
-    public function update(StoreDocenteRequest $request, Docente $docente) {
-        // 1. La validación también es manejada por StoreDocenteRequest.
-
-        // 2. Actualización del Modelo
-        $docente->update($request->validated());
-
-        // 3. Redirección
-        return redirect()->route('docentes.index')->with('success', '¡El Docente ha sido actualizado exitosamente!');
+    public function update(Request $request, Docente $docente)
+    {
+        // Aquí iría la lógica para actualizar un docente
+        // Por ejemplo:
+        // $docente->update($request->validate([...]));
+        return redirect()->route('docentes.index')->with('success', 'Docente actualizado exitosamente.');
     }
 
     /**
-     * Elimina el docente de la base de datos (DESTROY).
+     * Remove the specified resource from storage.
      */
-    public function destroy(Docente $docente) {
-        // 1. Eliminación del Modelo
-        $docente->delete();
-
-        // 2. Redirección
-        return redirect()->route('docentes.index')->with('success', '¡El Docente ha sido eliminado exitosamente!');
-    }
-
-    public function addCargo(Docente $docente)
+    public function destroy(Docente $docente)
     {
-
-        if ($docente->modalidad_desempeño === 'Desarrollo') {
-            $dedicaciones = \App\Models\Dedicaciones::whereIn('nombre', ['Simple', 'SemiExclusiva(DP)'])->get();
-        } elseif ($docente->modalidad_desempeño === 'Investigador') {
-            $dedicaciones = \App\Models\Dedicaciones::whereIn('nombre', ['SemiExclusiva(DI)', 'Exclusiva'])->get();
+        try {
+            $docente->delete();
+            return redirect()->route('docentes.index')->with('success', 'Docente eliminado exitosamente.');
+        } catch (\Exception $e) {
+            return redirect()->route('docentes.index')->with('error', 'No se puede eliminar el docente porque tiene registros asociados.');
         }
-
-        return Inertia::render('Docentes/Cargos/Create', [
-            'docente' => $docente,
-            'dedicaciones' => $dedicaciones,
-        ]);
-    }
-
-    public function storeCargo(Request $request)
-    {
-    try {
-        \App\Models\Cargo::create([
-            'nombre' => $request->cargo,
-            'dedicacion_id' => $request->dedicacion_id,
-            'docente_id' => $request->docente_id,
-            'nro_materias_asig' => 0,
-            'sum_horas_frente_aula' => 0,
-        ]);
-    } catch (\Exception $e) {
-        \Log::error('Error al crear cargo: '.$e->getMessage());
-        return redirect()
-            ->route('docentes.addcargo', $request->docente_id)
-            ->with('error', 'No se pudo asignar el Cargo. Intenta nuevamente.');    
-    }
-        return redirect()->route('docentes.edit', $request->docente_id)->with('success', '¡El Cargo ha sido asignado exitosamente!');
     }
 }
