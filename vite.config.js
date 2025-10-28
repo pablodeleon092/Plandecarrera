@@ -8,7 +8,18 @@ export default defineConfig({
         port: 5173,
         strictPort: true,
         hmr: {
+
             host: 'localhost',
+
+            protocol: 'ws',
+        },
+        // Enable CORS for the dev server and allow the server to echo back
+        // the incoming Origin. This is necessary when your browser loads the
+        // page from a different machine (host) than the VM/container running
+        // the Vite dev server.
+        cors: {
+            origin: true, // echo request origin
+            credentials: true,
         },
     },
     plugins: [

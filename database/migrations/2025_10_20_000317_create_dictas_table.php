@@ -36,7 +36,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('funciones_aulicas');
         Schema::dropIfExists('dictas');
+        Schema::dropIfExists('funciones_aulicas');
+        
     }
 };
