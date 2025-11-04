@@ -172,9 +172,10 @@ class ComisionController extends Controller
     
     }
 
-    public function destroy(Comision $comision)
+    public function destroy($id)
     {
         try {
+            $comision = Comision::findOrFail($id);
             $comision->delete();
             return redirect()->route('comisiones.index')->with('success', 'Comision eliminada.');
         } catch (\Exception $e) {
