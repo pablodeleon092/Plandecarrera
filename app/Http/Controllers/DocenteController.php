@@ -120,9 +120,24 @@ class DocenteController extends Controller
      */
     public function createCargo(Docente $docente)
     {
+        
+        if ($docente->modalidad_desempeño === 'Desarrollo') {
+
+
+            $dedicaciones = \App\Models\Dedicaciones::whereIn('nombre', ['Simple', 'SemiExclusiva(DP)'])->get();
+
+
+        } elseif ($docente->modalidad_desempeño === 'Investigador') {
+
+
+            $dedicaciones = \App\Models\Dedicaciones::whereIn('nombre', ['SemiExclusiva(DI)', 'Exclusiva'])->get();
+
+
+        }
+
         return Inertia::render('Docentes/Cargos/Create', [
             'docente' => $docente->load('cargos'),
-            'dedicaciones' => Dedicacion::all()
+            'dedicaciones' => $dedicaciones,
         ]);
     }
 

@@ -21,10 +21,10 @@ class CargoController extends Controller
 
     public function destroy(Cargo $cargo)
     {
-        // 1. Eliminación del Modelo
+
         $cargo->delete();
 
-        // 2. Redirección
+
         return redirect()->route('docentes.index')->with('success', '¡El Cargo ha sido eliminado exitosamente!');    
     }
 
