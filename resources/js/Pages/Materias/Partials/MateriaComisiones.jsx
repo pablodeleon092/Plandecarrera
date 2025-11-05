@@ -1,11 +1,10 @@
 // resources/js/Pages/Materias/Partials/MateriaComisiones.jsx
 import { Link } from '@inertiajs/react';
 
-export default function MateriaComisiones({ comisiones }) {
+export default function MateriaComisiones({ comisiones, materia }) {
     return (
         <div>
             <h3 className="text-2xl font-bold mb-6">Comisiones de la Materia</h3>
-
             {comisiones.length > 0 ? (
                 <ul className="divide-y divide-gray-200">
                     {comisiones.map((comision) => (
@@ -25,6 +24,16 @@ export default function MateriaComisiones({ comisiones }) {
             ) : (
                 <p className="text-gray-600">No hay comisiones registradas para esta materia.</p>
             )}
+            <div>
+                <div className="mt-4">
+                    <Link
+                        href={route('comisiones.create', { materia_id: materia.id })}
+                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-semibold transition"
+                        >
+                        Agregar Comision
+                    </Link>
+                </div>
+            </div>
         </div>
     );
 }

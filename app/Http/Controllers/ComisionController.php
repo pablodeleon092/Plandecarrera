@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Comision;
+use App\Models\Materia;
 use Inertia\Inertia;
 use Illuminate\Validation\Rule;
 
@@ -37,17 +38,15 @@ class ComisionController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $materias = \App\Models\Materia::where('estado', true)->get()->map(function ($materia) {
-            return [
-                'id' => $materia->id,
-                'nombre' => $materia->nombre,
-                'codigo' => $materia->codigo,
-            ];
-        });
+
+        $materiaId = $request->query('materia_id');
+
+        $materia = Materia::findOrFail($materiaId);
+
         return Inertia::render('Comisiones/Create', [
-            'materias' => $materias,
+            'materia' => $materia,
         ]);
     }
     

@@ -50,7 +50,7 @@ export default function Show({ auth, materia, comisiones }) {
                         {currentTab === 'informacion' ? (
                             <MateriaInfo materia={materia} />
                         ) : (
-                            <MateriaComisiones comisiones={comisiones} />
+                            <MateriaComisiones comisiones={comisiones}  materia={materia}/>
                         )}
                     </div>
                 </div>
