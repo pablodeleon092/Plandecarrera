@@ -83,19 +83,8 @@ class MateriaController extends Controller
     public function show(Materia $materia)
     {
         return Inertia::render('Materias/Show', [
-            'materia' => [
-                'id' => $materia->id,
-                'nombre' => $materia->nombre,
-                'codigo' => $materia->codigo,
-                'estado' => $materia->estado,
-                'estado_nombre' => $materia->estado_nombre,
-                'regimen' => $materia->regimen,
-                'regimen_nombre' => $materia->regimen_nombre,
-                'cuatrimestre' => $materia->cuatrimestre,
-                'horas_semanales' => $materia->horas_semanales,
-                'horas_totales' => $materia->horas_totales,
-                'created_at' => $materia->created_at->format('d/m/Y H:i'),
-            ]
+            'materia' => $materia,
+            'comisiones' => $materia->comisiones()->get(),
         ]);
     }
 

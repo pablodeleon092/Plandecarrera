@@ -74,7 +74,7 @@ class DocenteController extends Controller
     public function show(Docente $docente)
     {
         return Inertia::render('Docentes/Show', [
-            'docente' => $docente->load('cargos'),
+            'docente' => $docente->load('cargos.dedicacion'),
         ]);
     }
 

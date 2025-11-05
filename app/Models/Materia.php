@@ -43,6 +43,11 @@ class Materia extends Model
 
     //Relacion con las Comisiones
 
+    public function comisiones()
+    {
+        return $this->hasMany(Comision::class, 'id_materia');
+    }
+
     //Accessors y Mutators
 
     /**
