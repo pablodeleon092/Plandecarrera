@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function CreateDicta({ auth, comision, docente, funcionesAulicas }) {
+export default function CreateDicta({ auth, comision, flash, docente, funcionesAulicas }) {
     const { data, setData, post, errors } = useForm({
         comision_id: comision.id,
         docente_id: docente.id,
@@ -25,6 +25,17 @@ export default function CreateDicta({ auth, comision, docente, funcionesAulicas 
             header={<h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">Comisión: {comision.nombre}</h2>}
         >
             <Head title={`Comisión: ${comision.nombre}`} />
+
+                    {flash?.success && (
+                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                            {flash.success}
+                        </div>
+                    )}
+                    {flash?.error && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                            {flash.error}
+                        </div>
+                    )}
 
             <div className="py-8">
                 <div className="container mx-auto px-4 max-w-lg bg-white rounded-lg shadow-lg p-6">

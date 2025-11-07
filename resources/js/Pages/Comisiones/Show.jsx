@@ -4,7 +4,7 @@ import { Head, Link } from '@inertiajs/react';
 import ComisionInfo from './Partials/ComisionInfo';
 import ComisionDocentes from './Partials/ComisionDocentes';
 
-export default function ShowComision({ auth, comision, docentes, allDocentes}) {
+export default function ShowComision({ auth, comision, flash, docentes, allDocentes}) {
 
     const [currentTab, setCurrentTab] = useState('informacion');
     return (
@@ -16,7 +16,16 @@ export default function ShowComision({ auth, comision, docentes, allDocentes}) {
 
             <div className="bg-gray-50 py-8">
                 <div className="container mx-auto px-4 max-w-5xl">
-
+                    {flash?.success && (
+                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                            {flash.success}
+                        </div>
+                    )}
+                    {flash?.error && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                            {flash.error}
+                        </div>
+                    )}
                     {/* Tabs */}
                     <div className="px-8 pt-6">
                         <div className="flex gap-4 mb-6">
