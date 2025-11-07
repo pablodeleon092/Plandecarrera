@@ -32,9 +32,11 @@ class ComisionController extends Controller
         $docentes = $comision->dictas()->exists() 
             ? $comision->docentes_with_cargo
             : collect(); // colección vacía
+        $allDocentes = \App\Models\Docente::where('es_activo',true)->get();
         return Inertia::render('Comisiones/Show', [
             'comision' => $comision,
             'docentes' => $docentes,
+            'allDocentes' => $allDocentes,
         ]);
     }
 

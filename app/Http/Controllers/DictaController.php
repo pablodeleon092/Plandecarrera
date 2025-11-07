@@ -20,25 +20,13 @@ class DictaController extends Controller
         $comision = Comision::with('materia')->findOrFail($request->comision_id);
 
 
-        $docentes = \App\Models\Docente::with('cargos')->get()->map(function($docente) {
-            return [
-                'id' => $docente->id,
-                'nombre' => $docente->nombre,
-                'apellido' => $docente->apellido,
-                'cargos' => $docente->cargos->map(function($cargo) {
-                    return [
-                        'id' => $cargo->id,
-                        'nombre' => $cargo->nombre,
-                    ];
-                }),
-            ];
-        });
+        $docente = \App\Models\Docente::with('cargos')->findOrFail($request->docente_id);
 
         $funcionesAulicas = FuncionAulica::all();
 
         return Inertia::render('Comisiones/Dictas/Create', [
             'comision' => $comision,
-            'docentes' => $docentes,
+            'docente' => $docente,
             'funcionesAulicas' => $funcionesAulicas,
         ]);
     }
@@ -82,6 +70,14 @@ class DictaController extends Controller
             ->with('success', 'Docente vinculado exitosamente a la comisión.');
     }
 
+    public function destroy($id)
+    {
+        $dicta = \App\Models\Dicta::findOrFail($id);
+        $comisionId = $dicta->comision_id;
+        $dicta->delete();
 
+        return redirect()->route('comisiones.show', $comisionId)
+            ->with('success', 'Vinculación del docente eliminada exitosamente.');
+    }
 
 }
