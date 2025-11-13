@@ -8,19 +8,17 @@ use App\Models\Instituto;
 use App\Models\Materia;
 use App\Models\Plan;
 use Inertia\Inertia;
+// ¡Importante! Agregar esto para la validación
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rule;
+
 class CarreraController extends Controller
 {
     public function index()
     {
-        // Authorize if a policy exists for Carrera
-        try {
-            $this->authorize('index', Carrera::class);
-        } catch (\Throwable $e) {
-            // If no policy exists, ignore and continue
-        }
-
+        // ... (Tu código de index)
+        // ...
         $carreras = Carrera::with('instituto')->orderBy('id', 'desc')->paginate(15)->withQueryString();
-        
         $institutos = Instituto::select('id', 'siglas')->get();
 
         return Inertia::render('Carreras/Index', [
@@ -29,48 +27,65 @@ class CarreraController extends Controller
         ]);
     }
 
+    // --- NUEVO MÉTODO 'CREATE' ---
+    // Muestra la vista para crear una nueva carrera
+    public function create()
+    {
+        // Pasamos los institutos para poder mostrarlos en un <select>
+        return Inertia::render('Carreras/Create', [
+            'institutos' => Instituto::select('id', 'siglas')->get()
+        ]);
+    }
+
+    // --- NUEVO MÉTODO 'STORE' ---
+    // Guarda la nueva carrera en la base de datos
+    public function store(Request $request)
+    {
+        // Validación de los datos
+        $request->validate([
+            'nombre' => 'required|string|max:255|unique:carreras',
+            'codigo' => 'required|string|max:50|unique:carreras',
+            'duracion_anios' => 'required|integer|min:1|max:10',
+            'titulo_que_otorga' => 'required|string|max:255',
+            'instituto_id' => 'required|integer|exists:institutos,id',
+        ]);
+
+        // Creación de la carrera
+        Carrera::create([
+            'nombre' => $request->nombre,
+            'codigo' => $request->codigo,
+            'duracion_anios' => $request->duracion_anios,
+            'titulo_que_otorga' => $request->titulo_que_otorga,
+            'instituto_id' => $request->instituto_id,
+        ]);
+
+        // Redireccionamos al index (o a donde quieras) con un mensaje
+        return Redirect::route('carreras.index')->with('success', 'Carrera creada exitosamente.');
+    }
+
+    // --- NUEVO MÉTODO 'SHOW' ---
+    // Muestra una carrera específica
+    public function show(Carrera $carrera)
+    {
+        // Cargamos la relación con instituto (si no viene por defecto)
+        $carrera->load('instituto');
+
+        return Inertia::render('Carreras/Show', [
+            'carrera' => $carrera
+        ]);
+    }
+
     public function edit(Carrera $carrera)
     {
-        // Authorize if a policy exists for Carrera
-        try {
-            $this->authorize('edit', Carrera::class);
-        } catch (\Throwable $e) {
-            // If no policy exists, ignore and continue
-        }
-
-        $plan = $carrera->planActual();
-
-        $materiasEnPlan = $plan ? $plan->materias()->get() : collect();
-
-        $materiasDisponibles = Materia::whereNotIn('id', $materiasEnPlan->pluck('id'))->get();
-
-
-        return Inertia::render('Carreras/Edit', [
-            'carrera' => $carrera,
-            'plan' => $plan,
-            'materiasEnPlan' => $materiasEnPlan,
-            'materiasDisponibles' => $materiasDisponibles,
-        ]);
+        // ... (Tu código de edit)
+        // ...
     }
 
     public function update(Request $request)
     {
-        $plan_id = $request->input('plan');
-        $plan = Plan::findOrFail($plan_id);
-        $materiasRecibidas = $request->input('materias', []);
-
-        $plan->materias()->sync($materiasRecibidas);
-
-        return redirect()->back()->with('success', 'Cambios al plan exitosamente guardados.');
+        // ... (Tu código de update para el Plan)
+        // ...
     }
-
-    private function addMateriaToPlan(Plan $plan, integer $materia)
-    {
-        $plan->materias()->attach($materia->id);
-    }
-
-    private function removeMateriaFromPlan(Plan $plan, Materia $materia)
-    {
-        $plan->materias()->detach($materia->id);
-    }
+    
+    // ... (Tus métodos privados)
 }
