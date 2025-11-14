@@ -91,15 +91,42 @@ class CarreraController extends Controller
 
     public function edit(Carrera $carrera)
     {
-        // ... (Tu código de edit)
-        // ...
+        // Buscamos el primer plan de la carrera. Si no existe, lo creamos.
+        $plan = $carrera->planes()->firstOrCreate([]);
+
+        // Obtenemos las materias que ya están en el plan
+        $materiasEnPlan = $plan->materias()->get();
+
+        // Obtenemos los IDs de las materias que ya están en el plan
+        $materiasEnPlanIds = $materiasEnPlan->pluck('id');
+
+        // Obtenemos las materias que NO están en el plan para mostrarlas como disponibles
+        $materiasDisponibles = Materia::whereNotIn('id', $materiasEnPlanIds)->get();
+
+        return Inertia::render('Carreras/Edit', [
+            'carrera' => $carrera,
+            'plan' => $plan,
+            'materiasEnPlan' => $materiasEnPlan,
+            'materiasDisponibles' => $materiasDisponibles,
+            'flash' => session()->only(['success', 'error']),
+        ]);
     }
 
-    public function update(Request $request)
+    public function update(Request $request, Carrera $carrera)
     {
-        // ... (Tu código de update para el Plan)
-        // ...
+        $validated = $request->validate([
+            'materias' => 'present|array', // 'present' asegura que la clave 'materias' exista, incluso si el array está vacío
+            'materias.*' => 'integer|exists:materias,id', // Valida que cada elemento sea un ID de materia existente
+            'plan' => 'required|integer|exists:planes,id'
+        ]);
+
+        // Buscamos el plan para asegurarnos de que pertenece a la carrera (por seguridad)
+        $plan = $carrera->planes()->findOrFail($validated['plan']);
+
+        // Sincronizamos las materias del plan.
+        // sync() se encarga de añadir, eliminar y mantener las relaciones necesarias.
+        $plan->materias()->sync($validated['materias']);
+
+        return Redirect::route('carreras.edit', $carrera->id)->with('success', 'Plan de estudios actualizado correctamente.');
     }
-    
-    // ... (Tus métodos privados)
 }
