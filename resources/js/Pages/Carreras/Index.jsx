@@ -114,10 +114,8 @@ export default function Index({ auth, carreras }) {
     };
 
     const handleToggleStatus = (carrera) => {
-        const action = carrera.estado === 'activa' ? 'desactivar' : 'activar';
-        if (confirm(`¿Estás seguro de ${action} esta carrera?`)) {
-            router.patch(route('carreras.toggleStatus', carrera.id), {}, { preserveScroll: true });
-        }
+        // Realiza la petición para cambiar el estado directamente, sin confirmación.
+        router.patch(route('carreras.toggleStatus', carrera.id), {}, { preserveScroll: true });
     };
 
     return (
