@@ -23,17 +23,19 @@ return new class extends Migration
             
             $table->enum('sede', ['Ushuaia', 'Rio Grande', 'Ushuaia/Rio Grande']);
 
-            $table->string('estado') ->default('activa')->change();
+            $table->boolean('estado')->default(true)->after('sede');
 
             $table->timestamps();
         });
-    }
+    }    
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('carreras');
+        Schema::table('carreras', function (Blueprint $table) {
+            $table->dropColumn('estado');
+        });
     }
 };

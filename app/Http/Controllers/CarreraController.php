@@ -27,8 +27,8 @@ class CarreraController extends Controller
                         });
                 });
             })
-            ->when($filters['estado'] ?? null, function ($query, $estado) {
-                $query->where('estado', $estado);
+            ->when(isset($filters['estado']) && $filters['estado'] !== '', function ($query) use ($filters) {
+                $query->where('estado', $filters['estado'] === 'true');
             })
             ->orderBy('id', 'desc')
             ->paginate(15)
@@ -73,7 +73,7 @@ class CarreraController extends Controller
             'duracion_anios' => $request->duracion_anios,
             'titulo_que_otorga' => $request->titulo_que_otorga,
             'instituto_id' => $request->instituto_id,
-            'estado' => 'activa', // Establecemos el estado por defecto
+            'estado' => true, // Establecemos el estado por defecto como booleano
         ]);
 
         // Redireccionamos al index (o a donde quieras) con un mensaje
@@ -94,15 +94,14 @@ class CarreraController extends Controller
 
     public function toggleStatus(Carrera $carrera)
     {
-        // Cambia el estado: si es 'activa', lo pone 'inactiva', y viceversa.
-        $nuevoEstado = $carrera->estado === 'activa' ? 'inactiva' : 'activa';
-        $carrera->update(['estado' => $nuevoEstado]);
+        $carrera->estado = !$carrera->estado;
+        $carrera->save();
 
-        $accion = $nuevoEstado === 'activa' ? 'activada' : 'desactivada';
-        $mensaje = "La carrera '{$carrera->nombre}' ha sido {$accion}.";
+        $accion = $carrera->estado ? 'activada' : 'desactivada';
+        $mensaje = "La carrera '{$carrera->nombre}' ha sido {$accion}."; // Corrected variable name
 
         // Redirige a la página anterior con un mensaje de éxito.
-        return back()->with('success', $mensaje);
+        return redirect()->back()->with('success', $mensaje);
     }
 
 

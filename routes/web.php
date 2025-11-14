@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::post('docentes/{docente}/cargo', [DocenteController::class, 'addCargo'])->name('docentes.cargo.store');
     Route::resource('materias', MateriaController::class);
 });
+Route::patch('materias/{materia}/toggle-status', [MateriaController::class, 'toggleStatus'])->name('materias.toggleStatus')->middleware('auth');
 Route::get('/test', fn () => Inertia::render('Test'))->name('test');
 
 /*

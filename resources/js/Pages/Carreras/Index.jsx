@@ -5,22 +5,23 @@ import ListHeader from '@/Components/ListHeader';
 import DataTable from '@/Components/DataTable';
 import TableFilters from '@/Components/TableFilters';
 import PaginatorButtons from '@/Components/PaginatorButtons';
-import { useDebounce } from 'use-debounce';
 
 export default function Index({ auth, carreras, filters: initialFilters }) {
     const [filters, setFilters] = useState({
         search: initialFilters.search || '',
-        estado: initialFilters.estado || '',
+        estado: initialFilters.estado ?? '',
     });
 
-    const [debouncedFilters] = useDebounce(filters, 300);
-
     useEffect(() => {
-        router.get(route('carreras.index'), debouncedFilters, {
-            preserveState: true,
-            replace: true,
-        });
-    }, [debouncedFilters]);
+        const timeout = setTimeout(() => {
+            router.get(route('carreras.index'), filters, {
+                preserveState: true,
+                replace: true,
+            });
+        }, 300);
+
+        return () => clearTimeout(timeout);
+    }, [filters]);
 
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({ ...prev, [key]: value }));
@@ -40,8 +41,8 @@ export default function Index({ auth, carreras, filters: initialFilters }) {
             type: 'select',
             value: filters.estado,
             options: [
-                { value: 'activa', label: 'Activa' },
-                { value: 'inactiva', label: 'Inactiva' }
+                { value: 'true', label: 'Activa' },
+                { value: 'false', label: 'Inactiva' }
             ]
         }
     ];
@@ -68,11 +69,11 @@ export default function Index({ auth, carreras, filters: initialFilters }) {
             label: 'Estado',
             render: (carrera) => (
                 <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    carrera.estado === 'activa' 
+                    carrera.estado
                         ? 'bg-green-100 text-green-800' 
                         : 'bg-yellow-100 text-yellow-800'
                 }`}>
-                    {carrera.estado === 'activa' ? 'Activa' : 'Inactiva'}
+                    {carrera.estado ? 'Activa' : 'Inactiva'}
                 </span>
             )
         }
