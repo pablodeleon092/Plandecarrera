@@ -1,25 +1,30 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import ListHeader from '@/Components/ListHeader';
 import DataTable from '@/Components/DataTable';
 import TableFilters from '@/Components/TableFilters';
 import PaginatorButtons from '@/Components/PaginatorButtons';
+import { useDebounce } from 'use-debounce';
 
-export default function Index({ auth, carreras }) {
+export default function Index({ auth, carreras, filters: initialFilters }) {
     const [filters, setFilters] = useState({
-        search: '',
-        modalidad: '',
-        sede: ''
+        search: initialFilters.search || '',
+        estado: initialFilters.estado || '',
     });
+
+    const [debouncedFilters] = useDebounce(filters, 300);
+
+    useEffect(() => {
+        router.get(route('carreras.index'), debouncedFilters, {
+            preserveState: true,
+            replace: true,
+        });
+    }, [debouncedFilters]);
 
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({ ...prev, [key]: value }));
     };
-
-    // Get unique modalidades and sedes for filter options
-    const modalidades = [...new Set(carreras.data.map(c => c.modalidad))].filter(Boolean);
-    const sedes = [...new Set(carreras.data.map(c => c.sede))].filter(Boolean);
 
     const filterConfig = [
         {
@@ -27,35 +32,19 @@ export default function Index({ auth, carreras }) {
             label: 'Buscar',
             type: 'text',
             value: filters.search,
-            placeholder: 'Buscar por nombre o instituto...'
+            placeholder: 'Buscar por nombre, instituto...'
         },
         {
-            key: 'modalidad',
-            label: 'Modalidad',
+            key: 'estado',
+            label: 'Estado',
             type: 'select',
-            value: filters.modalidad,
-            options: modalidades.map(m => ({ value: m, label: m }))
-        },
-        {
-            key: 'sede',
-            label: 'Sede',
-            type: 'select',
-            value: filters.sede,
-            options: sedes.map(s => ({ value: s, label: s }))
+            value: filters.estado,
+            options: [
+                { value: 'activa', label: 'Activa' },
+                { value: 'inactiva', label: 'Inactiva' }
+            ]
         }
     ];
-
-    const filteredData = useMemo(() => {
-        return carreras.data.filter(carrera => {
-            const matchSearch = !filters.search || 
-                carrera.nombre.toLowerCase().includes(filters.search.toLowerCase()) ||
-                (carrera.instituto?.siglas || '').toLowerCase().includes(filters.search.toLowerCase());
-            const matchModalidad = !filters.modalidad || carrera.modalidad === filters.modalidad;
-            const matchSede = !filters.sede || carrera.sede === filters.sede;
-            
-            return matchSearch && matchModalidad && matchSede;
-        });
-    }, [carreras.data, filters]);
 
     const columns = [
         {
@@ -73,24 +62,6 @@ export default function Index({ auth, carreras }) {
                 </span>
             )
         },
-        {
-            key: 'modalidad',
-            label: 'Modalidad',
-            render: (carrera) => (
-                <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                    {carrera.modalidad || '-'}
-                </span>
-            )
-        },
-        {
-            key: 'sede',
-            label: 'Sede',
-            render: (carrera) => (
-                <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                    {carrera.sede || '-'}
-                </span>
-            )
-        }
         ,
         {
             key: 'estado',
@@ -142,7 +113,7 @@ export default function Index({ auth, carreras }) {
                     <div className="bg-white rounded-lg shadow overflow-hidden">
                         <DataTable 
                             columns={columns}
-                            data={filteredData}
+                            data={carreras.data}
                             onShow={(carrera) => router.visit(route('carreras.show', carrera.id))}
                             onEdit={(carrera) => router.visit(route('carreras.edit', carrera.id))}
                             onDelete={handleDelete}
@@ -164,18 +135,7 @@ export default function Index({ auth, carreras }) {
                             <p className="text-sm text-gray-600">Total Carreras</p>
                             <p className="text-2xl font-bold text-gray-900">{carreras.meta?.total || carreras.data.length}</p>
                         </div>
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <p className="text-sm text-gray-600">Modalidades</p>
-                            <p className="text-2xl font-bold text-blue-600">
-                                {modalidades.length}
-                            </p>
-                        </div>
-                        <div className="bg-white rounded-lg shadow p-4">
-                            <p className="text-sm text-gray-600">Sedes</p>
-                            <p className="text-2xl font-bold text-green-600">
-                                {sedes.length}
-                            </p>
-                        </div>
+                        {/* Aquí puedes agregar más tarjetas de estadísticas si lo necesitas */}
                     </div>
                 </div>
             </div>

@@ -16,14 +16,30 @@ class CarreraController extends Controller
 {
     public function index()
     {
-        // ... (Tu código de index)
-        // ...
-        $carreras = Carrera::with('instituto')->orderBy('id', 'desc')->paginate(15)->withQueryString();
+        $filters = request()->only(['search', 'estado']);
+
+        $carreras = Carrera::with('instituto')
+            ->when($filters['search'] ?? null, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('nombre', 'like', '%' . $search . '%')
+                        ->orWhereHas('instituto', function ($query) use ($search) {
+                            $query->where('siglas', 'like', '%' . $search . '%');
+                        });
+                });
+            })
+            ->when($filters['estado'] ?? null, function ($query, $estado) {
+                $query->where('estado', $estado);
+            })
+            ->orderBy('id', 'desc')
+            ->paginate(15)
+            ->withQueryString();
+
         $institutos = Instituto::select('id', 'siglas')->get();
 
         return Inertia::render('Carreras/Index', [
             'carreras' => $carreras,
             'institutos' => $institutos,
+            'filters' => $filters,
         ]);
     }
 
@@ -57,6 +73,7 @@ class CarreraController extends Controller
             'duracion_anios' => $request->duracion_anios,
             'titulo_que_otorga' => $request->titulo_que_otorga,
             'instituto_id' => $request->instituto_id,
+            'estado' => 'activa', // Establecemos el estado por defecto
         ]);
 
         // Redireccionamos al index (o a donde quieras) con un mensaje
