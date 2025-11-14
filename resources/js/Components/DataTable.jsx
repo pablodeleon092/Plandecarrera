@@ -5,7 +5,8 @@ export default function DataTable({
     data = [], 
     onShow, 
     onEdit, 
-    onDelete, 
+    onDelete,
+    onToggleStatus,
     emptyMessage = 'Sin registros.',
     emptyIcon,
     actions = true,
@@ -81,6 +82,19 @@ export default function DataTable({
                     </svg>
                 </button>
             )}
+            {onToggleStatus && (
+                <button
+                    onClick={() => onToggleStatus(item)}
+                    className={`transition ${item.estado === 'activa' ? 'text-yellow-500 hover:text-yellow-700' : 'text-green-500 hover:text-green-700'}`}
+                    title={item.estado === 'activa' ? 'Desactivar' : 'Activar'}
+                >
+                    {item.estado === 'activa' ? (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                    ) : (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    )}
+                </button>
+            )}
         </div>
     );
 
@@ -98,7 +112,7 @@ export default function DataTable({
                                     {col.label}
                                 </th>
                             ))}
-                            {actions && (onShow || onEdit || onDelete) && (
+                            {actions && (onShow || onEdit || onDelete || onToggleStatus) && (
                                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Acciones
                                 </th>
@@ -109,7 +123,7 @@ export default function DataTable({
                         {data.length === 0 ? (
                             <tr>
                                 <td 
-                                    colSpan={columns.length + (actions && (onShow || onEdit || onDelete) ? 1 : 0)} 
+                                    colSpan={columns.length + (actions && (onShow || onEdit || onDelete || onToggleStatus) ? 1 : 0)} 
                                     className="px-6 py-8 text-center text-gray-500"
                                 >
                                     <div className="flex flex-col items-center">
@@ -131,7 +145,7 @@ export default function DataTable({
                                             {col.render ? col.render(item) : item[col.key]}
                                         </td>
                                     ))}
-                                    {actions && (onShow || onEdit || onDelete) && (
+                                    {actions && (onShow || onEdit || onDelete || onToggleStatus) && (
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <ActionButtons item={item} />
                                         </td>

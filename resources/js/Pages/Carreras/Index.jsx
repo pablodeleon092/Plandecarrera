@@ -91,11 +91,32 @@ export default function Index({ auth, carreras }) {
                 </span>
             )
         }
+        ,
+        {
+            key: 'estado',
+            label: 'Estado',
+            render: (carrera) => (
+                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                    carrera.estado === 'activa' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                }`}>
+                    {carrera.estado === 'activa' ? 'Activa' : 'Inactiva'}
+                </span>
+            )
+        }
     ];
 
     const handleDelete = (carrera) => {
         if (confirm('¿Estás seguro de eliminar esta carrera?')) {
             router.delete(route('carreras.destroy', carrera.id));
+        }
+    };
+
+    const handleToggleStatus = (carrera) => {
+        const action = carrera.estado === 'activa' ? 'desactivar' : 'activar';
+        if (confirm(`¿Estás seguro de ${action} esta carrera?`)) {
+            router.patch(route('carreras.toggleStatus', carrera.id), {}, { preserveScroll: true });
         }
     };
 
@@ -127,6 +148,7 @@ export default function Index({ auth, carreras }) {
                             onShow={(carrera) => router.visit(route('carreras.show', carrera.id))}
                             onEdit={(carrera) => router.visit(route('carreras.edit', carrera.id))}
                             onDelete={handleDelete}
+                            onToggleStatus={handleToggleStatus}
                             hover={true}
                             emptyMessage="No se encontraron carreras"
                             emptyIcon={

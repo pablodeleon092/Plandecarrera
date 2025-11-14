@@ -75,6 +75,20 @@ class CarreraController extends Controller
         ]);
     }
 
+    public function toggleStatus(Carrera $carrera)
+    {
+        // Cambia el estado: si es 'activa', lo pone 'inactiva', y viceversa.
+        $nuevoEstado = $carrera->estado === 'activa' ? 'inactiva' : 'activa';
+        $carrera->update(['estado' => $nuevoEstado]);
+
+        $accion = $nuevoEstado === 'activa' ? 'activada' : 'desactivada';
+        $mensaje = "La carrera '{$carrera->nombre}' ha sido {$accion}.";
+
+        // Redirige a la página anterior con un mensaje de éxito.
+        return back()->with('success', $mensaje);
+    }
+
+
     public function edit(Carrera $carrera)
     {
         // ... (Tu código de edit)
