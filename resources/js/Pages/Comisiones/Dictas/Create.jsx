@@ -8,7 +8,7 @@ export default function CreateDicta({ auth, comision, docentes, funcionesAulicas
         docente_id: '',
         cargo_id: '',
         horas_frente_aula: '',
-        modalidad_presencia: 'presencial',
+        modalidad_presencia: 'Presencial',
         ano_inicio: comision.anio,
         año_fin: '',
         funcion_aulica_id: '',

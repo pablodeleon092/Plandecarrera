@@ -8,7 +8,7 @@ export default function Create({ auth, materias, flash }) {
         codigo: '', 
         nombre: '',
         turno: 'Mañana',
-        modalidad: 'presencial', 
+        modalidad: 'Presencial', 
         sede: 'Ushuaia', 
         cuatrimestre: '1ro',
         anio: '',
