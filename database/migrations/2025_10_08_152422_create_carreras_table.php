@@ -23,6 +23,8 @@ return new class extends Migration
             
             $table->enum('sede', ['Ushuaia', 'Rio Grande', 'Ushuaia/Rio Grande']);
 
+            $table->string('estado') ->default('activa')->change();
+
             $table->timestamps();
         });
     }
