@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm, router } from '@inertiajs/react';
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import PrimaryButton from '@/Components/PrimaryButton';
+import DangerButton from '@/Components/DangerButton';
 
 export default function Edit({ auth, plan, carrera, materiasEnPlan, materiasDisponibles,flash }) {
     const [enPlan, setEnPlan] = useState(materiasEnPlan || []);
@@ -39,7 +41,7 @@ export default function Edit({ auth, plan, carrera, materiasEnPlan, materiasDisp
     };
 
     // useForm for submitting via Inertia.put to CarreraController.update
-    const { data, setData, put, processing } = useForm({
+    const { setData, put, processing, processing: isPutting } = useForm({
         materias: enPlan.map(m => m.id),
         plan: plan.id,
     });
@@ -59,6 +61,19 @@ export default function Edit({ auth, plan, carrera, materiasEnPlan, materiasDisp
 
         // Send a PUT to the carreras.update route: /carreras/{id}
         put(`/carreras/${carrera.id}`);
+    };
+
+    const [isDeactivating, setIsDeactivating] = useState(false);
+    const desactivarCarrera = (e) => {
+        e.preventDefault();
+        if (confirm('¿Estás seguro de que deseas desactivar esta carrera? La carrera seguirá existiendo pero se marcará como inactiva.')) {
+            setIsDeactivating(true);
+            // Usamos PATCH para actualizar solo el estado, a una ruta dedicada.
+            router.patch(route('carreras.desactivar', carrera.id), {}, {
+                preserveState: true, // Evita que se recargue toda la página si no es necesario
+                onFinish: () => setIsDeactivating(false),
+            });
+        }
     };
 
     return (
@@ -128,14 +143,19 @@ export default function Edit({ auth, plan, carrera, materiasEnPlan, materiasDisp
                     </table>
                 </DragDropContext>
 
-                <div className="flex justify-end">
-                    <button
-                        type="button"
+                <div className="flex justify-between items-center mt-6">
+                    <DangerButton
+                        onClick={desactivarCarrera}
+                        disabled={isPutting || isDeactivating}
+                    >
+                        Desactivar Carrera
+                    </DangerButton>
+                    <PrimaryButton
                         onClick={guardarCambios}
-                        className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold transition shadow-lg"
+                        disabled={isPutting || isDeactivating}
                     >
                         Guardar cambios
-                    </button>
+                    </PrimaryButton>
                 </div>
             </div>
         </AuthenticatedLayout>

@@ -8,7 +8,7 @@ export default function CreateDicta({ auth, comision, flash, docente, funcionesA
         docente_id: docente.id,
         cargo_id: '',
         horas_frente_aula: '',
-        modalidad_presencia: 'presencial',
+        modalidad_presencia: 'Presencial',
         ano_inicio: comision.anio,
         año_fin: '',
         funcion_aulica_id: '',

@@ -1,11 +1,13 @@
 import { Link } from '@inertiajs/react';
+import ToggleStatusButton from './ToggleStatusButton'; // Asegúrate de que la importación esté
 
 export default function DataTable({ 
     columns = [], 
     data = [], 
     onShow, 
     onEdit, 
-    onDelete, 
+    onDelete,
+    onToggleStatus,
     emptyMessage = 'Sin registros.',
     emptyIcon,
     actions = true,
@@ -81,6 +83,12 @@ export default function DataTable({
                     </svg>
                 </button>
             )}
+            {onToggleStatus && (
+                <ToggleStatusButton
+                    isActive={item.estado === 'activa'}
+                    onClick={() => onToggleStatus(item)}
+                />
+            )}
         </div>
     );
 
@@ -98,7 +106,7 @@ export default function DataTable({
                                     {col.label}
                                 </th>
                             ))}
-                            {actions && (onShow || onEdit || onDelete) && (
+                            {actions && (onShow || onEdit || onDelete || onToggleStatus) && (
                                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Acciones
                                 </th>
@@ -109,7 +117,7 @@ export default function DataTable({
                         {data.length === 0 ? (
                             <tr>
                                 <td 
-                                    colSpan={columns.length + (actions && (onShow || onEdit || onDelete) ? 1 : 0)} 
+                                    colSpan={columns.length + (actions && (onShow || onEdit || onDelete || onToggleStatus) ? 1 : 0)} 
                                     className="px-6 py-8 text-center text-gray-500"
                                 >
                                     <div className="flex flex-col items-center">
@@ -131,7 +139,7 @@ export default function DataTable({
                                             {col.render ? col.render(item) : item[col.key]}
                                         </td>
                                     ))}
-                                    {actions && (onShow || onEdit || onDelete) && (
+                                    {actions && (onShow || onEdit || onDelete || onToggleStatus) && (
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <ActionButtons item={item} />
                                         </td>

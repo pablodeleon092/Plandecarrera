@@ -33,8 +33,10 @@ class DocenteController extends Controller
         }
 
         // Aplicar filtro de estado
-        if ($request->has('es_activo') && $request->input('es_activo') !== '') {
-            $query->where('es_activo', $request->input('es_activo') === '1');
+        if ($request->filled('es_activo')) {
+            // El valor de es_activo será '1' para activos o '0' para inactivos.
+            // Lo convertimos a booleano para la consulta.
+            $query->where('es_activo', $request->input('es_activo') == '1');
         }
 
         $docentes = $query->with('cargos')->orderBy('apellido')->paginate(15)->withQueryString();

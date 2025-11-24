@@ -23,6 +23,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('users', UserController::class);
 
     Route::resource('carreras', CarreraController::class);
+    Route::patch('carreras/{carrera}/toggle-status', [CarreraController::class, 'toggleStatus'])->name('carreras.toggleStatus');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -37,6 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::post('docentes/{docente}/cargo', [DocenteController::class, 'addCargo'])->name('docentes.cargo.store');
     Route::resource('materias', MateriaController::class);
 });
+Route::patch('materias/{materia}/toggle-status', [MateriaController::class, 'toggleStatus'])->name('materias.toggleStatus')->middleware('auth');
 Route::get('/test', fn () => Inertia::render('Test'))->name('test');
 
 /*

@@ -1,27 +1,41 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import PaginatorButtons from '@/Components/PaginatorButtons';
 
-export default function Index({ auth, materias }) {
-    const [search, setSearch] = useState('');
-    const [filterRegimen, setFilterRegimen] = useState('');
-    const [filterEstado, setFilterEstado] = useState('');
+export default function Index({ auth, materias, filters: initialFilters }) {
+    const [filters, setFilters] = useState({
+        search: initialFilters.search || '',
+        regimen: initialFilters.regimen || '',
+        estado: initialFilters.estado ?? '',
+    });
 
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            router.get(route('materias.index'), filters, {
+                preserveState: true,
+                replace: true,
+            });
+        }, 300);
+
+        return () => clearTimeout(timeout);
+    }, [filters]);
+    
     const handleDelete = (id) => {
         if (confirm('¿Estás seguro de eliminar esta materia?')) {
             router.delete(`/materias/${id}`);
         }
     };
 
-    const filteredMaterias = materias.filter(materia => {
-        const matchSearch = materia.nombre.toLowerCase().includes(search.toLowerCase()) ||
-                          materia.codigo.toLowerCase().includes(search.toLowerCase());
-        const matchRegimen = filterRegimen === '' || materia.regimen === filterRegimen;
-        const matchEstado = filterEstado === '' || materia.estado.toString() === filterEstado;
-        
-        return matchSearch && matchRegimen && matchEstado;
-    });
+    const handleToggleStatus = (materia) => {
+        router.patch(route('materias.toggleStatus', materia.id), {}, {
+            preserveScroll: true,
+        });
+    };
 
+    const handleFilterChange = (key, value) => {
+        setFilters(prev => ({ ...prev, [key]: value }));
+    };
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -56,8 +70,8 @@ export default function Index({ auth, materias }) {
                                 <input
                                     type="text"
                                     placeholder="Buscar por nombre o código..."
-                                    value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
+                                    value={filters.search}
+                                    onChange={(e) => handleFilterChange('search', e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
@@ -66,8 +80,8 @@ export default function Index({ auth, materias }) {
                                     Régimen
                                 </label>
                                 <select
-                                    value={filterRegimen}
-                                    onChange={(e) => setFilterRegimen(e.target.value)}
+                                    value={filters.regimen}
+                                    onChange={(e) => handleFilterChange('regimen', e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="">Todos</option>
@@ -80,8 +94,8 @@ export default function Index({ auth, materias }) {
                                     Estado
                                 </label>
                                 <select
-                                    value={filterEstado}
-                                    onChange={(e) => setFilterEstado(e.target.value)}
+                                    value={filters.estado}
+                                    onChange={(e) => handleFilterChange('estado', e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="">Todos</option>
@@ -121,7 +135,7 @@ export default function Index({ auth, materias }) {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {filteredMaterias.length === 0 ? (
+                                    {materias.data.length === 0 ? (
                                         <tr>
                                             <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
                                                 <div className="flex flex-col items-center">
@@ -133,7 +147,7 @@ export default function Index({ auth, materias }) {
                                             </td>
                                         </tr>
                                     ) : (
-                                        filteredMaterias.map((materia) => (
+                                        materias.data.map((materia) => (
                                             <tr key={materia.id} className="hover:bg-gray-50 transition">
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className="text-sm font-semibold text-gray-900">
@@ -196,6 +210,19 @@ export default function Index({ auth, materias }) {
                                                             </svg>
                                                         </Link>
                                                         <button
+                                                            onClick={() => handleToggleStatus(materia)}
+                                                            className={`transition ${
+                                                                materia.estado 
+                                                                    ? 'text-yellow-500 hover:text-yellow-700' 
+                                                                    : 'text-gray-400 hover:text-gray-600'
+                                                            }`}
+                                                            title={materia.estado ? 'Desactivar' : 'Activar'}
+                                                        >
+                                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                                            </svg>
+                                                        </button>
+                                                        <button
                                                             onClick={() => handleDelete(materia.id)}
                                                             className="text-red-600 hover:text-red-900 transition"
                                                             title="Eliminar"
@@ -214,21 +241,23 @@ export default function Index({ auth, materias }) {
                         </div>
                     </div>
 
+                    <PaginatorButtons meta={materias?.meta} paginator={materias} routeName={'materias.index'} />
+
                     <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="bg-white rounded-lg shadow p-4">
                             <p className="text-sm text-gray-600">Total Materias</p>
-                            <p className="text-2xl font-bold text-gray-900">{materias.length}</p>
+                            <p className="text-2xl font-bold text-gray-900">{materias.meta?.total || materias.data.length}</p>
                         </div>
                         <div className="bg-white rounded-lg shadow p-4">
                             <p className="text-sm text-gray-600">Materias Activas</p>
                             <p className="text-2xl font-bold text-green-600">
-                                {materias.filter(m => m.estado).length}
+                                {materias.data.filter(m => m.estado).length}
                             </p>
                         </div>
                         <div className="bg-white rounded-lg shadow p-4">
                             <p className="text-sm text-gray-600">Materias Cuatrimestrales</p>
                             <p className="text-2xl font-bold text-blue-600">
-                                {materias.filter(m => m.regimen === 'cuatrimestral').length}
+                                {materias.data.filter(m => m.regimen === 'cuatrimestral').length}
                             </p>
                         </div>
                     </div>

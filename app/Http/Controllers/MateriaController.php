@@ -10,26 +10,28 @@ class MateriaController extends Controller
 {
     public function index()
     {
-        $materias = Materia::latest()
-            ->get()
-            ->map(function ($materia) {
-                return [
-                    'id' => $materia->id,
-                    'nombre' => $materia->nombre,
-                    'codigo' => $materia->codigo,
-                    'estado' => $materia->estado,
-                    'estado_nombre' => $materia->estado_nombre,
-                    'regimen' => $materia->regimen,
-                    'regimen_nombre' => $materia->regimen_nombre,
-                    'cuatrimestre' => $materia->cuatrimestre,
-                    'horas_semanales' => $materia->horas_semanales,
-                    'horas_totales' => $materia->horas_totales,
-                    'created_at' => $materia->created_at->format('d/m/Y'),
-                ];
-            });
+        $filters = request()->only(['search', 'regimen', 'estado']);
+
+        $materias = Materia::query()
+            ->when($filters['search'] ?? null, function ($query, $search) {
+                $query->where(function ($query) use ($search) {
+                    $query->where('nombre', 'like', '%' . $search . '%')
+                          ->orWhere('codigo', 'like', '%' . $search . '%');
+                });
+            })
+            ->when($filters['regimen'] ?? null, function ($query, $regimen) {
+                $query->where('regimen', $regimen);
+            })
+            ->when(isset($filters['estado']) && $filters['estado'] !== '', function ($query) use ($filters) {
+                $query->where('estado', $filters['estado'] === 'true');
+            })
+            ->orderBy('id', 'desc')
+            ->paginate(15)
+            ->withQueryString();
 
         return Inertia::render('Materias/Index', [
-            'materias' => $materias
+            'materias' => $materias,
+            'filters' => $filters,
         ]);
     }
 
@@ -135,5 +137,14 @@ class MateriaController extends Controller
             return redirect()->route('materias.index')
                 ->with('error', 'No se puede eliminar la materia porque tiene registros asociados');
         }
+    }
+
+    public function toggleStatus(Materia $materia)
+    {
+        $materia->estado = !$materia->estado;
+        $materia->save();
+
+        return redirect()->route('materias.index')
+            ->with('success', 'Estado de la materia actualizado exitosamente.');
     }
 }
