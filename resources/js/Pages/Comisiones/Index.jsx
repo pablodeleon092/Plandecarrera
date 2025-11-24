@@ -6,7 +6,7 @@ import DataTable from '@/Components/DataTable';
 import TableFilters from '@/Components/TableFilters';
 import PaginatorButtons from '@/Components/PaginatorButtons';
 
-export default function Index({ auth, comisiones }) {
+export default function Index({ auth, comisiones,flash }) {
     const [filters, setFilters] = useState({
         search: '',
         modalidad: '',
@@ -117,7 +117,19 @@ export default function Index({ auth, comisiones }) {
             header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Gestión de Comisiones</h2>}
         >
             <Head title="Comisiones" />
-            
+
+                    {flash?.success && (
+                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                            {flash.success}
+                        </div>
+                    )}
+                    {flash?.error && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                            {flash.error}
+                        </div>
+                    )}
+
+
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <ListHeader

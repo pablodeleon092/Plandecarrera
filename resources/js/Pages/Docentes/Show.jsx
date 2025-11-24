@@ -108,7 +108,7 @@ export default function Show({ auth, docente }) {
                                                 {docente.cargos.map(cargo => (
                                                     <li key={cargo.id} className="p-3 bg-white border rounded-md">
                                                         <p className="font-semibold">{cargo.nombre}</p>
-                                                        <p className="text-sm text-gray-500">Dedicación: {cargo.dedicacion}</p>
+                                                        <p className="text-sm text-gray-500">Dedicación: {cargo.dedicacion.nombre}</p>
                                                     </li>
                                                 ))}
                                             </ul>

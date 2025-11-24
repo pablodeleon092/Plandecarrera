@@ -98,8 +98,16 @@ export default function Index({ auth, docentes, flash, filters: initialFilters =
                                 {
                                     key: 'cargos', label: 'Cargos', render: (doc) => (
                                         doc.cargos.length > 0
-                                            ? doc.cargos.map(cargo => cargo.nombre).join(', ')
-                                            : '—'
+                                            ? doc.cargos
+                                                .map(cargo => (
+                                                        <Link 
+                                                            key={cargo.id}
+                                                            href={route('cargos.show', cargo.id)}
+                                                            className="text-indigo-600 hover:underline"
+                                                            >
+                                                        {cargo.nombre}
+                                                        </Link>
+                                                    )).reduce((prev, curr) => [prev, ', ', curr])  : '—'
                                     )
                                 }
                             ]}
