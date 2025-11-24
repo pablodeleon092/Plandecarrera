@@ -3,10 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Materia extends Model
 {
+
+    use HasFactory;
+
     protected $table = 'materias';
+
+
 
     protected $fillable = [
         'nombre',
@@ -36,6 +42,11 @@ class Materia extends Model
     }
 
     //Relacion con las Comisiones
+
+    public function comisiones()
+    {
+        return $this->hasMany(Comision::class, 'id_materia');
+    }
 
     //Accessors y Mutators
 

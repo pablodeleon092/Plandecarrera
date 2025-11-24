@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Comision;
+use App\Models\Materia;
 use Inertia\Inertia;
 use Illuminate\Validation\Rule;
 
@@ -31,23 +32,23 @@ class ComisionController extends Controller
         $docentes = $comision->dictas()->exists() 
             ? $comision->docentes_with_cargo
             : collect(); // colección vacía
+        $allDocentes = \App\Models\Docente::where('es_activo',true)->get();
         return Inertia::render('Comisiones/Show', [
             'comision' => $comision,
             'docentes' => $docentes,
+            'allDocentes' => $allDocentes,
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $materias = \App\Models\Materia::where('estado', true)->get()->map(function ($materia) {
-            return [
-                'id' => $materia->id,
-                'nombre' => $materia->nombre,
-                'codigo' => $materia->codigo,
-            ];
-        });
+
+        $materiaId = $request->query('materia_id');
+
+        $materia = Materia::findOrFail($materiaId);
+
         return Inertia::render('Comisiones/Create', [
-            'materias' => $materias,
+            'materia' => $materia,
         ]);
     }
     
@@ -172,9 +173,10 @@ class ComisionController extends Controller
     
     }
 
-    public function destroy(Comision $comision)
+    public function destroy($id)
     {
         try {
+            $comision = Comision::findOrFail($id);
             $comision->delete();
             return redirect()->route('comisiones.index')->with('success', 'Comision eliminada.');
         } catch (\Exception $e) {

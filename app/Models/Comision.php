@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Comision extends Model
 {
+    use HasFactory;
     protected $table = 'comisiones';
 
     protected $fillable = [
@@ -50,6 +52,7 @@ class Comision extends Model
         return $this->dictas()->with(['docente', 'cargo'])->get()->map(function($dicta) {
             return [
                 'id' => $dicta->docente->id,
+                'dicta_id' => $dicta->id,
                 'nombre' => $dicta->docente->nombre,
                 'apellido' => $dicta->docente->apellido,
                 'cargo' => $dicta->cargo->nombre ?? null,

@@ -25,7 +25,7 @@ class DocenteSeeder extends Seeder
                 'nombre' => $faker->firstName,
                 'apellido' => $faker->lastName,
                 'modalidad_desempeño' => $faker->randomElement(['Investigador', 'Desarrollo']),
-                'carga_horaria' => $faker->randomElement([10, 20, 30, 40]),
+                'carga_horaria' => 0,
                 'es_activo' => $faker->boolean(90),
                 'telefono' => $faker->unique(true)->optional()->e164PhoneNumber,
                 'email' => $faker->unique(true)->optional()->safeEmail,
