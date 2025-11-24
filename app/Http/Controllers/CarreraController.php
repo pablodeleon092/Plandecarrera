@@ -38,7 +38,7 @@ class CarreraController extends Controller
             // If no policy exists, ignore and continue
         }
 
-        $plan = $carrera->planActual();
+        $plan = $carrera->planActual()->first();
 
         $materiasEnPlan = $plan ? $plan->materias()->get() : collect();
 
