@@ -118,7 +118,7 @@ export default function Index({ auth, users }) {
             <Head title="Usuarios" />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <ListHeader
-                    title="Listado de Docentes"
+                    title="Listado de Usuarios"
                     buttonLabel="Agregar Usuario"
                     buttonRoute={route('users.create')}
                 />

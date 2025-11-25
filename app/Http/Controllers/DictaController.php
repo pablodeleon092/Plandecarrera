@@ -83,7 +83,7 @@ class DictaController extends Controller
         } catch (ValidationException $e) {
             // Si hay errores de validación de normativa o de request
             return redirect()
-                ->route('comisiones.show', $validated['comision_id'])
+                ->route('comisiones.show', $request->comision_id)
                 ->with('error', 'Error al asignar el docente: ' . collect($e->errors())->flatten()->first())
                 ->withInput();
 

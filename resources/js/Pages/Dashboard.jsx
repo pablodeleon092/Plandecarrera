@@ -65,6 +65,7 @@ export default function Dashboard({ user, institutos, materias, selectedInstitut
     };
 
 
+
     // ----------------------------------------------------------------------
     // 4. RENDERING
     // ----------------------------------------------------------------------
@@ -154,6 +155,15 @@ export default function Dashboard({ user, institutos, materias, selectedInstitut
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Régimen</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cuatrimestre</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Horas Sem.</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comisiones</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cant. Docentes</th>
+                                        
+                                        {/* 🎯 Nuevas columnas de Docentes por Cargo (mostrando los nombres) */}
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Titular</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asociado</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Adjunto</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">JTP</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asist</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
@@ -165,11 +175,28 @@ export default function Dashboard({ user, institutos, materias, selectedInstitut
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{materia.regimen}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{materia.cuatrimestre}</td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{materia.horas_semanales}</td>
+                                                <td className="px-6 py-4 text-sm text-gray-500">
+                                                    {materia.comisiones?.length > 0 ? (
+                                                        materia.comisiones.map(c => c.codigo).join(', ')
+                                                    ) : (
+                                                        'N/A'
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4 text-sm text-gray-500 text-center">
+
+                                                    {Array.from(new Set(materia.comisiones?.flatMap(c => c.dictas.map(d => d.docente.id)))).length}
+                                                </td>
+                                                <td className="px-6 py-4 text-sm text-gray-500">{materia.Titular || '-'}</td>
+                                                <td className="px-6 py-4 text-sm text-gray-500">{materia.Asociado || '-'}</td>
+                                                <td className="px-6 py-4 text-sm text-gray-500">{materia.Adjunto || '-'}</td>
+                                                <td className="px-6 py-4 text-sm text-gray-500">{materia.JTP || '-'}</td>
+                                                <td className="px-6 py-4 text-sm text-gray-500">{materia.Asist || '-'}</td>
+
                                             </tr>
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
+                                            <td colSpan="12" className="px-6 py-4 text-center text-sm text-gray-500">
                                                 No hay materias disponibles para los criterios seleccionados.
                                             </td>
                                         </tr>

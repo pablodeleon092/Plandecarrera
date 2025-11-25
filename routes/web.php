@@ -21,6 +21,8 @@ Route::get('/', [DashboardController::class, 'home'])
 Route::middleware('auth')->group(function () {
     #UsuariusCrud
     Route::resource('users', UserController::class);
+    Route::get('users/{user}/carreras', [UserController::class, 'carrerasCoordinador'])->name('coordinadores.carreras.edit');
+    Route::patch('users/{user}/carreras', [UserController::class, 'updateCarrerasCoordinador'])->name('coordinadores.carreras.update');
 
     Route::resource('carreras', CarreraController::class);
     Route::patch('carreras/{carrera}/toggle-status', [CarreraController::class, 'toggleStatus'])->name('carreras.toggleStatus');

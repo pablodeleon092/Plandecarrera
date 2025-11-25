@@ -155,6 +155,43 @@ class UserController extends Controller
         return redirect(route('users.index'))->with('success', 'Usuario eliminado correctamente.');
     }
 
+    public function carrerasCoordinador(User $user)
+    {
+
+        $this->authorize('update', $user);
+
+        $user->load('carreras', 'instituto');
+
+        $carrerasAsignadas = $user->carreras;
+        $carreras = $user->instituto->carreras;
+
+        $carrerasRestantes = $carreras->diff($carrerasAsignadas);
+
+        return inertia('Users/AsignarCarrerasCoordinador', [
+            'coordinador' => $user->only('id', 'nombre', 'apellido'),
+            'carrerasAsignadas' => $carrerasAsignadas,
+            'carrerasRestantes' => $carrerasRestantes
+        ]);
+    }
+
+    public function updateCarrerasCoordinador(Request $request, User $user)
+    {
+ 
+        $validated = $request->validate([
+            'carreras_ids' => 'nullable|array',
+            'carreras_ids.*' => 'exists:carreras,id', // Asume que la tabla es 'carreras'
+        ]);
+
+
+        $user->carreras()->sync($validated['carreras_ids'] ?? []);
+
+
+        return redirect()
+            ->route('coordinadores.carreras.edit', $user) // Redirige de vuelta a la vista de edición
+            ->with('success', 'Asignación de carreras actualizada con éxito.');
+    }
+
+
 
     private function getDefaultRoleForCargo(string $cargo)
     {
@@ -170,4 +207,6 @@ class UserController extends Controller
 
         return $cargoRoleMap[$cargo] ?? 'user'; // Rol por defecto si no se encuentra el cargo
     }
+
+
 }

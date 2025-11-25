@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import InputLabel from '@/Components/InputLabel';
 import InputError from '@/Components/InputError';
@@ -198,15 +198,22 @@ export default function Show( {institutos, flash} ) {
                 </div>
 
                 {/* Botón */}
-                <div className="md:col-span-3 flex justify-end mt-4">
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                    >
-                        {processing ? 'Guardando...' : 'Actualizar'}
-                    </button>
-                </div>
+            <div className="md:col-span-3 flex justify-between mt-4">
+                <Link 
+                    href={route('coordinadores.carreras.edit', user.id)}  
+                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 inline-flex items-center" 
+                >
+                    Agregar Materia
+                </Link>
+
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                    {processing ? 'Guardando...' : 'Actualizar'}
+                </button>
+            </div>
             </form>
 
             <button
