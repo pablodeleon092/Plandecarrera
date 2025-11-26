@@ -88,8 +88,8 @@ class ComisionController extends Controller
     public function create(Request $request)
     {
 
-        $materiaId = $request->query('materia_id');
-
+        $materiaId = $request->old('id_materia') ?? $request->query('materia_id');
+      
         $materia = Materia::findOrFail($materiaId);
 
         return Inertia::render('Comisiones/Create', [

@@ -32,7 +32,7 @@ class DashboardController extends Controller
         $materiasFiltradas = $this->getMateriasFiltradas($selectedInstitutoId, $selectedCarreraId);
 
     
-        return Inertia::render('Dashboard', [
+        return Inertia::render('Gestion/Dashboard', [
             'user' => $user,
             'institutos' => $institutosDisponibles,
             'selectedInstitutoId' => (int)$selectedInstitutoId, // Pasar el ID seleccionado

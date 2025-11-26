@@ -2,115 +2,162 @@
 
 namespace App\Services;
 
-use App\Models\Docente;
-use App\Models\Comision;
 use App\Models\Dicta;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use DB;
 
-class NormativaAsignacion {
-
-    public static function cargarHorasFrenteAlAula(Dicta $dicta)
+class NormativaAsignacion
+{
+    /**
+     * Valida la compatibilidad entre la Función Áulica y el Cargo.
+     * Si no es compatible, lanza una excepción de validación.
+     *
+     * @param Dicta $dicta El modelo Dicta con sus relaciones cargadas.
+     * @throws ValidationException
+     * @return void
+     */
+    private static function validarCompatibilidad(Dicta $dicta): void
     {
+        // Aseguramos que las relaciones estén cargadas
+        $dicta->loadMissing(['funcionAulica', 'cargo']);
+
         $funcion_aulica = strtolower(trim($dicta->funcionAulica->nombre));
-        $docente = $dicta->docente;
         $cargo = $dicta->cargo;
-        $comision = $dicta->comision;
 
+        $esTeorica = $funcion_aulica === 'teorica';
+        $esPractica = $funcion_aulica === 'practica';
+        $esTeoricaPractica = $funcion_aulica === 'teorica/practica';
 
-        $yaAsignado = self::docenteYaAsignado($docente, $comision, $cargo);
+        $esCargoSuperior = Str::contains($cargo->nombre, ['Titular', 'Adjunto', 'Asociado']);
+        $esCargoPractico = Str::contains($cargo->nombre, ['Jefe de Trabajos Practicos', 'Ayudante de Primera']);
 
-       
         if (
-            $funcion_aulica === 'teorica' &&
-            Str::contains($cargo->nombre, ['Titular', 'Adjunto', 'Asociado'])
+            ($esTeorica && $esCargoSuperior) ||
+            ($esPractica && $esCargoPractico) ||
+            $esTeoricaPractica
         ) {
-            self::SumarHoras($docente, $cargo, $dicta->horas_frente_aula, !$yaAsignado);
-        } elseif (
-            $funcion_aulica === 'practica' &&
-            Str::contains($cargo->nombre, ['Jefe de Trabajos Practicos', 'Ayudante de Primera'])
-        ) {
-            self::sumarHoras($docente, $cargo, $dicta->horas_frente_aula, !$yaAsignado);
-        } elseif ($funcion_aulica === 'teorica/practica') {
-            self::sumarHoras($docente, $cargo, $dicta->horas_frente_aula, !$yaAsignado);
+            return; // OK, compatible
         } else {
             throw ValidationException::withMessages([
                 'funcion_aulica' => 'La función áulica no es compatible con el cargo del docente.',
             ]);
         }
-
-        $docente->save();
-        $cargo->save();
     }
 
-    public static function eliminarHorasFrenteAlAula(Dicta $dicta)
+    /**
+     * Recalcula la carga horaria y el número de materias asignadas
+     * para un CARGO específico de un DOCENTE, consultando directamente la tabla Dicta.
+     * * Implementa la lógica: SUM de horas y COUNT DISTINCT de materias.
+     *
+     * @param object $docente El modelo Docente.
+     * @param object $cargo El modelo Cargo que se debe recalcular.
+     * @return void
+     */
+    public static function recalcularCargo($docente, $cargo): void
     {
-        $funcion_aulica = strtolower(trim($dicta->funcionAulica->nombre));
+        // 1. SUMA de horas frente al aula
+        $totalHoras = Dicta::where('docente_id', $docente->id)
+            ->where('cargo_id', $cargo->id)
+            ->sum('horas_frente_aula');
+
+        // 2. COUNT DISTINCT de materias asignadas
+        // Necesitamos unir con 'comisiones' para acceder a 'id_materia'
+        $totalMaterias = Dicta::select('comisiones.id_materia')
+            ->join('comisiones', 'dictas.comision_id', '=', 'comisiones.id')
+            ->where('dictas.docente_id', $docente->id)
+            ->where('dictas.cargo_id', $cargo->id)
+            ->distinct()
+            ->count();
+            
+        // 3. Aplicar y guardar
+        $cargo->sum_horas_frente_aula = $totalHoras;
+        $cargo->nro_materias_asig = $totalMaterias;
+        
+        $cargo->save();
+    }
+    
+    /**
+     * Recalcula y guarda la carga horaria total del docente (docente.carga_horaria)
+     * sumando todas las horas de Dictas.
+     *
+     * @param object $docente El modelo Docente.
+     * @return void
+     */
+    public static function recalcularCargaHorariaDocente($docente): void
+    {
+        $totalCargaHoraria = Dicta::where('docente_id', $docente->id)->sum('horas_frente_aula');
+        
+        $docente->carga_horaria = $totalCargaHoraria;
+        $docente->save();
+    }
+
+    // ----------------------------------------------------------------------
+    // FLUJOS DE ALTO NIVEL (CREATE, UPDATE, DELETE)
+    // ----------------------------------------------------------------------
+
+    /**
+     * Asigna horas al docente (flujo de creación).
+     *
+     * @param Dicta $dicta El modelo Dicta recién guardado.
+     * @return void
+     */
+    public static function cargarHorasFrenteAlAula(Dicta $dicta): void
+    {
+        // 1. Validar si la Dicta es válida
+        self::validarCompatibilidad($dicta);
+        
+        // 2. Recalcular los agregados
+        self::recalcularCargo($dicta->docente, $dicta->cargo);
+        self::recalcularCargaHorariaDocente($dicta->docente);
+    }
+
+    /**
+     * Elimina horas del docente (flujo de eliminación).
+     * Se debe llamar con el modelo Dicta justo antes de la eliminación del registro.
+     *
+     * @param Dicta $dicta El modelo Dicta a eliminar.
+     * @return void
+     */
+    public static function eliminarHorasFrenteAlAula(Dicta $dicta): void
+    {
+        // 1. Validar (necesario por si la combinación era inválida al momento de la eliminación)
+        self::validarCompatibilidad($dicta);
+        
+        // 2. Recalcular los agregados (la Dicta será excluida por la query de recalculo)
+        self::recalcularCargo($dicta->docente, $dicta->cargo);
+        self::recalcularCargaHorariaDocente($dicta->docente);
+    }
+
+    /**
+     * Gestiona la actualización de una Dicta.
+     *
+     * @param Dicta $dicta La Dicta con los datos nuevos (ya actualizada).
+     * @param array $originalData Datos de la Dicta antes de la actualización (para identificar el cargo anterior).
+     * @return void
+     */
+    public static function updateDicta(Dicta $dicta, array $originalData): void
+    {
+        $dicta->loadMissing(['docente', 'cargo']);
         $docente = $dicta->docente;
-        $cargo = $dicta->cargo;
+        
+        // 1. VALIDAR COMPATIBILIDAD CARGO-FUNCIÓN para la Dicta recién actualizada
+        self::validarCompatibilidad($dicta);
 
-        if (
-            $funcion_aulica === 'teorica' &&
-            Str::contains($cargo->nombre, ['Titular', 'Adjunto', 'Asociado'])
-        ) {
-            self::restarHoras($docente, $cargo, $dicta);
-        } elseif (
-            $funcion_aulica === 'practica' &&
-            Str::contains($cargo->nombre, ['Jefe de Trabajos Practicos', 'Ayudante de Primera'])
-        ) {
-            self::restarHoras($docente, $cargo, $dicta);
-        } elseif ($funcion_aulica === 'teorica/practica') {
-            self::restarHoras($docente, $cargo, $dicta);
-        } else {
-            throw ValidationException::withMessages([
-                'funcion_aulica' => 'La función áulica no es compatible con el cargo del docente.',
-            ]);
+        // 2. Recalcular el Cargo ANTERIOR
+        // Si el cargo cambió, debemos recalcular el cargo que perdió esta Dicta.
+        if ($originalData['cargo_id'] !== $dicta->cargo_id) {
+            $cargoAnterior = $docente->cargos()->find($originalData['cargo_id']);
+            if ($cargoAnterior) {
+                self::recalcularCargo($docente, $cargoAnterior);
+            }
         }
 
-        $docente->save();
-        $cargo->save();
+        // 3. Recalcular el Cargo NUEVO 
+        // Siempre se recalcula el nuevo cargo para incluir las horas actualizadas.
+        self::recalcularCargo($docente, $dicta->cargo);
+
+        // 4. Recalcular la Carga Horaria total del Docente
+        self::recalcularCargaHorariaDocente($docente);
     }
-
-    private static function sumarHoras($docente, $cargo, $horas, $sumarMateria = true)
-    {
-        $docente->carga_horaria += $horas;
-        $cargo->sum_horas_frente_aula += $horas;
-
-        if ($sumarMateria) {
-            $cargo->nro_materias_asig += 1;
-        }
-    }
-
-    private static function restarHoras($docente, $cargo, $dicta)
-    {
-        $horas = $dicta->horas_frente_aula;
-        $materiaId = $dicta->comision->id_materia;
-        $docente->carga_horaria -= $horas;
-        $cargo->sum_horas_frente_aula -= $horas;
-        $aunDictaMateria = Dicta::where('docente_id', $docente->id)
-            ->whereHas('comision', function ($q) use ($materiaId) {
-                $q->where('id_materia', $materiaId);
-            })
-            ->where('id', '!=', $dicta->id)
-            ->exists();
-
-        if (!$aunDictaMateria) {
-            $cargo->nro_materias_asig -= 1;
-        }
-    }
-
-    private static function docenteYaAsignado($docente, $comision, $cargo)
-    {
-        return Dicta::where('docente_id', $docente->id)
-            ->where(function ($q) use ($comision) {
-                // Caso único: misma materia pero en otra comisión
-                $q->where('comision_id', '!=', $comision->id)
-                ->whereHas('comision', function ($c) use ($comision) {
-                    $c->where('id_materia', $comision->id_materia);
-                });
-            })
-            ->exists();
-    }
-
 }
-

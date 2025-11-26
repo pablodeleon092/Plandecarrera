@@ -7,8 +7,10 @@ use App\Models\Comision;
 use App\Models\FuncionAulica;
 use Inertia\Inertia;
 use App\Models\Dicta;
+use App\Models\Docente;
 use App\Services\NormativaAsignacion;
 use Illuminate\Validation\ValidationException;
+use DB;
 use Exception;
 
 
@@ -96,15 +98,118 @@ class DictaController extends Controller
         }
     }
 
+    public function edit(Dicta $dicta)
+    {
+
+        $dicta->load(['comision', 'docente']);
+
+        $cargos = $dicta->docente->cargos;
+        
+        $funcionesAulicas = FuncionAulica::all();
+
+        return Inertia::render('Comisiones/Dictas/Edit', [
+            'dicta' => $dicta,
+            'cargos' => $cargos,
+            'funcionesAulicas' => $funcionesAulicas,
+        ]);
+    }
+
+    public function update(Request $request, Dicta $dicta)
+    {
+        // 1. CLAVE: Capturar los datos originales antes de cualquier cambio en la base de datos
+        // Esto incluye cargo_id, horas_frente_aula, y funcion_aulica_id.
+        $originalData = $dicta->only(['cargo_id', 'horas_frente_aula', 'funcion_aulica_id', 'docente_id', 'comision_id']);
+
+        try {
+            // 2. Validación de los datos del Request
+            $validated = $request->validate([
+                // Aseguramos que no se intenten cambiar las claves primarias aquí si no es necesario
+                'comision_id' => 'required|exists:comisiones,id',
+                'docente_id' => 'required|exists:docentes,id',
+                'cargo_id' => 'required|exists:cargos,id',
+                'horas_frente_aula' => 'required|integer|min:0',
+                'modalidad_presencia' => 'required|in:presencial,virtual,mixta',
+                'ano_inicio' => 'required|date',
+                'año_fin' => 'nullable|date|after_or_equal:ano_inicio',
+                'funcion_aulica_id' => 'nullable|exists:funciones_aulicas,id',
+            ], [
+                // ... Mensajes de error (abreviado) ...
+                'comision_id.required' => 'La comisión es obligatoria',
+                'docente_id.required' => 'El docente es obligatorio',
+                'cargo_id.required' => 'El cargo es obligatorio',
+                'horas_frente_aula.required' => 'Debe ingresar las horas frente al aula',
+                'modalidad_presencia.required' => 'Debe seleccionar la modalidad de presencia',
+                'ano_inicio.required' => 'El año de inicio es obligatorio',
+                'año_fin.after_or_equal' => 'El año de fin debe ser igual o posterior al año de inicio.',
+            ]);
+
+            // 3. Ejecutar la actualización dentro de una transacción
+            DB::transaction(function () use ($dicta, $validated, $originalData) {
+                
+                // Actualizar la dicta primero con los nuevos datos
+                $dicta->update($validated);
+
+                // 4. Aplicar la lógica de Normativa: Restar impacto antiguo y sumar impacto nuevo
+                NormativaAsignacion::updateDicta($dicta, $originalData);
+            });
+
+            // 5. Redirección exitosa
+            return redirect()
+                ->route('comisiones.show', $validated['comision_id'])
+                ->with('success', 'Relación entre docente y comisión actualizada correctamente.');
+
+        } catch (ValidationException $e) {
+            // Errores de validación de Laravel (incluyendo los lanzados por NormativaAsignacion::aplicarImpactoHorario)
+            return redirect()
+                ->route('dictas.edit', $dicta)
+                ->withErrors($e->errors())
+                ->withInput();
+
+        } catch (Exception $e) {
+            // Cualquier otro error inesperado
+            return redirect()
+                ->route('dictas.edit', $dicta)
+                ->with('error', 'Ocurrió un error al intentar actualizar la asignación: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
     public function destroy($id)
     {
         $dicta = \App\Models\Dicta::findOrFail($id);
         $comisionId = $dicta->comision_id;
-        NormativaAsignacion::eliminarHorasFrenteAlAula($dicta);
-        $dicta->delete();
 
-        return redirect()->route('comisiones.show', $comisionId)
-            ->with('success', 'Vinculación del docente eliminada exitosamente.');
+        try {
+            DB::transaction(function () use ($dicta) {
+                
+                // 1. Ejecutar el recalculo del cargo/docente ANTES de la eliminación
+                // El servicio NormativaAsignacion recalcula basándose en las Dictas restantes.
+                // Para el cálculo correcto, el servicio debe manejar la eliminación del registro.
+                // NOTA IMPORTANTE: En el nuevo diseño, la eliminación DEBE ir primero
+                
+                // **FLUJO RECOMENDADO PARA ELIMINACIÓN CON RECALCULO TOTAL:**
+                
+                // 1. Cargar referencias para el recalculo
+                $docente = $dicta->docente;
+                $cargo = $dicta->cargo;
+
+                // 2. Eliminar el registro de Dicta
+                $dicta->delete();
+
+                // 3. Recalcular los agregados.
+                // La query de recalcularCargo ya no encontrará esta Dicta, dando el total correcto.
+                NormativaAsignacion::recalcularCargo($docente, $cargo);
+                NormativaAsignacion::recalcularCargaHorariaDocente($docente);
+
+            });
+
+            return redirect()->route('comisiones.show', $comisionId)
+                ->with('success', 'Vinculación del docente eliminada exitosamente.');
+        } catch (Exception $e) {
+            // Manejar cualquier fallo de la transacción
+            return redirect()->back()
+                ->with('error', 'Error al eliminar la asignación: ' . $e->getMessage());
+        }
     }
 
 

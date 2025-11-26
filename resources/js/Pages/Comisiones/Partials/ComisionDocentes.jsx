@@ -54,6 +54,15 @@ export default function ComisionDocentes({ comision, docentes, allDocentes, filt
 
                         {/* Contenedor de acciones */}
                         <div className="flex items-center space-x-4">
+
+                            <Link
+                                href={route('dictas.edit', docente.dicta_id)}
+                                className="text-blue-600 hover:underline"
+                            >
+                                Editar relacion
+                            </Link>
+
+
                             <Link
                                 href={route('docentes.show', docente.id)}
                                 className="text-blue-600 hover:underline"

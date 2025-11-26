@@ -8,7 +8,7 @@ export default function Create({ auth, materias, materia, flash }) {
         codigo: '', 
         nombre: '',
         turno: 'Mañana',
-        modalidad: 'Presencial', 
+        modalidad: 'presencial', 
         sede: 'Ushuaia', 
         cuatrimestre: '1ro',
         anio: '',
@@ -22,7 +22,7 @@ export default function Create({ auth, materias, materia, flash }) {
 
     const submit = (e) => {
         e.preventDefault();
-        // Envía la petición POST. Inertia maneja la redirección o los errores 422.
+
         post(route('comisiones.store')); 
     };
 
@@ -106,9 +106,9 @@ export default function Create({ auth, materias, materia, flash }) {
                                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                                         required
                                     >
-                                        <option value="Presencial">Presencial</option>
-                                        <option value="Virtual">Virtual</option>
-                                        <option value="Mixta">Mixta</option>
+                                        <option value="presencial">Presencial</option>
+                                        <option value="virtual">Virtual</option>
+                                        <option value="mixta">Mixta</option>
                                     </select>
                                     {errors.modalidad && <div className="text-red-600 mt-1 text-sm">{errors.modalidad}</div>}
                                 </div>
