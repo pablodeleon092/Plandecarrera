@@ -22,7 +22,7 @@ class UserPolicy
      */
     public function show(User $user, User $model): bool
     {
-        return ($user->hasRole('Admin')) or ($user->can('consultar_usuario'));
+        return ($user->hasRole('Admin')) or ($user->can('consultar_usuario') and $user->id === $model->id);
 
     }
 

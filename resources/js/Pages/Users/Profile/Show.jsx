@@ -26,6 +26,8 @@ export default function Show( {institutos, flash} ) {
         put(route('users.update', user.id)); // Llama al método update
     };
 
+    const coordinador = user.cargo === 'Coordinador de Carrera';
+
     return (
     <AuthenticatedLayout
         header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">
@@ -199,13 +201,6 @@ export default function Show( {institutos, flash} ) {
 
                 {/* Botón */}
             <div className="md:col-span-3 flex justify-between mt-4">
-                <Link 
-                    href={route('coordinadores.carreras.edit', user.id)}  
-                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 inline-flex items-center" 
-                >
-                    Agregar Materia
-                </Link>
-
                 <button
                     type="submit"
                     disabled={processing}
@@ -213,6 +208,17 @@ export default function Show( {institutos, flash} ) {
                 >
                     {processing ? 'Guardando...' : 'Actualizar'}
                 </button>
+
+                {coordinador && (
+                <Link 
+                    href={route('coordinadores.carreras.edit', user.id)}  
+                    className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 inline-flex items-center" 
+                >
+                    Agregar Materia
+                </Link>
+                )} 
+
+                
             </div>
             </form>
 

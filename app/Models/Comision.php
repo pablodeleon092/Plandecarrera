@@ -127,4 +127,25 @@ class Comision extends Model
 
     }
 
+    public function scopeByInstituto($query, $institutoId)
+    {
+        return $query->whereHas('materia', function ($q) use ($institutoId) {
+            // Invoca el scope 'ByInstituto' del modelo Materia
+            $q->byInstituto($institutoId);
+        });
+    }
+
+    /**
+     * Scope para filtrar comisiones por un array de Carrera IDs.
+     * Sigue la relación a Materia y usa la lógica de planes de la materia.
+     */
+    public function scopeByCarreras($query, array $carreraIds)
+    {
+        return $query->whereHas('materia', function ($q) use ($carreraIds) {
+            // Invoca el scope 'ByCarreras' del modelo Materia
+            $q->byCarreras($carreraIds);
+        });
+    }
+
+
 }

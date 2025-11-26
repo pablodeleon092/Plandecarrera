@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Materia;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -10,9 +11,44 @@ class MateriaController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
         $filters = request()->only(['search', 'regimen', 'estado']);
 
-        $materias = Materia::query()
+        // --- Aplicación del Filtro de Acceso por Rol ---
+        $query = Materia::query();
+
+        // 1. Admin y Admin_global: Ven todo.
+        if ($user->hasAnyRole(['Admin', 'Admin_global'])) {
+            // No se aplica restricción.
+        } 
+        
+        // 2. Admin_instituto y Consulta_instituto: Solo materias de su Instituto.
+        elseif ($user->hasAnyRole(['Admin_instituto', 'Consulta_instituto'])) {
+            if ($user->instituto_id) {
+                // Aplica el Scope actualizado que usa la relación Many-to-Many
+                $query->byInstituto($user->instituto_id);
+            } else {
+                $query->whereRaw('1 = 0'); // Denegar acceso si no tiene instituto asignado.
+            }
+        } 
+        
+        // 3. Coordinador_carrera: Solo materias asociadas a sus carreras.
+        elseif ($user->hasRole('Coord_carrera')) {
+       
+            $carreraIds = $user->carreras->pluck('id')->toArray(); 
+            
+            if (!empty($carreraIds)) {
+                // Aplica el Scope actualizado que usa la relación Many-to-Many
+                $query->byCarreras($carreraIds);
+            } else {
+                $query->whereRaw('1 = 0'); // Denegar acceso si no tiene carreras asignadas.
+            }
+        } 
+        else {
+            $query->whereRaw('1 = 0'); // Denegar acceso por defecto.
+        }
+
+        $materias = $query
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('nombre', 'like', '%' . $search . '%')

@@ -10,17 +10,35 @@ export default function Index({ auth, materias, filters: initialFilters }) {
         estado: initialFilters.estado ?? '',
     });
 
+    // 1. Destructurar las propiedades para usarlas como dependencias individuales
+    const { search, regimen, estado } = filters;
+    
+    // 2. Usamos el useEffect para aplicar los filtros (con debounce)
     useEffect(() => {
+
+        const query = {
+            search: search || undefined,
+            regimen: regimen || undefined,
+            estado: estado || undefined,
+        };
+
         const timeout = setTimeout(() => {
-            router.get(route('materias.index'), filters, {
+            router.get(route('materias.index'), query, {
+                preserveScroll: true,
                 preserveState: true,
                 replace: true,
+                only: ['materias', 'filters'], 
             });
         }, 300);
 
         return () => clearTimeout(timeout);
-    }, [filters]);
+
+    }, [search, regimen, estado]);  
     
+    const activeFilters = Object.fromEntries(
+            Object.entries(filters).filter(([key, value]) => value !== '' && value !== null)
+        );   
+
     const handleDelete = (id) => {
         if (confirm('¿Estás seguro de eliminar esta materia?')) {
             router.delete(`/materias/${id}`);
@@ -36,6 +54,8 @@ export default function Index({ auth, materias, filters: initialFilters }) {
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({ ...prev, [key]: value }));
     };
+
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -241,7 +261,12 @@ export default function Index({ auth, materias, filters: initialFilters }) {
                         </div>
                     </div>
 
-                    <PaginatorButtons meta={materias?.meta} paginator={materias} routeName={'materias.index'} />
+                    <PaginatorButtons 
+                        meta={materias?.meta} 
+                        paginator={materias} 
+                        routeName={'materias.index'} 
+                        routeParams={activeFilters} // ⬅️ Correcto: Pasa los filtros activos
+                    />
 
                     <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="bg-white rounded-lg shadow p-4">

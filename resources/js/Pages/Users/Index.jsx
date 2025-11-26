@@ -23,6 +23,8 @@ export default function Index({ auth, users }) {
     const cargos = [...new Set(userList.map(u => u.cargo))].filter(Boolean);
     const institutos = [...new Set(userList.map(u => u.instituto?.siglas))].filter(Boolean);
 
+    const canEditusers = auth?.user?.permissions?.includes('modificar_usuario');
+
     const filterConfig = [
         {
             key: 'search',
@@ -132,12 +134,19 @@ export default function Index({ auth, users }) {
                 <DataTable
                     columns={columns}
                     data={filteredData}
-                    onEdit={(user) => router.visit(route('users.show', user.id))}
-                    onDelete={(user) => {
-                        if (confirm('¿Eliminar usuario?')) {
-                                inertiaDelete(route('users.destroy', user.id));
-                         }
-                    }}
+                    onEdit={canEditusers 
+                        ? (user) => router.visit(route('users.show', user.id))
+                        : null 
+                    }
+                    onDelete={canEditusers 
+                            ? (user) => {
+                                if (confirm('¿Eliminar usuario?')) {
+                                    // Asumo que `inertiaDelete` es una función/hook de Inertia para DELETE (como `router.delete`)
+                                    inertiaDelete(route('users.destroy', user.id)); 
+                                }
+                            }
+                            : null 
+                        }
                     hover={true}
                     emptyMessage="No hay usuarios para mostrar."
                     emptyIcon={

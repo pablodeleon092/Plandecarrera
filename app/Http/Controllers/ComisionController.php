@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Comision;
 use App\Models\Materia;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class ComisionController extends Controller
@@ -13,14 +14,58 @@ class ComisionController extends Controller
 
     public function index()
     {
+        $user = Auth::user();
         try {
-            $this->authorize('index', Materia::class);
+
+            $this->authorize('index', Comision::class); 
         } catch (\Throwable $e) {
-            // If no policy exists, ignore and continue
+
         }
 
-        $comisiones = Comision::with('materia')->orderBy('id', 'desc')->paginate(15)->withQueryString();
+        $query = Comision::query();
 
+        // 1. Admin y Admin_global: Ven todo.
+        if ($user->hasAnyRole(['Admin', 'Admin_global'])) {
+    
+        } 
+        
+        // 2. Admin_instituto y Consulta_instituto: Solo comisiones de su Instituto.
+        elseif ($user->hasAnyRole(['Admin_instituto', 'Consulta_instituto'])) {
+            if ($user->instituto_id) {
+                // Filtra comisiones por instituto usando el Scope del modelo Comision
+                $query->byInstituto($user->instituto_id);
+
+            } else {
+                $query->whereRaw('1 = 0'); 
+            }
+        } 
+        
+        // 3. Coordinador_carrera: Solo comisiones asociadas a las materias de sus carreras.
+        elseif ($user->hasRole('Coord_carrera')) {
+
+            $carreraIds = $user->carreras->pluck('id')->toArray();
+            
+            if (!empty($carreraIds)) {
+                // Filtra comisiones por carreras usando el Scope del modelo Comision
+                $query->byCarreras($carreraIds);
+            } else {
+                $query->whereRaw('1 = 0'); 
+            }
+        } 
+        
+
+        else {
+            $query->whereRaw('1 = 0'); // Denegar acceso por defecto.
+        }
+
+
+        $comisiones = $query
+            ->with('materia')
+            ->orderBy('id', 'desc')
+            ->paginate(15)
+            ->withQueryString();
+           
+ 
         return Inertia::render('Comisiones/Index', [
             'comisiones' => $comisiones,
         ]);

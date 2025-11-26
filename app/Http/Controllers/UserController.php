@@ -81,14 +81,16 @@ class UserController extends Controller
 
         $user->assignRole($this->getDefaultRoleForCargo($request->cargo));
 
-        #event(new Registered($user));
+
 
         return redirect(route('users.index'))->with('success', 'Usuario creado exitosamente.');
     }
 
     public function show(User $user)
     {
-        $this->authorize('show', $user);
+        if (!Auth::user()->can('modificar_usuario')) {
+            abort(403, 'No tienes permiso para modificar usuarios.');
+        }
 
         $institutos = Instituto::select('id', 'siglas')->get();
 
