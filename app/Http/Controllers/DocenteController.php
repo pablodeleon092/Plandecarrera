@@ -73,10 +73,18 @@ class DocenteController extends Controller
     /**
      * Display the specified resource.
      */
+  /**
+     * Display the specified resource.
+     */
     public function show(Docente $docente)
     {
+        // Cargar relaciones: Cargos (con dedicación) Y Comisiones (con materia)
+        $docente->load(['cargos.dedicacion', 'comisiones.materia']);
+
         return Inertia::render('Docentes/Show', [
-            'docente' => $docente->load('cargos.dedicacion'),
+            'docente' => $docente,
+            // Pasamos las comisiones por separado para usarlas fácil en el frontend
+            'comisiones' => $docente->comisiones 
         ]);
     }
 
