@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Docente extends Model
 {
     use HasFactory;
+
     /**
      * Estos campos son seguros para ser llenados mediante Docente::create().
-     * (El campo 'es_activo' es booleano, pero se maneja aquí.)
      */
     protected $fillable = [
         'legajo',
@@ -22,10 +22,21 @@ class Docente extends Model
         'telefono',
         'email',
     ];
+
     protected $table = 'docentes'; 
 
+    // Relación con Cargos
     public function cargos()
     {
         return $this->hasMany(Cargo::class, 'docente_id');
+    }
+
+    // --- NUEVA RELACIÓN AGREGADA (Soluciona el error 500) ---
+    public function comisiones()
+    {
+        // Asumiendo que la tabla intermedia se llama 'dictas' (por tu DictaController)
+        // Parámetros: Modelo Destino, Tabla Pivot, FK Local, FK Foránea
+        return $this->belongsToMany(Comision::class, 'dictas', 'docente_id', 'comision_id')
+                    ->withPivot('id'); // Opcional: trae el ID de la relación dicta
     }
 }
