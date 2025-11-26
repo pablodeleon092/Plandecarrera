@@ -143,34 +143,6 @@ class DocenteController extends Controller
         ]);
     }
 
-    /**
-     * Add a cargo to a docente.
-     *
-     * @param Request $request
-     * @param Docente $docente
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function addCargo(Request $request, Docente $docente)
-    {
-        $validated = $request->validate([
-            'cargo' => 'required|string|max:255',
-            'dedicacion_id' => 'required|exists:dedicaciones,id',
-            'docente_id' => 'required|exists:docentes,id',
-        ]);
 
-        // Usamos el docente que viene por la URL para asegurar la relación correcta.
-        $cargo = $docente->cargos()->create([
-            'nombre' => $validated['cargo'],
-            'dedicacion_id' => $validated['dedicacion_id'],
-            // Los valores por defecto se establecen aquí
-            'nro_materias_asig' => 0,
-            'sum_horas_frente_aula' => 0,
-        ]);
 
-        if ($cargo) {
-            return redirect()->route('docentes.edit', $docente->id)->with('success', 'Cargo agregado exitosamente');
-        }
-
-        return redirect()->route('docentes.edit', $docente->id)->with('error', 'Error al agregar el cargo');
-    }
 }

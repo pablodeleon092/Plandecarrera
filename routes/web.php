@@ -35,8 +35,8 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('comisiones', ComisionController::class);
     Route::get('docentes/{docente}/cargo/create', [DocenteController::class, 'createCargo'])->name('docentes.cargo.create');
-    Route::post('docentes/{docente}/cargo', [DocenteController::class, 'addCargo'])->name('docentes.cargo.store');
     Route::resource('materias', MateriaController::class);
+    Route::post('/docentes/{docente}/cargos', [CargoController::class, 'addCargo'])->name('cargos.addCargo');
 });
 Route::patch('materias/{materia}/toggle-status', [MateriaController::class, 'toggleStatus'])->name('materias.toggleStatus')->middleware('auth');
 Route::get('/test', fn () => Inertia::render('Test'))->name('test');
