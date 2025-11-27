@@ -61,7 +61,7 @@ export default function Index({ auth, materias, filters: initialFilters = {} }) 
     };
 
     const handleToggleStatus = (materia) => {
-        router.patch(route('materias.toggleStatus', materia.id), {}, {
+        router.patch(route('materias.toggleStatus', materia), {}, {
             preserveScroll: true
         });
     };
@@ -150,6 +150,7 @@ export default function Index({ auth, materias, filters: initialFilters = {} }) 
                             onShow={(materia) => router.visit(route('materias.show', materia.id))}
                             onEdit={(materia) => router.visit(route('materias.edit', materia.id))}
                             onDelete={(materia) => handleDelete(materia.id, materia.nombre, materia.apellido)}
+                            onToggleStatus={(materia) => handleToggleStatus(materia.id)}
                             emptyMessage="No se encontraron materias."
                             hover={true}
                             emptyIcon={

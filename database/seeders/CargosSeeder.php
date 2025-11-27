@@ -12,11 +12,12 @@ class CargosSeeder extends Seeder
     public function run()
     {
         $cargosDisponibles = [
-            'Titular',
-            'Asociado',
-            'Adjunto',
-            'Jefe de Trabajos Practicos',
-            'Ayudante de Primera'
+            'Profesor Titular',
+            'Profesor Asociado',
+            'Profesor Adjunto',
+            'Profesor Asistente',
+            'Jefe de Trabajos Prácticos',
+            'Ayudante de Primera',
         ];
 
         $docentes = Docente::all();

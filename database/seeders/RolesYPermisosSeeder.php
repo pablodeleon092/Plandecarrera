@@ -79,6 +79,7 @@ class RolesYPermisosSeeder extends Seeder
             // syncPermissions asegurará que solo se asignen los permisos definidos aquí.
             $role->syncPermissions($permisosRol);
         }
+
         $admin = User::firstOrCreate(
             ['email' => 'admin@domain.com'],
             [
@@ -94,7 +95,6 @@ class RolesYPermisosSeeder extends Seeder
         );
 
         $admin->assignRole('Admin');
-
 
     }
 
