@@ -7,6 +7,11 @@ use Illuminate\Support\ServiceProvider;
 use App\Models\User;
 use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
+use App\Models\Materia;
+use App\Models\Comision;
+use App\Observers\MateriaObserver;
+use App\Observers\ComisionObserver;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,5 +32,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(User::class, UserPolicy::class);
         Vite::prefetch(concurrency: 3);
+        Materia::observe(MateriaObserver::class);
+        Comision::observe(ComisionObserver::class);
     }
 }

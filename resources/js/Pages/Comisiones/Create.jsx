@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
 
-export default function Create({ auth, materias, flash }) {
+export default function Create({ auth, materias, materia, flash }) {
     
     
     const { data, setData, post, processing, errors } = useForm({
@@ -15,14 +15,14 @@ export default function Create({ auth, materias, flash }) {
         horas_teoricas: '',
         horas_practicas: '',  
         horas_totales: 0,
-        id_materia: '',
+        id_materia: materia.id || '',
     });
 
 
 
     const submit = (e) => {
         e.preventDefault();
-        // Envía la petición POST. Inertia maneja la redirección o los errores 422.
+
         post(route('comisiones.store')); 
     };
 
@@ -57,22 +57,13 @@ export default function Create({ auth, materias, flash }) {
                                     {errors.codigo && <div className="text-red-600 mt-1 text-sm">{errors.codigo}</div>}
                                 </div>
                                 <div>
-                                    <label htmlFor="materia" className="block text-sm font-medium text-gray-700">Materia</label>
-                                    <select
-                                        id="id_materia"
-                                        value={data.id_materia}
-                                        onChange={(e) => setData('id_materia', e.target.value)}
-                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                                        required
-                                    >
-                                        <option value="">Seleccionar materia</option>
-                                        {materias.map((materia) => (
-                                            <option key={materia.id} value={materia.id}>
-                                                {materia.nombre} ({materia.codigo})
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {errors.id_materia && <div className="text-red-600 mt-1 text-sm">{errors.id_materia}</div>}
+                                    <label className="block text-sm font-medium text-gray-700">Materia</label>
+                                    <input
+                                        type="text"
+                                        value={materia.nombre}
+                                        readOnly
+                                        className="mt-1 block w-full bg-gray-100 border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                                    />
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -115,9 +106,9 @@ export default function Create({ auth, materias, flash }) {
                                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
                                         required
                                     >
-                                        <option value="Presencial">Presencial</option>
-                                        <option value="Virtual">Virtual</option>
-                                        <option value="Mixta">Mixta</option>
+                                        <option value="presencial">Presencial</option>
+                                        <option value="virtual">Virtual</option>
+                                        <option value="mixta">Mixta</option>
                                     </select>
                                     {errors.modalidad && <div className="text-red-600 mt-1 text-sm">{errors.modalidad}</div>}
                                 </div>

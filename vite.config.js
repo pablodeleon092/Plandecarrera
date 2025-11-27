@@ -9,8 +9,8 @@ export default defineConfig({
         strictPort: true,
         hmr: {
 
-            host: 'localhost',
-
+            host: 'localhost', // 👈 importante: accesible desde el navegador
+            port: 5173,
             protocol: 'ws',
         },
         // Enable CORS for the dev server and allow the server to echo back

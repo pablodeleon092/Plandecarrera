@@ -48,7 +48,10 @@ class Carrera extends Model
 
     public function planActual()
     {
-        $planes = $this->hasMany(Plan::class, 'carrera_id');
-        return $planes->whereNull('anio_fin')->first();
+        return $this->hasOne(Plan::class, 'carrera_id')
+                    ->whereNull('anio_fin');
     }
+
+
+    
 }

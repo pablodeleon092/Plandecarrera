@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Docente;
 use App\Models\Dedicacion;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreDocenteRequest;
 use Inertia\Inertia;
 
 class DocenteController extends Controller
@@ -33,8 +34,10 @@ class DocenteController extends Controller
         }
 
         // Aplicar filtro de estado
-        if ($request->has('es_activo') && $request->input('es_activo') !== '') {
-            $query->where('es_activo', $request->input('es_activo') === '1');
+        if ($request->filled('es_activo')) {
+            // El valor de es_activo será '1' para activos o '0' para inactivos.
+            // Lo convertimos a booleano para la consulta.
+            $query->where('es_activo', $request->input('es_activo') == '1');
         }
 
         $docentes = $query->with('cargos')->orderBy('apellido')->paginate(15)->withQueryString();
@@ -60,21 +63,27 @@ class DocenteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreDocenteRequest  $request)
     {
-        // Aquí iría la lógica para guardar un nuevo docente
-        // Por ejemplo:
-        // Docente::create($request->validate([...]));
+        Docente::create($request->validated());
         return redirect()->route('docentes.index')->with('success', 'Docente creado exitosamente.');
     }
 
     /**
      * Display the specified resource.
      */
+  /**
+     * Display the specified resource.
+     */
     public function show(Docente $docente)
     {
+        // Cargar relaciones: Cargos (con dedicación) Y Comisiones (con materia)
+        $docente->load(['cargos.dedicacion', 'comisiones.materia']);
+
         return Inertia::render('Docentes/Show', [
-            'docente' => $docente->load('cargos'),
+            'docente' => $docente,
+            // Pasamos las comisiones por separado para usarlas fácil en el frontend
+            'comisiones' => $docente->comisiones 
         ]);
     }
 
@@ -91,11 +100,10 @@ class DocenteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Docente $docente)
+    public function update(StoreDocenteRequest  $request, Docente $docente)
     {
-        // Aquí iría la lógica para actualizar un docente
-        // Por ejemplo:
-        // $docente->update($request->validate([...]));
+        $docente->update($request->validated());
+
         return redirect()->route('docentes.index')->with('success', 'Docente actualizado exitosamente.');
     }
 
@@ -120,40 +128,27 @@ class DocenteController extends Controller
      */
     public function createCargo(Docente $docente)
     {
-        return Inertia::render('Docentes/Cargos/Create', [
-            'docente' => $docente->load('cargos'),
-            'dedicaciones' => Dedicacion::all()
-        ]);
-    }
+        
+        if ($docente->modalidad_desempeño === 'Desarrollo') {
 
-    /**
-     * Add a cargo to a docente.
-     *
-     * @param Request $request
-     * @param Docente $docente
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function addCargo(Request $request, Docente $docente)
-    {
-        $validated = $request->validate([
-            'cargo' => 'required|string|max:255',
-            'dedicacion_id' => 'required|exists:dedicaciones,id',
-            'docente_id' => 'required|exists:docentes,id',
-        ]);
 
-        // Usamos el docente que viene por la URL para asegurar la relación correcta.
-        $cargo = $docente->cargos()->create([
-            'nombre' => $validated['cargo'],
-            'dedicacion_id' => $validated['dedicacion_id'],
-            // Los valores por defecto se establecen aquí
-            'nro_materias_asig' => 0,
-            'sum_horas_frente_aula' => 0,
-        ]);
+            $dedicaciones = \App\Models\Dedicaciones::whereIn('nombre', ['Simple', 'SemiExclusiva(DP)'])->get();
 
-        if ($cargo) {
-            return redirect()->route('docentes.edit', $docente->id)->with('success', 'Cargo agregado exitosamente');
+
+        } elseif ($docente->modalidad_desempeño === 'Investigador') {
+
+
+            $dedicaciones = \App\Models\Dedicaciones::whereIn('nombre', ['SemiExclusiva(DI)', 'Exclusiva'])->get();
+
+
         }
 
-        return redirect()->route('docentes.edit', $docente->id)->with('error', 'Error al agregar el cargo');
+        return Inertia::render('Docentes/Cargos/Create', [
+            'docente' => $docente->load('cargos'),
+            'dedicaciones' => $dedicaciones,
+        ]);
     }
+
+
+
 }

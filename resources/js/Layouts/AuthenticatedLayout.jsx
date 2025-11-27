@@ -11,7 +11,6 @@ export default function AuthenticatedLayout({ header, children }) {
 
 
     const canViewUsers =
-        auth?.user?.roles?.includes('admin') ||
         auth?.user?.permissions?.includes('consultar_usuario');
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
@@ -118,11 +117,6 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
-                                        >
-                                            Profile
-                                        </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route('logout')}
                                             method="post"

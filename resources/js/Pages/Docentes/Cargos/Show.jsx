@@ -46,7 +46,7 @@ export default function Show({ auth, cargo, docente }) {
                                         href={route('cargos.destroy', cargo.id)} 
                                         method="delete"
                                         as="button"
-                                        onBefore={() => confirm('¿Estás seguro de que deseas eliminar esta materia?')}
+                                        onBefore={() => confirm('¿Estás seguro de que deseas eliminar este cargo?')}
                                         className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition flex items-center gap-2 font-semibold"
                                     >
                                         {/* Icono de Eliminar */}

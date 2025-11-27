@@ -4,9 +4,8 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 
-export default function Create({ auth, docente, dedicaciones,flash}) {
+export default function Create({ auth, docente, dedicaciones, flash }) {
     
-    // 1. Inicialización del estado del formulario con los NUEVOS CAMPOS
     const { data, setData, post, processing, errors } = useForm({
         cargo: '',
         dedicacion_id: '',
@@ -15,20 +14,20 @@ export default function Create({ auth, docente, dedicaciones,flash}) {
 
     const submit = (e) => {
         e.preventDefault();
-        // Envía la petición POST a la ruta correcta, pasando el ID del docente.
-        post(route('docentes.cargo.store', { docente: docente.id }));
+   
+        post(route('cargos.addCargo', { docente: docente.id }));
     };
 
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Agregar Cargo a {docente.nombre}</h2>}
+            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Agregar Cargo a {docente.nombre} {docente.apellido}</h2>}
         >
-            <Head title="Docente" />
+            <Head title="Agregar Cargo" />
 
             {flash?.error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                    {flash?.error}
+                    {flash.error}
                 </div>
             )}
 
@@ -36,6 +35,9 @@ export default function Create({ auth, docente, dedicaciones,flash}) {
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <form onSubmit={submit} className="p-6 space-y-6">
+                            {/* Campo oculto con el ID del docente */}
+                            <input type="hidden" name="docente_id" value={data.docente_id} />
+
                             {/* Cargo */}
                             <div className="mt-4">
                                 <InputLabel htmlFor="cargo" value="Cargo" />
@@ -52,7 +54,7 @@ export default function Create({ auth, docente, dedicaciones,flash}) {
                                     <option value="Titular">Titular</option>
                                     <option value="Asociado">Asociado</option>
                                     <option value="Adjunto">Adjunto</option>
-                                    <option value="Jefe de Trabajos Practicos">Jefe de Trabajos Practicos</option>
+                                    <option value="Jefe de Trabajos Practicos">Jefe de Trabajos Prácticos</option>
                                     <option value="Ayudante de Primera">Ayudante de Primera</option>
                                 </select>
 
@@ -61,7 +63,7 @@ export default function Create({ auth, docente, dedicaciones,flash}) {
 
                             {/* Dedicaciones */}
                             <div className="mt-4">
-                                <InputLabel htmlFor="dedicacion" value="Dedicacion" />
+                                <InputLabel htmlFor="dedicacion" value="Dedicación" />
 
                                 <select
                                     id="dedicacion"
@@ -79,11 +81,12 @@ export default function Create({ auth, docente, dedicaciones,flash}) {
                                     ))}
                                 </select>
 
-                                <InputError message={errors.dedicaciones} className="mt-2" />
+                                <InputError message={errors.dedicacion_id} className="mt-2" />
                             </div>
+
                             <div className="flex justify-end space-x-4">
                                 <Link
-                                    href={route('docentes.edit', { docente: docente.id })}
+                                    href={route('docentes.edit', docente.id)}
                                     className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >
                                     Cancelar

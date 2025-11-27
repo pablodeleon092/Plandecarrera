@@ -3,10 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Materia extends Model
 {
+
+    use HasFactory;
+
     protected $table = 'materias';
+
+
 
     protected $fillable = [
         'nombre',
@@ -32,10 +38,15 @@ class Materia extends Model
 
     public function planes()
     {
-        return $this->belongsToMany(Plan::class, 'plan_materia', 'plan_id', 'materia_id');
+        return $this->belongsToMany(Plan::class, 'plan_materia', 'materia_id', 'plan_id');
     }
 
     //Relacion con las Comisiones
+
+    public function comisiones()
+    {
+        return $this->hasMany(Comision::class, 'id_materia');
+    }
 
     //Accessors y Mutators
 
@@ -71,6 +82,23 @@ class Materia extends Model
     }
 
     // Scopes (consultas reutilizables)
+
+    public function scopeByInstituto($query, $institutoId)
+    {
+        return $query->whereHas('planes.carrera', function ($q) use ($institutoId) {
+            $q->where('instituto_id', $institutoId);
+        });
+    }
+
+    /**
+     * Scope para filtrar materias por un array de Carrera IDs.
+     */
+    public function scopeByCarreras($query, array $carreraIds)
+    {
+        return $query->whereHas('planes', function ($q) use ($carreraIds) {
+            $q->whereIn('carrera_id', $carreraIds);
+        });
+    }
 
     /**
      * Scope para materias activas

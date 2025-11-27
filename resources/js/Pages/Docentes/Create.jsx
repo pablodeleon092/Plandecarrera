@@ -9,7 +9,7 @@ export default function Create({ auth }) {
         nombre: '',
         apellido: '',
         modalidad_desempeño: 'Investigador', // ENUM
-        carga_horaria: '', // integer
+        carga_horaria: 0, // integer
         es_activo: true, // boolean
         telefono: '',
         email: '',
@@ -90,18 +90,6 @@ export default function Create({ auth }) {
                                         <option value="Desarrollo">Desarrollo</option>
                                     </select>
                                     {errors.modalidad_desempeño && <div className="text-red-600 mt-1 text-sm">{errors.modalidad_desempeño}</div>}
-                                </div>
-                                <div>
-                                    <label htmlFor="carga_horaria" className="block text-sm font-medium text-gray-700">Carga Horaria (Hrs)</label>
-                                    <input
-                                        id="carga_horaria"
-                                        type="number" 
-                                        value={data.carga_horaria}
-                                        onChange={(e) => setData('carga_horaria', e.target.value)}
-                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
-                                        required
-                                    />
-                                    {errors.carga_horaria && <div className="text-red-600 mt-1 text-sm">{errors.carga_horaria}</div>}
                                 </div>
                             </div>
 

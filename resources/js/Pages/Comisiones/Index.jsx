@@ -6,20 +6,28 @@ import DataTable from '@/Components/DataTable';
 import TableFilters from '@/Components/TableFilters';
 import PaginatorButtons from '@/Components/PaginatorButtons';
 
-export default function Index({ auth, comisiones }) {
+export default function Index({ auth, comisiones, modalidades, sedes, flash, filters: initialFilters = {} }) {
     const [filters, setFilters] = useState({
-        search: '',
-        modalidad: '',
-        sede: ''
+        search: initialFilters.search || '',
+        modalidad: initialFilters.modalidad || '',
+        sede: initialFilters.sede || ''
     });
 
     const handleFilterChange = (key, value) => {
-        setFilters(prev => ({ ...prev, [key]: value }));
+        const newFilters = { ...filters, [key]: value };
+        setFilters(newFilters);
+        router.get(route('comisiones.index'), newFilters, {
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+        });
     };
 
-    
-    const modalidades = [...new Set(comisiones.data.map(c => c.modalidad))].filter(Boolean);
-    const sedes = [...new Set(comisiones.data.map(c => c.sede))].filter(Boolean);
+    const handleToggleStatus = (comision) => {
+        router.patch(route('comisiones.toggleStatus', comision), {}, {
+            preserveScroll: true
+        });
+    };    
 
     const filterConfig = [
         {
@@ -44,18 +52,6 @@ export default function Index({ auth, comisiones }) {
             options: sedes.map(s => ({ value: s, label: s }))
         }
     ];
-
-    const filteredData = useMemo(() => {
-        return comisiones.data.filter(comision => {
-            const matchSearch = !filters.search || 
-                comision.codigo.toLowerCase().includes(filters.search.toLowerCase()) ||
-                (comision.materia?.nombre || '').toLowerCase().includes(filters.search.toLowerCase());
-            const matchModalidad = !filters.modalidad || comision.modalidad === filters.modalidad;
-            const matchSede = !filters.sede || comision.sede === filters.sede;
-            
-            return matchSearch && matchModalidad && matchSede;
-        });
-    }, [comisiones.data, filters]);
 
     const columns = [
         {
@@ -103,7 +99,25 @@ export default function Index({ auth, comisiones }) {
             label: 'Horas Practica',
             className: 'text-sm font-medium text-gray-900',
         },
+        {
+            key: 'estado',
+            label: 'Estado',
+            render: (comision) => (
+            <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                comision.estado
+                ? 'bg-green-100 text-green-800'
+                : 'bg-red-100 text-red-800'
+            }`}>
+                {comision.estado ? 'Activa' : 'Inactiva'}
+            </span>
+            )
+        }
     ];
+
+    const activeFilters = Object.fromEntries(
+            Object.entries(filters).filter(([key, value]) => value !== '' && value !== null)
+    );   
+
 
     const handleDelete = (comision) => {
         if (confirm('¿Estás seguro de eliminar esta comision?')) {
@@ -117,7 +131,19 @@ export default function Index({ auth, comisiones }) {
             header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Gestión de Comisiones</h2>}
         >
             <Head title="Comisiones" />
-            
+
+                    {flash?.success && (
+                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                            {flash.success}
+                        </div>
+                    )}
+                    {flash?.error && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                            {flash.error}
+                        </div>
+                    )}
+
+
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <ListHeader
@@ -135,10 +161,11 @@ export default function Index({ auth, comisiones }) {
                     <div className="bg-white rounded-lg shadow overflow-hidden">
                         <DataTable 
                             columns={columns}
-                            data={filteredData}
+                            data={comisiones.data}
                             onShow={(comision) => router.visit(route('comisiones.show', comision.id))}
                             onEdit={(comision) => router.visit(route('comisiones.edit', comision.id))}
                             onDelete={handleDelete}
+                            onToggleStatus={(comision) => handleToggleStatus(comision.id)}
                             hover={true}
                             emptyMessage="No se encontraron comisiones"
                             emptyIcon={
@@ -149,7 +176,7 @@ export default function Index({ auth, comisiones }) {
                         />
                     </div>
 
-                    <PaginatorButtons meta={comisiones?.meta} paginator={comisiones} routeName={'comisiones.index'} />
+                    <PaginatorButtons meta={comisiones?.meta} paginator={comisiones} routeName={'comisiones.index'} routeParams={activeFilters}/>
 
                     <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="bg-white rounded-lg shadow p-4">

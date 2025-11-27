@@ -1,61 +1,147 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Plandecarrera
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema de gestión académica para la universidad de Tierra Del Fuego que permite administrar docentes, carreras, materias, comisiones y asignaciones de enseñanza.
 
-## About Laravel
+## Tecnologías
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Backend
+- **Laravel** - Framework PHP
+- **PostgreSQL 16** - Base de datos relacional
+- **Laravel Breeze** - Autenticación
+- **Spatie Permissions** - Control de acceso basado en roles
+- **PHP 8.2+** - Versión requerida
 
--   [Simple, fast routing engine](https://laravel.com/docs/routing).
--   [Powerful dependency injection container](https://laravel.com/docs/container).
--   Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
--   Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
--   Database agnostic [schema migrations](https://laravel.com/docs/migrations).
--   [Robust background job processing](https://laravel.com/docs/queues).
--   [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Frontend
+- **React 18.2** - Librería UI
+- **Inertia.js 2.2** - Adaptador SPA Laravel-React
+- **Tailwind CSS 3.2** - Framework CSS
+- **Headless UI** - Componentes accesibles
+- **Vite 7.0** - Build tool y dev server
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Requisitos
 
-## Learning Laravel
+- Docker
+- Docker Compose
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Instalación
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+El proyecto incluye una configuración completa de Docker con los siguientes servicios:
+- **app**: Contenedor PHP con Laravel
+- **web**: Servidor Nginx
+- **db**: PostgreSQL 16
+- **node**: Servidor de desarrollo Vite
 
-## Laravel Sponsors
+### Pasos de instalación
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1.  **Clonar el repositorio**
+    ```bash
+    git clone [https://github.com/pablodeleon092/Plandecarrera.git](https://github.com/pablodeleon092/Plandecarrera.git)
+    cd Plandecarrera
+    ```
+2.  **Configurar variables de entorno**
+    ```bash
+    cp .env.example .env
+    ```
+3.  **Configurar variables de usuario (para permisos de archivos)**
+    ```bash
+    export MY_UID=$(id -u)
+    export MY_GID=$(id -g)
+    ```
+4.  **Configurar base de datos en `.env` para Docker**
+    ```ini
+    DB_CONNECTION=pgsql
+    DB_HOST=db
+    DB_PORT=5432
+    DB_DATABASE=laravel
+    DB_USERNAME=laravel
+    DB_PASSWORD=secret
+    ```
+5.  **Levantar los contenedores**
+    ```bash
+    docker-compose up -d
+    ```
+6.  **Instalar dependencias PHP**
+    ```bash
+    docker-compose exec app composer install
+    ```
+7.  **Generar key de aplicación**
+    ```bash
+    docker-compose exec app php artisan key:generate
+    ```
+8.  **Ejecutar migraciones**
+    ```bash
+    docker-compose exec app php artisan migrate
+    ```
+9.  **Poblar la base de datos con datos iniciales**
+    ```bash
+    docker-compose exec app php artisan db:seed
+    ```
+    Este comando ejecutará todos los seeders disponibles:
+    - `DocenteSeeder` - Crea 100 docentes de prueba
+    - `DedicacionesSeeder` - Carga tipos de dedicación (Simple, SemiExclusiva, Exclusiva)
+    - `FuncionAulicaSeeder` - Carga funciones áulicas (teórica, práctica, teórica/práctica)
+    - Seeders de carreras por instituto (ICPA, ICSE, IDEI, IEC)
 
-### Premium Partners
+10. **Acceder a la aplicación**
+    - Frontend: `http://localhost:8000`
+    - Base de datos: `localhost:5432`
+    - Vite dev server: `http://localhost:5173`
+   
+## Funcionalidades
 
--   **[Vehikl](https://vehikl.com)**
--   **[Tighten Co.](https://tighten.co)**
--   **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
--   **[64 Robots](https://64robots.com)**
--   **[Curotec](https://www.curotec.com/services/technologies/laravel)**
--   **[DevSquad](https://devsquad.com/hire-laravel-developers)**
--   **[Redberry](https://redberry.international/laravel-development)**
--   **[Active Logic](https://activelogic.com)**
+- Gestión de docentes con cargos y dedicaciones
+- Administración de carreras y materias
+- Creación de comisiones
+- Asignación de docentes a comisiones
+- Control de carga horaria docente
+- Sistema de roles y permisos
+- Interfaz SPA con React
 
-## Contributing
+## Estructura del Proyecto 
+Plandecarrera/  
+├── app/  
+│   ├── Http/Controllers/    # Controladores Laravel  
+│   └── Models/              # Modelos Eloquent  
+├── database/  
+│   ├── migrations/          # Esquema de base de datos  
+│   ├── seeders/             # Datos iniciales  
+│   └── factories/           # Factories para testing  
+├── resources/  
+│   ├── js/  
+│   │   ├── Pages/          # Páginas Inertia.js  
+│   │   └── Components/     # Componentes React  
+│   └── views/              # Templates Blade  
+├── routes/  
+│   └── web.php             # Definición de rutas  
+├── docker-compose.yml      # Configuración Docker  
+└── vite.config.js          # Configuración Vite  
+## Licencia
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+definir!
 
-## Code of Conduct
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Comandos útiles de Docker
 
-## Security Vulnerabilities
+```bash
+# Ver logs
+docker-compose logs -f
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Ver logs de un servicio específico
+docker-compose logs -f app
 
-## License
+# Detener contenedores
+docker-compose down
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Reiniciar contenedores
+docker-compose restart
+
+# Ejecutar comandos artisan
+docker-compose exec app php artisan [comando]
+
+# Acceder al contenedor
+docker-compose exec app bash
+
+# Limpiar y reconstruir
+docker-compose down -v
+docker-compose up -d --build

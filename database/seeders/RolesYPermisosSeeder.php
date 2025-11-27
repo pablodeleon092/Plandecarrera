@@ -32,18 +32,54 @@ class RolesYPermisosSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permiso]);
         }
 
+        // 🎯 ROLES MODIFICADOS:
+        // Se ha retirado 'modificar_usuario' de 'Admin_instituto' y 'Coord_carrera'.
         $roles = [
-            'Admin' => ['consultar_usuario', 'modificar_usuario', 'modificar_permisos', 'consultar_carrera', 'modificar_carrera', 'consultar_docente', 'modificar_docente'],
-            'Admin_global' => ['consultar_usuario', 'modificar_usuario', 'consultar_carrera', 'modificar_carrera', 'consultar_docente', 'modificar_docente'],
-            'Admin_instituto' => ['consultar_usuario', 'modificar_usuario','consultar_carrera','modificar_carrera', 'consultar_docente', 'modificar_docente'], #solo sobre las carreras de su instituto
-            'Coord_carrera' => ['consultar_usuario', 'modificar_usuario','consultar_carrera', 'modificar_carrera', 'consultar_docente', 'modificar_docente'], #solo sobre sus materias asignadas
-            'Consulta_instituto' => ['consultar_carrera', 'consultar_docente'], #solo sobre los carreras de su instituto
+            'Admin' => [
+                'consultar_usuario', 
+                'modificar_usuario',            // MANTENIDO
+                'modificar_permisos', 
+                'consultar_carrera', 
+                'modificar_carrera', 
+                'consultar_docente', 
+                'modificar_docente'
+            ],
+            'Admin_global' => [
+                'consultar_usuario', 
+                'modificar_usuario',            // MANTENIDO
+                'consultar_carrera', 
+                'modificar_carrera', 
+                'consultar_docente', 
+                'modificar_docente'
+            ],
+            'Admin_instituto' => [
+                'consultar_usuario', 
+                // 'modificar_usuario',         // ❌ ELIMINADO
+                'consultar_carrera',
+                'modificar_carrera', 
+                'consultar_docente', 
+                'modificar_docente'
+            ], 
+            'Coord_carrera' => [
+                //'consultar_usuario', 
+                // 'modificar_usuario',         // ❌ ELIMINADO
+                'consultar_carrera', 
+                'modificar_carrera', 
+                'consultar_docente', 
+                'modificar_docente'
+            ], 
+            'Consulta_instituto' => [
+                'consultar_carrera', 
+                'consultar_docente'
+            ], 
         ];
 
         foreach ($roles as $rol => $permisosRol) {
             $role = Role::firstOrCreate(['name' => $rol]);
+            // syncPermissions asegurará que solo se asignen los permisos definidos aquí.
             $role->syncPermissions($permisosRol);
         }
+
         $admin = User::firstOrCreate(
             ['email' => 'admin@domain.com'],
             [
@@ -59,5 +95,12 @@ class RolesYPermisosSeeder extends Seeder
         );
 
         $admin->assignRole('Admin');
+
     }
+
+    
+
+
+
+
 }

@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function CreateDicta({ auth, comision, docentes, funcionesAulicas }) {
+export default function CreateDicta({ auth, comision, flash, docente, funcionesAulicas }) {
     const { data, setData, post, errors } = useForm({
         comision_id: comision.id,
-        docente_id: '',
+        docente_id: docente.id,
         cargo_id: '',
         horas_frente_aula: '',
         modalidad_presencia: 'presencial',
@@ -22,32 +22,30 @@ export default function CreateDicta({ auth, comision, docentes, funcionesAulicas
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={<h2 className="text-xl font-semibold text-gray-800">Agregar docente a {comision.nombre}</h2>}
+            header={<h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">Comisión: {comision.nombre}</h2>}
         >
-            <Head title={`Agregar docente a ${comision.nombre}`} />
+            <Head title={`Comisión: ${comision.nombre}`} />
+
+                    {flash?.success && (
+                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                            {flash.success}
+                        </div>
+                    )}
+                    {flash?.error && (
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                            {flash.error}
+                        </div>
+                    )}
 
             <div className="py-8">
                 <div className="container mx-auto px-4 max-w-lg bg-white rounded-lg shadow-lg p-6">
+                    <div className="mb-6">
+                        <h3 className="text-2xl font-bold mb-6">Asignar Docente a la Comisión</h3>
+                        <p className="mb-4">Docente seleccionado: <strong>{docente.nombre} {docente.apellido} (Legajo: {docente.legajo})</strong></p>   
+                        <p>Horas Teoricas: {comision.horas_teoricas}</p>
+                        <p>Horas Practicas: {comision.horas_practicas}</p>
+                    </div>
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        {/* Seleccionar Docente */}
-                        <div>
-                            <label className="block text-gray-700 font-semibold mb-2">Docente</label>
-                            <select
-                                value={data.docente_id}
-                                onChange={e => setData('docente_id', e.target.value)}
-                                className="w-full border rounded px-3 py-2"
-                                required
-                            >
-                                <option value="">-- Seleccione un docente --</option>
-                                {docentes.map((docente) => (
-                                    <option key={docente.id} value={docente.id}>
-                                        {docente.nombre} {docente.apellido}
-                                    </option>
-                                ))}
-                            </select>
-                            {errors.docente_id && <p className="text-red-500 text-sm mt-1">{errors.docente_id}</p>}
-                        </div>
-
                         {/* Seleccionar Cargo */}
                         <div>
                             <label className="block text-gray-700 font-semibold mb-2">Cargo</label>
@@ -58,7 +56,7 @@ export default function CreateDicta({ auth, comision, docentes, funcionesAulicas
                                 required
                             >
                                 <option value="">-- Seleccione un cargo --</option>
-                                {data.docente_id && docentes.find(d => d.id == data.docente_id)?.cargos.map(cargo => (
+                                {docente.cargos.map(cargo => (
                                     <option key={cargo.id} value={cargo.id}>{cargo.nombre}</option>
                                 ))}
                             </select>
