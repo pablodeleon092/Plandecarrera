@@ -214,7 +214,7 @@ export default function Show( {institutos, flash} ) {
                     href={route('coordinadores.carreras.edit', user.id)}  
                     className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 inline-flex items-center" 
                 >
-                    Agregar Materia
+                    Agregar Carreras
                 </Link>
                 )} 
 

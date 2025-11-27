@@ -8,7 +8,7 @@ export default function Edit({ auth, docente,flash }) {
         nombre: docente.nombre ?? '',
         apellido: docente.apellido ?? '',
         modalidad_desempeño: docente.modalidad_desempeño ?? 'Investigador',
-        carga_horaria: docente.carga_horaria ?? 0,
+        carga_horaria: docente.carga_horaria,
         es_activo: !!docente.es_activo,
         telefono: docente.telefono ?? '',
         email: docente.email ?? '',
@@ -88,19 +88,6 @@ export default function Edit({ auth, docente,flash }) {
                                         </select>
                                         {errors.modalidad_desempeño && (
                                             <p className="text-red-600 text-sm mt-1">{errors.modalidad_desempeño}</p>
-                                        )}
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Carga horaria</label>
-                                        <input
-                                            type="number"
-                                            value={data.carga_horaria}
-                                            onChange={(e) => setData('carga_horaria', e.target.value)}
-                                            className="mt-1 block w-full rounded-md border-gray-300"
-                                        />
-                                        {errors.carga_horaria && (
-                                            <p className="text-red-600 text-sm mt-1">{errors.carga_horaria}</p>
                                         )}
                                     </div>
                                 </div>

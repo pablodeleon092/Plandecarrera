@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Docente;
 use App\Models\Dedicacion;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreDocenteRequest;
 use Inertia\Inertia;
 
 class DocenteController extends Controller
@@ -62,11 +63,9 @@ class DocenteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreDocenteRequest  $request)
     {
-        // Aquí iría la lógica para guardar un nuevo docente
-        // Por ejemplo:
-        // Docente::create($request->validate([...]));
+        Docente::create($request->validated());
         return redirect()->route('docentes.index')->with('success', 'Docente creado exitosamente.');
     }
 
@@ -101,11 +100,10 @@ class DocenteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Docente $docente)
+    public function update(StoreDocenteRequest  $request, Docente $docente)
     {
-        // Aquí iría la lógica para actualizar un docente
-        // Por ejemplo:
-        // $docente->update($request->validate([...]));
+        $docente->update($request->validated());
+
         return redirect()->route('docentes.index')->with('success', 'Docente actualizado exitosamente.');
     }
 

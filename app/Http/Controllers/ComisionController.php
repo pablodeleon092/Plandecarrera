@@ -12,51 +12,57 @@ use Illuminate\Validation\Rule;
 class ComisionController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+
         try {
-
-            $this->authorize('index', Comision::class); 
-        } catch (\Throwable $e) {
-
-        }
+            $this->authorize('index', Comision::class);
+        } catch (\Throwable $e) {}
 
         $query = Comision::query();
 
-        // 1. Admin y Admin_global: Ven todo.
+  
         if ($user->hasAnyRole(['Admin', 'Admin_global'])) {
-    
-        } 
-        
-        // 2. Admin_instituto y Consulta_instituto: Solo comisiones de su Instituto.
-        elseif ($user->hasAnyRole(['Admin_instituto', 'Consulta_instituto'])) {
-            if ($user->instituto_id) {
-                // Filtra comisiones por instituto usando el Scope del modelo Comision
-                $query->byInstituto($user->instituto_id);
 
+        } elseif ($user->hasAnyRole(['Admin_instituto', 'Consulta_instituto'])) {
+            if ($user->instituto_id) {
+                $query->byInstituto($user->instituto_id);
             } else {
-                $query->whereRaw('1 = 0'); 
+                $query->whereRaw('1 = 0');
             }
-        } 
-        
-        // 3. Coordinador_carrera: Solo comisiones asociadas a las materias de sus carreras.
-        elseif ($user->hasRole('Coord_carrera')) {
+        } elseif ($user->hasRole('Coord_carrera')) {
 
             $carreraIds = $user->carreras->pluck('id')->toArray();
-            
+
             if (!empty($carreraIds)) {
-                // Filtra comisiones por carreras usando el Scope del modelo Comision
                 $query->byCarreras($carreraIds);
             } else {
-                $query->whereRaw('1 = 0'); 
+                $query->whereRaw('1 = 0');
             }
-        } 
-        
-
-        else {
-            $query->whereRaw('1 = 0'); // Denegar acceso por defecto.
+        } else {
+            $query->whereRaw('1 = 0');
         }
+
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('codigo', 'like', "%$search%")
+                ->orWhereHas('materia', function ($mq) use ($search) {
+                    $mq->where('nombre', 'like', "%$search%");
+                });
+            });
+        }
+
+        if ($request->filled('modalidad')) {
+            $query->where('modalidad', $request->modalidad);
+        }
+
+        if ($request->filled('sede')) {
+            $query->where('sede', $request->sede);
+        }
+
 
 
         $comisiones = $query
@@ -64,10 +70,14 @@ class ComisionController extends Controller
             ->orderBy('id', 'desc')
             ->paginate(15)
             ->withQueryString();
-           
- 
+
+
+
         return Inertia::render('Comisiones/Index', [
             'comisiones' => $comisiones,
+            'filters' => $request->only(['search', 'modalidad', 'sede']),
+            'modalidades' => Comision::select('modalidad')->distinct()->pluck('modalidad'),
+            'sedes' => Comision::select('sede')->distinct()->pluck('sede'),
         ]);
     }
 
@@ -78,6 +88,7 @@ class ComisionController extends Controller
             ? $comision->docentes_with_cargo
             : collect(); // colección vacía
         $allDocentes = \App\Models\Docente::where('es_activo',true)->get();
+
         return Inertia::render('Comisiones/Show', [
             'comision' => $comision,
             'docentes' => $docentes,

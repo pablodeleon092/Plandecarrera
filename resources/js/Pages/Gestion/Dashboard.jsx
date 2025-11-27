@@ -1,8 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
-
-// ⬅️ Importamos el nuevo componente parcial. La ruta relativa es correcta si este archivo está en 'resources/js/Pages/'
 import Materias from './Partials/Materias';
 
 export default function Dashboard({ user, institutos, materias, selectedInstitutoId: initialInstitutoId, selectedCarreraId: initialCarreraId }) {
@@ -142,6 +140,9 @@ export default function Dashboard({ user, institutos, materias, selectedInstitut
                                 </select>
                             </div>
                         </div>
+
+
+
 
                         {/* ⬅️ CONTENIDO EXTRAÍDO: Ahora se llama al componente Materias */}
                         <Materias materias={materias} />

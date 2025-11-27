@@ -75,6 +75,7 @@ class Comision extends Model
                 'año_fin' => $dicta->año_fin,
                 'modalidad_presencia' => $dicta->modalidad_presencia,
                 'horas_frente_aula' => $dicta->horas_frente_aula,
+                'funcion_aulica' => $dicta->funcionAulica->nombre ?? null,
             ];
         });
     }

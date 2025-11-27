@@ -8,7 +8,7 @@ use App\Models\Carrera;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth; // <-- Importar la Facade Auth
+use Illuminate\Support\Facades\Auth; 
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -107,7 +107,7 @@ class DashboardController extends Controller
 
 
     private function getMateriasFiltradas($institutoId, $carreraId = 'all')
-        {
+    {
             // 🚨 Cargos a filtrar
             $cargosDisponibles = [
                 'Titular',
@@ -237,6 +237,4 @@ class DashboardController extends Controller
             return $materiasColeccion;
         }
 
-
-
-}
+} 
