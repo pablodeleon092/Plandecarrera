@@ -239,4 +239,15 @@ class ComisionController extends Controller
             return redirect()->route('comisiones.index')->with('error', 'No se puede eliminar la comision.');
         }
     }
+
+    public function toggleStatus(Comision $comision)
+    {
+        $comision->estado = !$comision->estado;
+        $comision->save();
+
+        return redirect()->route('comisiones.index')
+            ->with('success', 'Estado de la comisión actualizado exitosamente.');
+    }
+
+
 }

@@ -57,23 +57,23 @@ class NormativaAsignacion
     public static function recalcularCargo($docente, $cargo): void
     {
         // 1. SUMA de horas frente al aula
-        $totalHoras = Dicta::where('docente_id', $docente->id)
-            ->where('cargo_id', $cargo->id)
-            ->sum('horas_frente_aula');
-
-        // 2. COUNT DISTINCT de materias asignadas
-        // Necesitamos unir con 'comisiones' para acceder a 'id_materia'
-        $totalMaterias = Dicta::select('comisiones.id_materia')
-            ->join('comisiones', 'dictas.comision_id', '=', 'comisiones.id')
+        $totalHoras = Dicta::join('comisiones', 'dictas.comision_id', '=', 'comisiones.id')
             ->where('dictas.docente_id', $docente->id)
             ->where('dictas.cargo_id', $cargo->id)
-            ->distinct()
-            ->count();
+            ->where('comisiones.estado', true)
+            ->sum('dictas.horas_frente_aula');
+
+        // 2. COUNT DISTINCT de materias asignadas
+        $totalMaterias = Dicta::join('comisiones', 'dictas.comision_id', '=', 'comisiones.id')
+            ->where('dictas.docente_id', $docente->id)
+            ->where('dictas.cargo_id', $cargo->id)
+            ->where('comisiones.estado', true)
+            ->distinct('comisiones.id_materia')
+            ->count('comisiones.id_materia');
             
         // 3. Aplicar y guardar
         $cargo->sum_horas_frente_aula = $totalHoras;
         $cargo->nro_materias_asig = $totalMaterias;
-        
         $cargo->save();
     }
     
@@ -86,7 +86,10 @@ class NormativaAsignacion
      */
     public static function recalcularCargaHorariaDocente($docente): void
     {
-        $totalCargaHoraria = Dicta::where('docente_id', $docente->id)->sum('horas_frente_aula');
+        $totalCargaHoraria = Dicta::join('comisiones', 'dictas.comision_id', '=', 'comisiones.id')
+            ->where('dictas.docente_id', $docente->id)
+            ->where('comisiones.estado', true)
+            ->sum('dictas.horas_frente_aula');
         
         $docente->carga_horaria = $totalCargaHoraria;
         $docente->save();

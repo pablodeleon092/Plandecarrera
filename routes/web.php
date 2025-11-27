@@ -44,7 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('dictas', DictaController::class);
     Route::patch('materias/{materia}/toggle-status', [MateriaController::class, 'toggleStatus'])->name('materias.toggleStatus');
     Route::patch('carreras/{carrera}/toggle-status', [CarreraController::class, 'toggleStatus'])->name('carreras.toggleStatus');
-
+    Route::patch('comisiones/{comision}/toggle-status', [ComisionController::class, 'toggleStatus'])->name('comisiones.toggleStatus');
 
 });
 

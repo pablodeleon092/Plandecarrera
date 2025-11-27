@@ -23,7 +23,11 @@ export default function Index({ auth, comisiones, modalidades, sedes, flash, fil
         });
     };
 
-    
+    const handleToggleStatus = (comision) => {
+        router.patch(route('comisiones.toggleStatus', comision), {}, {
+            preserveScroll: true
+        });
+    };    
 
     const filterConfig = [
         {
@@ -95,6 +99,19 @@ export default function Index({ auth, comisiones, modalidades, sedes, flash, fil
             label: 'Horas Practica',
             className: 'text-sm font-medium text-gray-900',
         },
+        {
+            key: 'estado',
+            label: 'Estado',
+            render: (comision) => (
+            <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                comision.estado
+                ? 'bg-green-100 text-green-800'
+                : 'bg-red-100 text-red-800'
+            }`}>
+                {comision.estado ? 'Activa' : 'Inactiva'}
+            </span>
+            )
+        }
     ];
 
     const activeFilters = Object.fromEntries(
@@ -148,6 +165,7 @@ export default function Index({ auth, comisiones, modalidades, sedes, flash, fil
                             onShow={(comision) => router.visit(route('comisiones.show', comision.id))}
                             onEdit={(comision) => router.visit(route('comisiones.edit', comision.id))}
                             onDelete={handleDelete}
+                            onToggleStatus={(comision) => handleToggleStatus(comision.id)}
                             hover={true}
                             emptyMessage="No se encontraron comisiones"
                             emptyIcon={
