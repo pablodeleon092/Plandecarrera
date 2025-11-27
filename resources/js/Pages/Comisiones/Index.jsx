@@ -6,20 +6,24 @@ import DataTable from '@/Components/DataTable';
 import TableFilters from '@/Components/TableFilters';
 import PaginatorButtons from '@/Components/PaginatorButtons';
 
-export default function Index({ auth, comisiones,flash }) {
+export default function Index({ auth, comisiones, modalidades, sedes, flash, filters: initialFilters = {} }) {
     const [filters, setFilters] = useState({
-        search: '',
-        modalidad: '',
-        sede: ''
+        search: initialFilters.search || '',
+        modalidad: initialFilters.modalidad || '',
+        sede: initialFilters.sede || ''
     });
 
     const handleFilterChange = (key, value) => {
-        setFilters(prev => ({ ...prev, [key]: value }));
+        const newFilters = { ...filters, [key]: value };
+        setFilters(newFilters);
+        router.get(route('comisiones.index'), newFilters, {
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+        });
     };
 
     
-    const modalidades = [...new Set(comisiones.data.map(c => c.modalidad))].filter(Boolean);
-    const sedes = [...new Set(comisiones.data.map(c => c.sede))].filter(Boolean);
 
     const filterConfig = [
         {
@@ -44,18 +48,6 @@ export default function Index({ auth, comisiones,flash }) {
             options: sedes.map(s => ({ value: s, label: s }))
         }
     ];
-
-    const filteredData = useMemo(() => {
-        return comisiones.data.filter(comision => {
-            const matchSearch = !filters.search || 
-                comision.codigo.toLowerCase().includes(filters.search.toLowerCase()) ||
-                (comision.materia?.nombre || '').toLowerCase().includes(filters.search.toLowerCase());
-            const matchModalidad = !filters.modalidad || comision.modalidad === filters.modalidad;
-            const matchSede = !filters.sede || comision.sede === filters.sede;
-            
-            return matchSearch && matchModalidad && matchSede;
-        });
-    }, [comisiones.data, filters]);
 
     const columns = [
         {
@@ -105,6 +97,11 @@ export default function Index({ auth, comisiones,flash }) {
         },
     ];
 
+    const activeFilters = Object.fromEntries(
+            Object.entries(filters).filter(([key, value]) => value !== '' && value !== null)
+    );   
+
+
     const handleDelete = (comision) => {
         if (confirm('¿Estás seguro de eliminar esta comision?')) {
             router.delete(route('comisiones.destroy', comision.id));
@@ -147,7 +144,7 @@ export default function Index({ auth, comisiones,flash }) {
                     <div className="bg-white rounded-lg shadow overflow-hidden">
                         <DataTable 
                             columns={columns}
-                            data={filteredData}
+                            data={comisiones.data}
                             onShow={(comision) => router.visit(route('comisiones.show', comision.id))}
                             onEdit={(comision) => router.visit(route('comisiones.edit', comision.id))}
                             onDelete={handleDelete}
@@ -161,7 +158,7 @@ export default function Index({ auth, comisiones,flash }) {
                         />
                     </div>
 
-                    <PaginatorButtons meta={comisiones?.meta} paginator={comisiones} routeName={'comisiones.index'} />
+                    <PaginatorButtons meta={comisiones?.meta} paginator={comisiones} routeName={'comisiones.index'} routeParams={activeFilters}/>
 
                     <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="bg-white rounded-lg shadow p-4">

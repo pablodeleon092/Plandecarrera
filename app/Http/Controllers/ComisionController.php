@@ -6,23 +6,78 @@ use Illuminate\Http\Request;
 use App\Models\Comision;
 use App\Models\Materia;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class ComisionController extends Controller
 {
 
-    public function index()
+    public function index(Request $request)
     {
+        $user = Auth::user();
+
         try {
-            $this->authorize('index', Materia::class);
-        } catch (\Throwable $e) {
-            // If no policy exists, ignore and continue
+            $this->authorize('index', Comision::class);
+        } catch (\Throwable $e) {}
+
+        $query = Comision::query();
+
+  
+        if ($user->hasAnyRole(['Admin', 'Admin_global'])) {
+
+        } elseif ($user->hasAnyRole(['Admin_instituto', 'Consulta_instituto'])) {
+            if ($user->instituto_id) {
+                $query->byInstituto($user->instituto_id);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        } elseif ($user->hasRole('Coord_carrera')) {
+
+            $carreraIds = $user->carreras->pluck('id')->toArray();
+
+            if (!empty($carreraIds)) {
+                $query->byCarreras($carreraIds);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        } else {
+            $query->whereRaw('1 = 0');
         }
 
-        $comisiones = Comision::with('materia')->orderBy('id', 'desc')->paginate(15)->withQueryString();
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('codigo', 'like', "%$search%")
+                ->orWhereHas('materia', function ($mq) use ($search) {
+                    $mq->where('nombre', 'like', "%$search%");
+                });
+            });
+        }
+
+        if ($request->filled('modalidad')) {
+            $query->where('modalidad', $request->modalidad);
+        }
+
+        if ($request->filled('sede')) {
+            $query->where('sede', $request->sede);
+        }
+
+
+
+        $comisiones = $query
+            ->with('materia')
+            ->orderBy('id', 'desc')
+            ->paginate(15)
+            ->withQueryString();
+
+
 
         return Inertia::render('Comisiones/Index', [
             'comisiones' => $comisiones,
+            'filters' => $request->only(['search', 'modalidad', 'sede']),
+            'modalidades' => Comision::select('modalidad')->distinct()->pluck('modalidad'),
+            'sedes' => Comision::select('sede')->distinct()->pluck('sede'),
         ]);
     }
 
@@ -33,6 +88,7 @@ class ComisionController extends Controller
             ? $comision->docentes_with_cargo
             : collect(); // colección vacía
         $allDocentes = \App\Models\Docente::where('es_activo',true)->get();
+
         return Inertia::render('Comisiones/Show', [
             'comision' => $comision,
             'docentes' => $docentes,
@@ -43,8 +99,8 @@ class ComisionController extends Controller
     public function create(Request $request)
     {
 
-        $materiaId = $request->query('materia_id');
-
+        $materiaId = $request->old('id_materia') ?? $request->query('materia_id');
+      
         $materia = Materia::findOrFail($materiaId);
 
         return Inertia::render('Comisiones/Create', [

@@ -18,6 +18,7 @@ export default function Index({ auth, docentes, flash, filters: initialFilters =
         const newFilters = { ...filters, [key]: value };
         setFilters(newFilters);
         router.get(route('docentes.index'), newFilters, {
+            preserveScroll: true,
             preserveState: true,
             replace: true,
         });
@@ -35,6 +36,11 @@ export default function Index({ auth, docentes, flash, filters: initialFilters =
             ]
         }
     ];
+
+
+    const activeFilters = Object.fromEntries(
+            Object.entries(filters).filter(([key, value]) => value !== '' && value !== null)
+    );   
 
     // Función que maneja la eliminación de un docente
     const handleDelete = (id, nombre, apellido) => {
@@ -124,7 +130,9 @@ export default function Index({ auth, docentes, flash, filters: initialFilters =
                             }
                         />
                     </div>
-                    <PaginatorButtons meta={docentes.meta} paginator={docentes} routeName={'docentes.index'} />
+                    <PaginatorButtons meta={docentes.meta} paginator={docentes} routeName={'docentes.index'} 
+                    routeParams={activeFilters}
+                    />
 
                     <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="bg-white rounded-lg shadow p-4">

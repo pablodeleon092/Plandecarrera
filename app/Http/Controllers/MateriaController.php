@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Materia;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -10,9 +12,44 @@ class MateriaController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
         $filters = request()->only(['search', 'regimen', 'estado']);
 
-        $materias = Materia::query()
+        // --- Aplicación del Filtro de Acceso por Rol ---
+        $query = Materia::query();
+
+        // 1. Admin y Admin_global: Ven todo.
+        if ($user->hasAnyRole(['Admin', 'Admin_global'])) {
+            // No se aplica restricción.
+        } 
+        
+        // 2. Admin_instituto y Consulta_instituto: Solo materias de su Instituto.
+        elseif ($user->hasAnyRole(['Admin_instituto', 'Consulta_instituto'])) {
+            if ($user->instituto_id) {
+                // Aplica el Scope actualizado que usa la relación Many-to-Many
+                $query->byInstituto($user->instituto_id);
+            } else {
+                $query->whereRaw('1 = 0'); // Denegar acceso si no tiene instituto asignado.
+            }
+        } 
+        
+        // 3. Coordinador_carrera: Solo materias asociadas a sus carreras.
+        elseif ($user->hasRole('Coord_carrera')) {
+       
+            $carreraIds = $user->carreras->pluck('id')->toArray(); 
+            
+            if (!empty($carreraIds)) {
+                // Aplica el Scope actualizado que usa la relación Many-to-Many
+                $query->byCarreras($carreraIds);
+            } else {
+                $query->whereRaw('1 = 0'); // Denegar acceso si no tiene carreras asignadas.
+            }
+        } 
+        else {
+            $query->whereRaw('1 = 0'); // Denegar acceso por defecto.
+        }
+
+        $materias = $query
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($query) use ($search) {
                     $query->where('nombre', 'like', '%' . $search . '%')
@@ -47,7 +84,18 @@ class MateriaController extends Controller
             'codigo' => 'required|string|max:50|unique:materias,codigo',
             'estado' => 'boolean',
             'regimen' => 'required|in:anual,cuatrimestral',
-            'cuatrimestre' => 'nullable|integer|min:1|max:2|required_if:regimen,cuatrimestral',
+            'cuatrimestre' => [
+                'nullable',
+                'integer',
+                'min:1',
+                Rule::when($request->regimen === 'cuatrimestral', [
+                    'required',
+                    'max:10', 
+                ]),
+                Rule::when($request->regimen === 'anual', [
+                    'max:5', 
+                ]),
+            ],
             'horas_semanales' => 'required|integer|min:1|max:40',
             'horas_totales' => 'nullable|integer|min:1'
         ], [
@@ -55,7 +103,7 @@ class MateriaController extends Controller
             'codigo.required' => 'El código es obligatorio',
             'codigo.unique' => 'Este código ya está en uso',
             'regimen.required' => 'Debe seleccionar el régimen',
-            'cuatrimestre.required_if' => 'Debe especificar el cuatrimestre para materias cuatrimestrales',
+            'cuatrimestre.required' => 'Debe especificar el cuatrimestre para materias cuatrimestrales',
             'horas_semanales.required' => 'Las horas semanales son obligatorias',
             'horas_semanales.max' => 'Las horas semanales no pueden exceder 40'
         ]);

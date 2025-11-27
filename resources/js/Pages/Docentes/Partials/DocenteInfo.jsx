@@ -45,6 +45,8 @@ export default function DocenteInfo({ docente }) {
                                 <li key={cargo.id} className="p-3 bg-white border border-gray-200 rounded-md shadow-sm">
                                     <p className="font-semibold text-gray-800">{cargo.nombre}</p>
                                     <p className="text-sm text-gray-500">Dedicación: {cargo.dedicacion ? cargo.dedicacion.nombre : 'N/A'}</p>
+                                    <p className="text-sm text-gray-500">Horas: {cargo.sum_horas_frente_aula}</p>
+                                    <p className="text-sm text-gray-500">Materias: {cargo.nro_materias_asig}</p>
                                 </li>
                             ))}
                         </ul>

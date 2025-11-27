@@ -29,7 +29,6 @@ return new class extends Migration
             $table->foreignId('instituto_id')->nullable()->constrained('institutos')->nullOnDelete();
         });
 
-        // Crear tabla pivot coordinador_materias
         Schema::create('coordinador_materias', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();

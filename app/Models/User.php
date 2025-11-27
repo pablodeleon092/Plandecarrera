@@ -53,9 +53,9 @@ class User extends Authenticatable
         ];
     }
     
-    public function materias()
+    public function carreras()
     {
-        return $this->belongsToMany(Materia::class, 'coordinador_materias', 'user_id', 'materia_id')
+        return $this->belongsToMany(Carrera::class, 'coordinador_carreras', 'user_id', 'carrera_id')
                     ->withTimestamps();
     }
 

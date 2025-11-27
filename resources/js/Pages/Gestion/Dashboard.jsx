@@ -1,26 +1,25 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, router } from '@inertiajs/react'; // ⬅️ Importar 'router'
-import { useState, useMemo } from 'react'; // Eliminamos useEffect
+import { Head, router } from '@inertiajs/react';
+import { useState, useMemo } from 'react';
+import Materias from './Partials/Materias';
 
-// ⚠️ Props Actualizadas: Recibimos los IDs seleccionados desde Laravel
 export default function Dashboard({ user, institutos, materias, selectedInstitutoId: initialInstitutoId, selectedCarreraId: initialCarreraId }) {
     
-    // 1. STATE (Ahora solo reflejan el estado inicial o el último enviado por Inertia)
-    // Usamos los IDs que vienen de las props como estado inicial.
+    // 1. STATE 
     const [selectedInstitutoId, setSelectedInstitutoId] = useState(initialInstitutoId || (institutos.length > 0 ? institutos[0].id : null));
     const [selectedCarreraId, setSelectedCarreraId] = useState(initialCarreraId || 'all');
 
     // ----------------------------------------------------------------------
-    // 2. LÓGICA DE DATOS (Simplificada)
+    // 2. LÓGICA DE DATOS
     // ----------------------------------------------------------------------
 
-    // A. Obtener el Instituto Seleccionado (Sigue siendo útil para la lista de Carreras)
+    // A. Obtener el Instituto Seleccionado
     const selectedInstituto = useMemo(() => {
         return institutos.find(inst => inst.id === selectedInstitutoId);
     }, [selectedInstitutoId, institutos]);
 
 
-    // B. Carreras Disponibles (Necesario para poblar el segundo selector)
+    // B. Carreras Disponibles
     const carrerasDisponibles = useMemo(() => {
         if (!selectedInstituto || !selectedInstituto.carreras) {
             return [];
@@ -65,6 +64,7 @@ export default function Dashboard({ user, institutos, materias, selectedInstitut
     };
 
 
+
     // ----------------------------------------------------------------------
     // 4. RENDERING
     // ----------------------------------------------------------------------
@@ -91,6 +91,7 @@ export default function Dashboard({ user, institutos, materias, selectedInstitut
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg p-6">
                         
+                        {/* SELECTORES DE FILTRO (Permanecen en el Dashboard) */}
                         <div className="flex flex-col md:flex-row gap-6 mb-8">
                             
                             {/* Selector de Instituto */}
@@ -101,7 +102,7 @@ export default function Dashboard({ user, institutos, materias, selectedInstitut
                                 <select
                                     id="instituto_select"
                                     value={selectedInstitutoId || ''}
-                                    onChange={handleInstitutoChange} // ⬅️ Nuevo Handler
+                                    onChange={handleInstitutoChange}
                                     disabled={institutos.length <= 1} 
                                     className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full"
                                 >
@@ -126,7 +127,7 @@ export default function Dashboard({ user, institutos, materias, selectedInstitut
                                 <select
                                     id="carrera_select"
                                     value={selectedCarreraId}
-                                    onChange={handleCarreraChange} // ⬅️ Nuevo Handler
+                                    onChange={handleCarreraChange}
                                     disabled={carrerasDisponibles.length === 0}
                                     className="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full"
                                 >
@@ -140,43 +141,11 @@ export default function Dashboard({ user, institutos, materias, selectedInstitut
                             </div>
                         </div>
 
-                        {/* TABLA DE MATERIAS (Solo renderiza las materias que vienen en la prop 'materias') */}
-                        <h3 className="text-lg font-semibold border-b pb-2 mb-4">
-                            Materias Disponibles ({materias.length})
-                        </h3>
 
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Régimen</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cuatrimestre</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Horas Sem.</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    {materias.length > 0 ? (
-                                        materias.map((materia) => (
-                                            <tr key={materia.id}>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{materia.codigo}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{materia.nombre}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{materia.regimen}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{materia.cuatrimestre}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{materia.horas_semanales}</td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="5" className="px-6 py-4 text-center text-sm text-gray-500">
-                                                No hay materias disponibles para los criterios seleccionados.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
+
+
+                        {/* ⬅️ CONTENIDO EXTRAÍDO: Ahora se llama al componente Materias */}
+                        <Materias materias={materias} />
 
                     </div>
                 </div>
