@@ -19,9 +19,14 @@ class DashboardController extends Controller
         $selectedInstitutoId = $request->input('instituto_id');
         $selectedCarreraId = $request->input('carrera_id'); // Podría ser 'all' o un ID numérico
 
-        // 1. Obtener Institutos disponibles (usando tu método existente)
-        $institutosDisponibles = $this->getInstitutosPorRol($user); 
-        
+        // 1. Obtener institutos por rol
+        $institutosDisponibles = $this->getInstitutosPorRol($user)
+            ->map(function ($inst) {
+                // Filtrar solo carreras activas del instituto
+                $inst->carreras = $inst->carreras->where('estado', true)->values();
+                return $inst;
+            });
+            
         // 2. Determinar el Instituto Seleccionado
         if (!$selectedInstitutoId) {
             // Inicializar con el primer instituto si no hay filtro

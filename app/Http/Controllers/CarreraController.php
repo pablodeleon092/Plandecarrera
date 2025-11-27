@@ -53,42 +53,56 @@ class CarreraController extends Controller
         ]);
     }
 
-    // --- NUEVO MÉTODO 'STORE' ---
-    // Guarda la nueva carrera en la base de datos
+
     public function store(Request $request)
     {
-        // Validación de los datos
-        $request->validate([
-            'nombre' => 'required|string|max:255|unique:carreras',
-            'codigo' => 'required|string|max:50|unique:carreras',
-            'duracion_anios' => 'required|integer|min:1|max:10',
-            'titulo_que_otorga' => 'required|string|max:255',
-            'instituto_id' => 'required|integer|exists:institutos,id',
-        ]);
+        try {
+            $validated = $request->validate([
+                'nombre' => 'required|string|max:255|unique:carreras',
+                'modalidad' => 'required|string|max:100',
+                'sede' => 'required|string|max:100',
+                'instituto_id' => 'required|integer|exists:institutos,id',
+            ]);
 
-        // Creación de la carrera
-        Carrera::create([
-            'nombre' => $request->nombre,
-            'codigo' => $request->codigo,
-            'duracion_anios' => $request->duracion_anios,
-            'titulo_que_otorga' => $request->titulo_que_otorga,
-            'instituto_id' => $request->instituto_id,
-            'estado' => true, // Establecemos el estado por defecto como booleano
-        ]);
+            // Crear la carrera
+            Carrera::create([
+                'nombre' => $validated['nombre'],
+                'instituto_id' => $validated['instituto_id'],
+                'modalidad' => $validated['modalidad'],
+                'sede' => $validated['sede'],
+                'estado' => true,
+            ]);
 
-        // Redireccionamos al index (o a donde quieras) con un mensaje
-        return Redirect::route('carreras.index')->with('success', 'Carrera creada exitosamente.');
+            return Redirect::route('carreras.index')
+                ->with('success', 'Carrera creada exitosamente.');
+
+        } catch (\Exception $e) {
+            // Vuelve al formulario con el error y los datos cargados
+            return Redirect::back()
+                ->with(['error' => 'Ocurrió un error al crear la carrera: ' . $e->getMessage()])
+                ->withInput();
+        }
     }
+
 
     // --- NUEVO MÉTODO 'SHOW' ---
     // Muestra una carrera específica
     public function show(Carrera $carrera)
     {
         // Cargamos la relación con instituto (si no viene por defecto)
-        $carrera->load('instituto');
+        $carrera->load([
+            'instituto',
+            'planActual.materias'
+        ]);
+
+    $materias = $carrera->planActual?->materias()
+        ->orderBy('cuatrimestre')         
+        ->orderBy('nombre', 'desc')        
+        ->get() ?? collect([]);
 
         return Inertia::render('Carreras/Show', [
-            'carrera' => $carrera
+            'carrera' => $carrera,
+            'materias' => $materias,
         ]);
     }
 
@@ -107,8 +121,15 @@ class CarreraController extends Controller
 
     public function edit(Carrera $carrera)
     {
-        // Buscamos el primer plan de la carrera. Si no existe, lo creamos.
-        $plan = $carrera->planes()->firstOrCreate([]);
+        // Edit temporal modificar cuando definimaos el historial de planes.
+        $plan = $carrera->planActual()->first();
+
+        if (!$plan) {
+            $plan = $carrera->planes()->create([
+                'anio_comienzo' => now()->startOfYear()->toDateString(),
+                'anio_fin' => null,
+            ]);
+        }
 
         // Obtenemos las materias que ya están en el plan
         $materiasEnPlan = $plan->materias()->get();

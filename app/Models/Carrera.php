@@ -51,4 +51,7 @@ class Carrera extends Model
         return $this->hasOne(Plan::class, 'carrera_id')
                     ->whereNull('anio_fin');
     }
+
+
+    
 }
