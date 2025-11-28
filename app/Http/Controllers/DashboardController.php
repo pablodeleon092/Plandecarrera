@@ -6,6 +6,8 @@ use App\Models\Materia;
 use App\Models\Instituto;
 use App\Models\Carrera;
 use App\Models\User;
+use App\Models\Docente;
+use App\Models\Dicta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth; 
@@ -17,29 +19,93 @@ class DashboardController extends Controller
     {   
         $user = Auth::user();
         $selectedInstitutoId = $request->input('instituto_id');
-        $selectedCarreraId = $request->input('carrera_id'); // Podría ser 'all' o un ID numérico
+        $selectedCarreraId = $request->input('carrera_id'); 
+        $currentView = $request->input('view', 'materias'); // Default view
 
-        // 1. Obtener Institutos disponibles (usando tu método existente)
+        // 1. Obtener Institutos disponibles
         $institutosDisponibles = $this->getInstitutosPorRol($user); 
         
         // 2. Determinar el Instituto Seleccionado
         if (!$selectedInstitutoId) {
-            // Inicializar con el primer instituto si no hay filtro
             $selectedInstitutoId = $institutosDisponibles->first()?->id;
         }
 
-        // 3. Obtener Materias Filtradas (Nueva Lógica)
-        $materiasFiltradas = $this->getMateriasFiltradas($selectedInstitutoId, $selectedCarreraId);
+        $materiasFiltradas = collect();
+        $docentesFiltrados = collect();
 
-    
+        // 3. Cargar datos según la vista seleccionada
+        if ($currentView === 'materias') {
+            $materiasFiltradas = $this->getMateriasFiltradas($selectedInstitutoId, $selectedCarreraId);
+        } elseif ($currentView === 'docentes') {
+            $docentesFiltrados = $this->getDocentesFiltrados($selectedInstitutoId, $selectedCarreraId);
+        }
+
         return Inertia::render('Gestion/Dashboard', [
             'user' => $user,
             'institutos' => $institutosDisponibles,
-            'selectedInstitutoId' => (int)$selectedInstitutoId, // Pasar el ID seleccionado
-            'selectedCarreraId' => $selectedCarreraId ?: 'all', // Pasar el ID seleccionado
+            'selectedInstitutoId' => (int)$selectedInstitutoId,
+            'selectedCarreraId' => $selectedCarreraId ?: 'all',
+            'currentView' => $currentView,
             'materias' => $materiasFiltradas,
+            'docentes' => $docentesFiltrados,
         ]);
     }
+
+    private function getDocentesFiltrados($selectedInstitutoId, $selectedCarreraId)
+    {
+        $dictas = collect();
+        if ($selectedInstitutoId) {
+            $dictas = Dicta::whereHas('comision.materia.planes', function ($query) use ($selectedInstitutoId, $selectedCarreraId) {
+                $query->whereNull('anio_fin')->whereHas('carrera', function ($q) use ($selectedInstitutoId, $selectedCarreraId) {
+                    $q->where('instituto_id', $selectedInstitutoId);
+                    
+                    if ($selectedCarreraId && $selectedCarreraId !== 'all') {
+                        $q->where('id', $selectedCarreraId);
+                    }
+                });
+            })
+            ->with([
+                'docente',
+                'cargo.dedicacion',
+                'comision.materia',
+            ])
+            ->get();
+        }
+
+        return $dictas->groupBy('docente.id')->map(function ($docenteDictas) {
+            $docente = $docenteDictas->first()->docente;
+            if (!$docente) {
+                return null;
+            }
+            $materias = $docenteDictas->map(function ($dicta) {
+                return $dicta->comision->materia->nombre;
+            })->unique()->implode(', ');
+
+            $cargos = $docenteDictas->map(function ($dicta) {
+                return $dicta->cargo->nombre;
+            })->unique()->implode(', ');
+
+            $dedicaciones = $docenteDictas->map(function ($dicta) {
+                if ($dicta->cargo && $dicta->cargo->dedicacion) {
+                    return $dicta->cargo->dedicacion->nombre;
+                }
+                return 'N/A';
+            })->unique()->implode(', ');
+
+            $horas = $docenteDictas->sum('horas_frente_aula');
+
+            return [
+                'nombre' => $docente->nombre . ' ' . $docente->apellido,
+                'cargo' => $cargos,
+                'dedicacion' => $dedicaciones,
+                'sede' => 'Sede', // Placeholder
+                'modalidad' => $docente->modalidad_desempeño,
+                'horas' => $horas,
+                'materias' => $materias,
+            ];
+        })->filter()->values();
+    }
+
 
     private function getInstitutosPorRol(User $user)
     {
@@ -237,4 +303,4 @@ class DashboardController extends Controller
             return $materiasColeccion;
         }
 
-} 
+}

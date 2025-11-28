@@ -18,6 +18,8 @@ Route::get('/', [DashboardController::class, 'home'])
     ->name('dashboard');
 
 
+
+
 Route::middleware('auth')->group(function () {
     #UsuariusCrud
     Route::resource('users', UserController::class);

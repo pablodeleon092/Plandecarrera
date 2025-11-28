@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             MateriasSeeder::class,
             CargosSeeder::class,
             ComisionesSeeder::class,
+            DictasSeeder::class,
         ]);
     }
 }
