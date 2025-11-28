@@ -146,9 +146,6 @@ export default function Dashboard({ user, institutos, materias, selectedInstitut
                         </div>
 
 
-
-
-                        {/* ⬅️ CONTENIDO EXTRAÍDO: Ahora se llama al componente Materias */}
                         <Materias materias={materias} />
 
                     </div>

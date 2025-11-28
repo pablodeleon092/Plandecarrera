@@ -48,6 +48,13 @@ class Materia extends Model
         return $this->hasMany(Comision::class, 'id_materia');
     }
 
+    public function comisionesCorrienteAño()
+    {
+        $añoActual = date('Y');
+        return $this->hasMany(Comision::class, 'id_materia')
+            ->where('anio', $añoActual);
+    }
+
     //Accessors y Mutators
 
     /**
