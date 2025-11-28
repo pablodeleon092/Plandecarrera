@@ -62,27 +62,6 @@ export default function MateriaInfo({ materia }) {
                         </div>
                     </div>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-6">
-                    <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">Acciones</h3>
-                    <div className="space-y-3">
-                        <Link
-                            href={route('materias.edit', materia.id)} 
-                            as="button"
-                            className="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition flex items-center gap-2 font-semibold"
-                        >
-                            Editar
-                        </Link>
-                        <Link
-                            href={route('materias.destroy', materia.id)} 
-                            method="delete"
-                            as="button"
-                            onBefore={() => confirm('¿Estás seguro de eliminar esta comisión?')}
-                            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition flex items-center gap-2 font-semibold"
-                        >
-                            Eliminar
-                        </Link>
-                    </div>
-                </div>
             </div>
         </div>
     );

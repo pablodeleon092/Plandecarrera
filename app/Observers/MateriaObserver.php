@@ -19,19 +19,31 @@ class MateriaObserver
      */
     public function updated(Materia $materia): void
     {
-        if ($materia->isDirty('estado') && $materia->estado == false) {
-                
+        // Si el estado no cambió, no hacemos nada
+        if (!$materia->isDirty('estado')) {
+            return;
+        } 
+
+        $estadoAnterior = $materia->getOriginal('estado');
+        $estadoNuevo = $materia->estado;
+
+        // ----------- MATERIA DESACTIVADA → desactivar TODAS las comisiones -----------
+        if ($estadoNuevo == false && $estadoAnterior == true) {
             foreach ($materia->comisiones as $comision) {
-
-                if ($comision->estado == true) {
-
-                    $comision->estado = false;
-                    $comision->save();   // <- dispara ComisionObserver::updated()
-
+                if ($comision->estado) {
+                    $comision->update(['estado' => false]); // dispara ComisionObserver
                 }
             }
         }
 
+        // ----------- MATERIA ACTIVADA → activar SOLO comisiones del año corriente -----------
+        if ($estadoNuevo == true && $estadoAnterior == false) {
+            foreach ($materia->comisionesCorrienteAño  as $comision) {
+                if (! $comision->estado) {
+                    $comision->update(['estado' => true]); // dispara ComisionObserver
+                }
+            }
+        }
     }
 
     /**

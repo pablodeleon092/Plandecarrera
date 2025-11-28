@@ -2,10 +2,10 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
 import Materias from './Partials/Materias';
+import PaginatorButtons from '@/Components/PaginatorButtons';
 import DocentesList from './Partials/DocentesList';
 
 export default function Dashboard({ user, institutos, materias, docentes, selectedInstitutoId: initialInstitutoId, selectedCarreraId: initialCarreraId, currentView: initialView }) {
-
     // 1. STATE 
     const [selectedInstitutoId, setSelectedInstitutoId] = useState(initialInstitutoId || (institutos.length > 0 ? institutos[0].id : null));
     const [selectedCarreraId, setSelectedCarreraId] = useState(initialCarreraId || 'all');
@@ -47,7 +47,9 @@ export default function Dashboard({ user, institutos, materias, docentes, select
             view: currentView
         }, {
             // Esto evita que se recargue toda la página, solo actualiza las props.
-            preserveScroll: true
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
         });
     };
 
@@ -63,7 +65,9 @@ export default function Dashboard({ user, institutos, materias, docentes, select
             carrera_id: newCarreraId,
             view: currentView
         }, {
-            preserveScroll: true
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
         });
     };
 
@@ -75,9 +79,12 @@ export default function Dashboard({ user, institutos, materias, docentes, select
             carrera_id: selectedCarreraId,
             view: view
         }, {
-            preserveScroll: true
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
         });
     };
+
 
 
 
@@ -158,8 +165,6 @@ export default function Dashboard({ user, institutos, materias, docentes, select
                         </div>
 
 
-
-
                         {/* TABS DE NAVEGACIÓN */}
                         <div className="border-b border-gray-200 mb-6">
                             <nav className="-mb-px flex space-x-8" aria-label="Tabs">
@@ -200,6 +205,12 @@ export default function Dashboard({ user, institutos, materias, docentes, select
                         )}
 
                     </div>
+                    <PaginatorButtons
+                        meta={materias.meta}
+                        paginator={materias}
+                        routeName={'dashboard'}
+                        routeParams={{ instituto_id: selectedInstitutoId, carrera_id: selectedCarreraId }}
+                    />
                 </div>
             </div>
         </AuthenticatedLayout>

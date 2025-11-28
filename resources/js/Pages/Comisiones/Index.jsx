@@ -148,8 +148,6 @@ export default function Index({ auth, comisiones, modalidades, sedes, flash, fil
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <ListHeader
                         title="Listado de Comisiones"
-                        buttonLabel="Agregar Comisión"
-                        buttonRoute={route('comisiones.create')}
                     />
                     <div className="bg-white rounded-lg shadow p-6 mb-6">
                         <TableFilters 

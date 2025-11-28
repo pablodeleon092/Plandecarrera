@@ -17,7 +17,7 @@ class CargosSeeder extends Seeder
             'Asociado',
             'Adjunto',
             'Jefe de Trabajos Practicos',
-            'Ayudante de Primera'
+            'Ayudante de Primera',
         ];
 
         $docentes = Docente::all();
