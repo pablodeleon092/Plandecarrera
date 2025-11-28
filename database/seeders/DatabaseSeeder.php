@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             DedicacionesSeeder::class,
             FuncionAulicaSeeder::class,
             CarrerasIDEISeeder::class,
+            CarrerasIECSeeder::class,
             DocenteSeeder::class,
             PlanesSeeder::class,
             MateriasSeeder::class,
