@@ -19,7 +19,7 @@ class CargoController extends Controller
         ]);        
     }
 
-    public function addCargo(Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'cargo' => 'required|string|max:255',
@@ -37,7 +37,7 @@ class CargoController extends Controller
         ]);
 
         return redirect()
-            ->route('docentes.edit', $docente->id)
+            ->route('docentes.show', $docente->id)
             ->with('success', 'Cargo agregado exitosamente');
     }
 

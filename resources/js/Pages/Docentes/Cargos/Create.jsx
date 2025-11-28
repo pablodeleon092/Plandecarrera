@@ -15,7 +15,7 @@ export default function Create({ auth, docente, dedicaciones, flash }) {
     const submit = (e) => {
         e.preventDefault();
    
-        post(route('cargos.addCargo', { docente: docente.id }));
+        post(route('cargos.store', { docente: docente.id }));
     };
 
     return (
