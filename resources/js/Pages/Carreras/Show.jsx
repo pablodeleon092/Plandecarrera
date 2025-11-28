@@ -32,7 +32,8 @@ export default function Show({ auth, carrera, materias }) {
                     {/* Botón Volver */}
                     <div className="mb-4">
                         <Link
-                            href={route('carreras.index')}
+                            href="#"
+                            onClick={() => window.history.back()}
                             className="text-blue-600 hover:text-blue-800 flex items-center gap-2 transition"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

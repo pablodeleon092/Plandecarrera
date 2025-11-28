@@ -110,7 +110,8 @@ export default function Create({ auth, institutos}) {
                                 {/* BOTONES */}
                                 <div className="flex items-center justify-end mt-6">
                                     <Link 
-                                        href={route('carreras.index')}
+                                        href="#"
+                                        onClick={() => window.history.back()}
                                         className="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded mr-2"
                                     >
                                         Cancelar

@@ -5,7 +5,7 @@ export default function Materias({ materias }) {
     return (
         <>
             <h3 className="text-lg font-semibold border-b pb-2 mb-4">
-                Materias Disponibles ({materias.length})
+                Materias Disponibles
             </h3>
 
             <div className="overflow-x-auto">

@@ -31,7 +31,8 @@ export default function Show({ auth, materia, comisiones }) {
                     {/* Botón Volver */}
                     <div className="mb-4">
                         <Link
-                            href={route('materias.index')}
+                            href="#"
+                            onClick={() => window.history.back()}
                             className="text-blue-600 hover:text-blue-800 flex items-center gap-2 transition"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,7 +43,7 @@ export default function Show({ auth, materia, comisiones }) {
                                     d="M10 19l-7-7m0 0l7-7m-7 7h18"
                                 />
                             </svg>
-                            Volver al Listado
+                            Volver
                         </Link>
                     </div>
 

@@ -9,7 +9,7 @@ export default defineConfig({
         strictPort: true,
         hmr: {
 
-            host: 'localhost', // 👈 importante: accesible desde el navegador
+            host: '192.168.47.130', // 👈 importante: accesible desde el navegador
             port: 5173,
             protocol: 'ws',
         },

@@ -34,8 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('carreras', function (Blueprint $table) {
-            $table->dropColumn('estado');
-        });
+        Schema::dropIfExists('carreras');
     }
 };

@@ -136,7 +136,8 @@ export default function CreateDicta({ auth, comision, flash, docente, funcionesA
 
                         <div className="flex justify-between items-center">
                             <Link
-                                href={route('comisiones.show', comision.id)}
+                                href="#"
+                                onClick={() => window.history.back()}
                                 className="text-gray-600 hover:text-gray-800"
                             >
                                 Cancelar

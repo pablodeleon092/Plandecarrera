@@ -178,8 +178,8 @@ export default function EditDicta({ auth, flash, dicta, funcionesAulicas, cargos
 
                         <div className="flex justify-end items-center pt-4 space-x-4">
                             <Link
-
-                                href={route('comisiones.show', comision.id)}
+                                href="#"
+                                onClick={() => window.history.back()}
                                 className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition duration-150 ease-in-out"
                             >
                                 Cancelar

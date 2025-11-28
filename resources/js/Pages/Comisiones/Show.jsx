@@ -25,7 +25,8 @@ export default function ShowComision({ auth, comision, flash, docentes, allDocen
                     {/* Botón Volver */}
                     <div className="mb-4">
                         <Link 
-                            href={route('comisiones.index')}
+                            href="#"
+                            onClick={() => window.history.back()}
                             className="text-blue-600 hover:text-blue-800 flex items-center gap-2 transition"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

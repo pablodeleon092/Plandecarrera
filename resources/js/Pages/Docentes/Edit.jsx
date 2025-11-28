@@ -131,7 +131,8 @@ export default function Edit({ auth, docente,flash }) {
 
                                 <div className="flex items-center justify-between space-x-3">
                                     <Link
-                                        href={route('docentes.cargo.create', docente.id)}
+                                        href="#"
+                                        onClick={() => window.history.back()}
                                         className="px-4 py-2 rounded-md border border-gray-300 text-gray-700"
                                     >
                                         Agregar Cargo
