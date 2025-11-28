@@ -45,6 +45,7 @@ class DashboardController extends Controller
         } elseif ($currentView === 'docentes') {
             $docentesFiltrados = $this->getDocentesFiltrados($selectedInstitutoId, $selectedCarreraId);
         }
+        #dd($docentesFiltrados);
         return Inertia::render('Gestion/Dashboard', [
             'user' => $user,
             'institutos' => $institutosDisponibles,
@@ -55,61 +56,47 @@ class DashboardController extends Controller
             'docentes' => $docentesFiltrados,
         ]);
     }
-
     private function getDocentesFiltrados($selectedInstitutoId, $selectedCarreraId)
     {
-        $dictas = collect();
-        if ($selectedInstitutoId) {
-            $dictas = Dicta::whereHas('comision.materia.planes', function ($query) use ($selectedInstitutoId, $selectedCarreraId) {
-                $query->whereNull('anio_fin')->whereHas('carrera', function ($q) use ($selectedInstitutoId, $selectedCarreraId) {
-                    $q->where('instituto_id', $selectedInstitutoId);
-                    
-                    if ($selectedCarreraId && $selectedCarreraId !== 'all') {
-                        $q->where('id', $selectedCarreraId);
-                    }
-                });
-            })
-            ->with([
-                'docente',
-                'cargo.dedicacion',
-                'comision.materia',
-            ])
-            ->get();
+        if (!$selectedInstitutoId) {
+            return collect();
         }
 
-        return $dictas->groupBy('docente.id')->map(function ($docenteDictas) {
-            $docente = $docenteDictas->first()->docente;
-            if (!$docente) {
-                return null;
-            }
-            $materias = $docenteDictas->map(function ($dicta) {
-                return $dicta->comision->materia->nombre;
-            })->unique()->implode(', ');
+        $query = Docente::query();
 
-            $cargos = $docenteDictas->map(function ($dicta) {
-                return $dicta->cargo->nombre;
-            })->unique()->implode(', ');
+        if ($selectedCarreraId && $selectedCarreraId !== 'all') {
+            $query->deInstitutoYCarrera($selectedInstitutoId, $selectedCarreraId);
+        } else {
+            $query->deInstituto($selectedInstitutoId);
+        }
 
-            $dedicaciones = $docenteDictas->map(function ($dicta) {
-                if ($dicta->cargo && $dicta->cargo->dedicacion) {
-                    return $dicta->cargo->dedicacion->nombre;
-                }
-                return 'N/A';
-            })->unique()->implode(', ');
+        $docentes = $query->with([
+            'cargos.dedicacion',
+            'comisiones.materia',
+        ])->get();
 
-            $horas = $docenteDictas->sum('horas_frente_aula');
+        return $docentes->map(function ($doc) {
 
             return [
-                'nombre' => $docente->nombre . ' ' . $docente->apellido,
-                'cargo' => $cargos,
-                'dedicacion' => $dedicaciones,
-                'sede' => 'Sede', // Placeholder
-                'modalidad' => $docente->modalidad_desempeño,
-                'horas' => $horas,
-                'materias' => $materias,
+                'id' => $doc->id,
+                'nombre' => $doc->nombre . ' ' . $doc->apellido,
+                'modalidad' => $doc->modalidad_desempeño,
+                'horas' => $doc->carga_horaria,
+
+                'cargos' => $doc->cargos->map(function ($cargo) {
+                    return [
+                        'nombre' => $cargo->nombre,
+                        'dedicacion' => $cargo->dedicacion?->nombre,
+                    ];
+                })->values(),
+
+                'materias' => $doc->comisiones->map(fn($c) => $c->materia->nombre)
+                                            ->unique()
+                                            ->values(),
             ];
-        })->filter()->values();
+        });
     }
+
 
 
     private function getInstitutosPorRol(User $user)

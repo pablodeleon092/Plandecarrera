@@ -7,6 +7,7 @@ use App\Models\Dicta;
 use App\Models\Comision;
 use App\Models\Docente;
 use App\Models\FuncionAulica;
+use App\Services\NormativaAsignacion;
 
 class DictasSeeder extends Seeder
 {
@@ -38,7 +39,7 @@ class DictasSeeder extends Seeder
                     continue;
                 }
 
-                Dicta::create([
+                $dicta = Dicta::create([
                     'comision_id' => $comision->id,
                     'docente_id'  => $docente->id,
                     'cargo_id'    => $docente->cargos->random()->id, // Toma 1 cargo
@@ -48,6 +49,10 @@ class DictasSeeder extends Seeder
                     'horas_frente_aula'   => rand(2, 6),
                     'funcion_aulica_id'   => $funcionesAulicas->isNotEmpty() ? $funcionesAulicas->random()->id : null,
                 ]);
+
+                NormativaAsignacion::recalcularCargo($dicta->docente, $dicta->cargo);
+
+                NormativaAsignacion::recalcularCargaHorariaDocente($dicta->docente);
             }
         }
     }
