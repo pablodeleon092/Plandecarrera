@@ -23,11 +23,7 @@ class DashboardController extends Controller
         $currentView = $request->input('view', 'materias'); // Default view
 
         // 1. Obtener Institutos disponibles
-        $institutosDisponibles = $this->getInstitutosPorRol($user)
-            ->map(function ($inst) {
-                $inst->carreras = $inst->carreras->where('estado', true)->values();
-                return $inst;
-            });
+        $institutosDisponibles = $this->getInstitutosPorRol($user); 
         
         // 2. Determinar el Instituto Seleccionado
         if (!$selectedInstitutoId) {
@@ -39,7 +35,7 @@ class DashboardController extends Controller
 
         // 3. Cargar datos según la vista seleccionada
         if ($currentView === 'materias') {
-            $query = $this->getMateriasFiltradasQuery($selectedInstitutoId, $selectedCarreraId);
+            $query = $this->getMateriasFiltradasQuery($selectedInstitutoId, $selectedCarreraId, $user);
             $materiasFiltradas = $query->orderBy('cuatrimestre')->paginate(10);
             $this->agregarDocentesPorCargo($materiasFiltradas);
         } elseif ($currentView === 'docentes') {
@@ -116,7 +112,7 @@ class DashboardController extends Controller
             return collect([$user->instituto]);
 
         } elseif ($rol === 'Coordinador de Carrera') {
-        
+
             $user->instituto->load(['carreras' => function ($query) use ($user) {
 
                 $carreraIds = $user->carreras()->pluck('carrera_id');
@@ -124,6 +120,8 @@ class DashboardController extends Controller
                 $query->whereIn('id', $carreraIds) 
                     ->with('planActual'); 
             }]);
+
+            
 
             return collect([$user->instituto]);
 
@@ -165,7 +163,7 @@ class DashboardController extends Controller
     }
 
 
-    private function getMateriasFiltradasQuery($institutoId, $carreraId = 'all')
+    private function getMateriasFiltradasQuery($institutoId, $carreraId = 'all', User $user = null)
     {
         $anioActual = date('Y');
         $cargosDisponibles = [
@@ -180,11 +178,14 @@ class DashboardController extends Controller
             ->where('estado', true)
 
             // Filtrado por instituto y carrera
-            ->whereHas('planes.carrera', function ($q) use ($institutoId, $carreraId) {
+            ->whereHas('planes.carrera', function ($q) use ($institutoId, $carreraId, $user) {
                 $q->where('instituto_id', $institutoId);
 
                 if ($carreraId !== 'all' && is_numeric($carreraId)) {
                     $q->where('id', $carreraId);
+                } elseif ($user && $user->cargo === 'Coordinador de Carrera') {
+                    $coordinadorCarreras = $user->carreras()->pluck('carrera_id');
+                    $q->whereIn('id', $coordinadorCarreras);
                 }
             })
 
