@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
 import Materias from './Partials/Materias';
-
+import PaginatorButtons from '@/Components/PaginatorButtons';
 export default function Dashboard({ user, institutos, materias, selectedInstitutoId: initialInstitutoId, selectedCarreraId: initialCarreraId }) {
     
     // 1. STATE 
@@ -44,7 +44,9 @@ export default function Dashboard({ user, institutos, materias, selectedInstitut
             carrera_id: 'all' // Resetear la carrera al cambiar de instituto
         }, { 
             // Esto evita que se recargue toda la página, solo actualiza las props.
-            preserveScroll: true 
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,            
         });
     };
 
@@ -59,7 +61,9 @@ export default function Dashboard({ user, institutos, materias, selectedInstitut
             instituto_id: selectedInstitutoId, 
             carrera_id: newCarreraId
         }, { 
-            preserveScroll: true 
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,            
         });
     };
 
@@ -148,6 +152,12 @@ export default function Dashboard({ user, institutos, materias, selectedInstitut
                         <Materias materias={materias} />
 
                     </div>
+                    <PaginatorButtons 
+                    meta={materias.meta} 
+                    paginator={materias} 
+                    routeName={'dashboard'} 
+                    routeParams={{ instituto_id: selectedInstitutoId, carrera_id: selectedCarreraId }}
+                    />
                 </div>
             </div>
         </AuthenticatedLayout>
