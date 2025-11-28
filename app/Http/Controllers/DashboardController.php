@@ -56,6 +56,7 @@ class DashboardController extends Controller
             'docentes' => $docentesFiltrados,
         ]);
     }
+    
     private function getDocentesFiltrados($selectedInstitutoId, $selectedCarreraId)
     {
         if (!$selectedInstitutoId) {
