@@ -1,11 +1,14 @@
+
 // resources/js/Pages/Carreras/Create.jsx
 
 import React from 'react';
 import { Head, useForm, Link, usePage } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout'; 
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import PrimaryButton from '@/Components/PrimaryButton';
+import DangerButton from '@/Components/DangerButton';
 
-export default function Create({ auth, institutos}) {
-    
+export default function Create({ auth, institutos }) {
+
     const { flash } = usePage().props;
 
     const modalidades = ['presencial', 'virtual', 'mixta'];
@@ -34,7 +37,7 @@ export default function Create({ auth, institutos}) {
                 <div className="max-w-3xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 bg-white border-b border-gray-200">
-                            
+
                             {flash?.error && (
                                 <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
                                     {flash.error}
@@ -109,23 +112,22 @@ export default function Create({ auth, institutos}) {
 
                                 {/* BOTONES */}
                                 <div className="flex items-center justify-end mt-6">
-                                    <Link 
-                                        href="#"
-                                        onClick={() => window.history.back()}
-                                        className="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded mr-2"
-                                    >
-                                        Cancelar
-                                    </Link>
-
-                                    <button 
-                                        type="submit" 
-                                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                                        disabled={processing}
-                                    >
-                                        {processing ? 'Guardando...' : 'Guardar Carrera'}
-                                    </button>
+                                    <div className="flex justify-end space-x-4">
+                                        <DangerButton
+                                            as={Link}
+                                            href={route('carreras.index')}
+                                        >
+                                            Cancelar
+                                        </DangerButton>
+                                        <PrimaryButton
+                                            type="submit"
+                                            disabled={processing}
+                                        >
+                                            {processing ? 'Guardando...' : 'Guardar Carrera'}
+                                        </PrimaryButton>
+                                    </div>
                                 </div>
-                                
+
                             </form>
 
                         </div>

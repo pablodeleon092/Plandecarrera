@@ -1,4 +1,5 @@
 import { Link } from '@inertiajs/react';
+import PrimaryButton from '@/Components/PrimaryButton';
 
 export default function ListHeader({ title, buttonLabel, buttonRoute }) {
     return (
@@ -7,9 +8,10 @@ export default function ListHeader({ title, buttonLabel, buttonRoute }) {
             {buttonRoute && (
                 <Link
                     href={buttonRoute}
-                    className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition"
                 >
-                    {buttonLabel}
+                    <PrimaryButton>
+                        {buttonLabel}
+                    </PrimaryButton>
                 </Link>
             )}
         </div>

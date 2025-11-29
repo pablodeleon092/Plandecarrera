@@ -38,6 +38,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('docentes/{docente}/cargo/create', [DocenteController::class, 'createCargo'])->name('docentes.cargo.create');
     Route::post('docentes/{docente}/cargo', [DocenteController::class, 'addCargo'])->name('docentes.cargo.store');
+    Route::patch('docentes/{docente}/toggle-status', [DocenteController::class, 'toggleStatus'])->name('docentes.toggleStatus');
 
     //Rutas espacios curricualres
     Route::resource('carreras', CarreraController::class);

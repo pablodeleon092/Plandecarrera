@@ -39,14 +39,21 @@ export default function Index({ auth, docentes, flash, filters: initialFilters =
 
 
     const activeFilters = Object.fromEntries(
-            Object.entries(filters).filter(([key, value]) => value !== '' && value !== null)
-    );   
+        Object.entries(filters).filter(([key, value]) => value !== '' && value !== null)
+    );
 
     // Función que maneja la eliminación de un docente
     const handleDelete = (id, nombre, apellido) => {
-        if (confirm(`¿Estás seguro de eliminar a ${nombre} ${apellido}?`)) {
-            router.delete(route('docentes.destroy', id));
-        }
+        router.delete(route('docentes.destroy', id));
+    };
+
+    const handleToggleStatus = (docente) => {
+        router.patch(route('docentes.toggleStatus', docente.id), {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                // Optional: Show a toast or notification if not handled by flash messages automatically
+            }
+        });
     };
 
     // Calcular totales para las tarjetas de resumen
@@ -106,14 +113,14 @@ export default function Index({ auth, docentes, flash, filters: initialFilters =
                                         doc.cargos.length > 0
                                             ? doc.cargos
                                                 .map(cargo => (
-                                                        <Link 
-                                                            key={cargo.id}
-                                                            href={route('cargos.show', cargo.id)}
-                                                            className="text-indigo-600 hover:underline"
-                                                            >
+                                                    <Link
+                                                        key={cargo.id}
+                                                        href={route('cargos.show', cargo.id)}
+                                                        className="text-indigo-600 hover:underline"
+                                                    >
                                                         {cargo.nombre}
-                                                        </Link>
-                                                    )).reduce((prev, curr) => [prev, ', ', curr])  : '—'
+                                                    </Link>
+                                                )).reduce((prev, curr) => [prev, ', ', curr]) : '—'
                                     )
                                 }
                             ]}
@@ -121,6 +128,8 @@ export default function Index({ auth, docentes, flash, filters: initialFilters =
                             onShow={(docente) => router.visit(route('docentes.show', docente.id))}
                             onEdit={(docente) => router.visit(route('docentes.edit', docente.id))}
                             onDelete={(docente) => handleDelete(docente.id, docente.nombre, docente.apellido)}
+                            onToggleStatus={handleToggleStatus}
+                            statusKey="es_activo"
                             hover={true}
                             emptyMessage="No se encontraron docentes."
                             emptyIcon={
@@ -130,8 +139,8 @@ export default function Index({ auth, docentes, flash, filters: initialFilters =
                             }
                         />
                     </div>
-                    <PaginatorButtons meta={docentes.meta} paginator={docentes} routeName={'docentes.index'} 
-                    routeParams={activeFilters}
+                    <PaginatorButtons meta={docentes.meta} paginator={docentes} routeName={'docentes.index'}
+                        routeParams={activeFilters}
                     />
 
                     <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">

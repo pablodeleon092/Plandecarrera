@@ -3,9 +3,12 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import DocenteInfo from './Partials/DocenteInfo';             // <--- Nuevo
 import DocenteComisiones from './Partials/DocenteComisiones'; // <--- Nuevo
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
 
 export default function Show({ auth, docente, comisiones }) { // <--- Agregamos 'comisiones'
-    
+
     const [currentTab, setCurrentTab] = useState('informacion');
 
     const handleDelete = () => {
@@ -20,22 +23,26 @@ export default function Show({ auth, docente, comisiones }) { // <--- Agregamos 
             header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Docente: {docente.nombre} {docente.apellido}</h2>}
         >
             <Head title={`Docente: ${docente.nombre} ${docente.apellido}`} />
-            
+
             <div className="py-12">
                 <div className="max-w-5xl mx-auto sm:px-6 lg:px-8">
-                    
+
                     {/* Botón Volver */}
                     <div className="mb-4">
-                        <Link 
+                        <SecondaryButton
+                            as={Link}
                             href="#"
-                            onClick={() => window.history.back()}
-                            className="text-blue-600 hover:text-blue-800 flex items-center gap-2 transition"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                window.history.back();
+                            }}
+                            className="flex items-center gap-2"
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
                             Volver al Listado
-                        </Link>
+                        </SecondaryButton>
                     </div>
 
                     {/* ENCABEZADO (Tu diseño original) */}
@@ -45,11 +52,10 @@ export default function Show({ auth, docente, comisiones }) { // <--- Agregamos 
                                 <div className="flex-1">
                                     <div className="flex items-center gap-3 mb-2">
                                         <h1 className="text-3xl font-bold text-white">{docente.apellido}, {docente.nombre}</h1>
-                                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                                            docente.es_activo 
-                                                ? 'bg-green-400 text-green-900' 
-                                                : 'bg-red-400 text-red-900'
-                                        }`}>
+                                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${docente.es_activo
+                                            ? 'bg-green-400 text-green-900'
+                                            : 'bg-red-400 text-red-900'
+                                            }`}>
                                             {docente.es_activo ? 'Activo' : 'Inactivo'}
                                         </span>
                                     </div>
@@ -60,18 +66,17 @@ export default function Show({ auth, docente, comisiones }) { // <--- Agregamos 
                                     </div>
                                 </div>
                                 <div className="flex gap-3">
-                                    <Link
-                                        href={route('docentes.edit', docente.id)} 
-                                        className="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition font-semibold"
+                                    <PrimaryButton
+                                        as={Link}
+                                        href={route('docentes.edit', docente.id)}
                                     >
                                         Editar
-                                    </Link>
-                                    <button
+                                    </PrimaryButton>
+                                    <DangerButton
                                         onClick={handleDelete}
-                                        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition font-semibold"
                                     >
                                         Eliminar
-                                    </button>
+                                    </DangerButton>
                                 </div>
                             </div>
                         </div>
@@ -84,21 +89,19 @@ export default function Show({ auth, docente, comisiones }) { // <--- Agregamos 
                             <div className="flex gap-4">
                                 <button
                                     onClick={() => setCurrentTab('informacion')}
-                                    className={`px-4 py-2 font-semibold transition border-b-2 ${
-                                        currentTab === 'informacion'
-                                            ? 'border-blue-600 text-blue-600'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                    }`}
+                                    className={`px-4 py-2 font-semibold transition border-b-2 ${currentTab === 'informacion'
+                                        ? 'border-blue-600 text-blue-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                        }`}
                                 >
                                     Información
                                 </button>
                                 <button
                                     onClick={() => setCurrentTab('comisiones')}
-                                    className={`px-4 py-2 font-semibold transition border-b-2 ${
-                                        currentTab === 'comisiones'
-                                            ? 'border-blue-600 text-blue-600'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                    }`}
+                                    className={`px-4 py-2 font-semibold transition border-b-2 ${currentTab === 'comisiones'
+                                        ? 'border-blue-600 text-blue-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                        }`}
                                 >
                                     Comisiones
                                 </button>

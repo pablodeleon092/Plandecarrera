@@ -1,8 +1,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
 
 export default function Create({ auth }) {
-    
+
     // 1. Inicialización del estado del formulario con los NUEVOS CAMPOS
     const { data, setData, post, processing, errors } = useForm({
         legajo: '', // integer
@@ -18,7 +21,7 @@ export default function Create({ auth }) {
     const submit = (e) => {
         e.preventDefault();
         // Envía la petición POST. Inertia maneja la redirección o los errores 422.
-        post(route('docentes.store')); 
+        post(route('docentes.store'));
     };
 
     return (
@@ -32,13 +35,13 @@ export default function Create({ auth }) {
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <form onSubmit={submit} className="p-6 space-y-6">
-                            
+
                             {/* Legajo */}
                             <div>
                                 <label htmlFor="legajo" className="block text-sm font-medium text-gray-700">Legajo</label>
                                 <input
                                     id="legajo"
-                                    type="number" 
+                                    type="number"
                                     value={data.legajo}
                                     onChange={(e) => setData('legajo', e.target.value)}
                                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
@@ -74,7 +77,7 @@ export default function Create({ auth }) {
                                     {errors.apellido && <div className="text-red-600 mt-1 text-sm">{errors.apellido}</div>}
                                 </div>
                             </div>
-                            
+
                             {/* Modalidad Desempeño (ENUM) y Carga Horaria (Integer) */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
@@ -109,7 +112,7 @@ export default function Create({ auth }) {
                                 </div>
                                 {errors.es_activo && <div className="text-red-600 mt-1 text-sm">{errors.es_activo}</div>}
                             </div>
-                            
+
                             {/* Email y Teléfono */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div>
@@ -137,19 +140,18 @@ export default function Create({ auth }) {
                             </div>
 
                             <div className="flex justify-end space-x-4">
-                                <Link
+                                <DangerButton
+                                    as={Link}
                                     href={route('docentes.index')}
-                                    className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >
                                     Cancelar
-                                </Link>
-                                <button
+                                </DangerButton>
+                                <PrimaryButton
                                     type="submit"
                                     disabled={processing}
-                                    className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                                 >
                                     {processing ? 'Guardando...' : 'Guardar Docente'}
-                                </button>
+                                </PrimaryButton>
                             </div>
                         </form>
                     </div>

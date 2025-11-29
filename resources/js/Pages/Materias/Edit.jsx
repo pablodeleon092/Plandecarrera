@@ -1,6 +1,8 @@
 import { Head, useForm, Link } from '@inertiajs/react';
 import { useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import PrimaryButton from '@/Components/PrimaryButton';
+import DangerButton from '@/Components/DangerButton';
 
 export default function Edit({ auth, materia }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -31,12 +33,12 @@ export default function Edit({ auth, materia }) {
             header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Editar Materia</h2>}
         >
             <Head title="Editar Materia" />
-            
+
             <div className="py-12">
                 <div className="mx-auto max-w-3xl sm:px-6 lg:px-8">
                     <div className="mb-6">
-                        <Link 
-                            href="/materias" 
+                        <Link
+                            href="/materias"
                             className="text-blue-600 hover:text-blue-800 flex items-center gap-2 transition"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,7 +58,7 @@ export default function Edit({ auth, materia }) {
                             <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b">
                                 Información Básica
                             </h2>
-                            
+
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -66,9 +68,8 @@ export default function Edit({ auth, materia }) {
                                         type="text"
                                         value={data.nombre}
                                         onChange={e => setData('nombre', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                            errors.nombre ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.nombre ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         placeholder="Ej: Matemática I"
                                     />
                                     {errors.nombre && (
@@ -84,9 +85,8 @@ export default function Edit({ auth, materia }) {
                                         type="text"
                                         value={data.codigo}
                                         onChange={e => setData('codigo', e.target.value.toUpperCase())}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                            errors.codigo ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.codigo ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         placeholder="Ej: MAT101"
                                     />
                                     {errors.codigo && (
@@ -114,7 +114,7 @@ export default function Edit({ auth, materia }) {
                             <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b">
                                 Configuración Académica
                             </h2>
-                            
+
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -128,9 +128,8 @@ export default function Edit({ auth, materia }) {
                                                 setData('cuatrimestre', '');
                                             }
                                         }}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                            errors.regimen ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.regimen ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                     >
                                         <option value="cuatrimestral">Cuatrimestral</option>
                                         <option value="anual">Anual</option>
@@ -148,9 +147,8 @@ export default function Edit({ auth, materia }) {
                                         value={data.cuatrimestre}
                                         onChange={e => setData('cuatrimestre', e.target.value)}
                                         disabled={data.regimen === 'anual'}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                            data.regimen === 'anual' ? 'bg-gray-100 cursor-not-allowed' : ''
-                                        } ${errors.cuatrimestre ? 'border-red-500' : 'border-gray-300'}`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${data.regimen === 'anual' ? 'bg-gray-100 cursor-not-allowed' : ''
+                                            } ${errors.cuatrimestre ? 'border-red-500' : 'border-gray-300'}`}
                                     >
                                         <option value="">Seleccione...</option>
                                         <option value="1">1° Cuatrimestre</option>
@@ -167,7 +165,7 @@ export default function Edit({ auth, materia }) {
                             <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b">
                                 Carga Horaria
                             </h2>
-                            
+
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -179,9 +177,8 @@ export default function Edit({ auth, materia }) {
                                         max="40"
                                         value={data.horas_semanales}
                                         onChange={e => setData('horas_semanales', e.target.value)}
-                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                            errors.horas_semanales ? 'border-red-500' : 'border-gray-300'
-                                        }`}
+                                        className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.horas_semanales ? 'border-red-500' : 'border-gray-300'
+                                            }`}
                                         placeholder="Ej: 4"
                                     />
                                     {errors.horas_semanales && (
@@ -208,11 +205,18 @@ export default function Edit({ auth, materia }) {
                         </div>
 
                         <div className="flex gap-4 pt-6 border-t">
-                            <button
+                            <DangerButton
+                                as={Link}
+                                href="/materias"
+                                className="flex-1 justify-center"
+                            >
+                                Cancelar
+                            </DangerButton>
+                            <PrimaryButton
                                 type="button"
                                 onClick={handleSubmit}
                                 disabled={processing}
-                                className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition shadow-lg"
+                                className="flex-1 justify-center"
                             >
                                 {processing ? (
                                     <span className="flex items-center justify-center gap-2">
@@ -223,13 +227,7 @@ export default function Edit({ auth, materia }) {
                                         Actualizando...
                                     </span>
                                 ) : 'Actualizar Materia'}
-                            </button>
-                            <Link
-                                href="/materias"
-                                className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 text-center font-semibold transition"
-                            >
-                                Cancelar
-                            </Link>
+                            </PrimaryButton>
                         </div>
                     </div>
                 </div>

@@ -149,6 +149,11 @@ class DocenteController extends Controller
         ]);
     }
 
+    public function toggleStatus(Docente $docente)
+    {
+        $docente->es_activo = !$docente->es_activo;
+        $docente->save();
 
-
+        return back();
+    }
 }
