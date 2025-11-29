@@ -44,7 +44,9 @@ export default function Index({ auth, docentes, flash, filters: initialFilters =
 
     // Función que maneja la eliminación de un docente
     const handleDelete = (id, nombre, apellido) => {
-        router.delete(route('docentes.destroy', id));
+        if (confirm(`¿Estás seguro de eliminar a ${nombre} ${apellido}?`)) {
+            router.delete(route('docentes.destroy', id));
+        }
     };
 
     const handleToggleStatus = (docente) => {
