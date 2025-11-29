@@ -15,6 +15,19 @@ use Inertia\Response;
 class ProfileController extends Controller
 {
     /**
+     * Display the user's profile.
+     */
+    public function show(Request $request): Response
+    {
+        $user = $request->user();
+        $user->load('instituto');
+
+        return Inertia::render('Users/Show', [
+            'user' => $user,
+        ]);
+    }
+
+    /**
      * Display the user's profile form.
      */
     public function edit(Request $request): Response

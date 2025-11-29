@@ -86,7 +86,7 @@ class UserController extends Controller
         return redirect(route('users.index'))->with('success', 'Usuario creado exitosamente.');
     }
 
-    public function show(User $user)
+    public function edit(User $user)
     {
         if (!Auth::user()->can('modificar_usuario')) {
             abort(403, 'No tienes permiso para modificar usuarios.');
@@ -94,9 +94,17 @@ class UserController extends Controller
 
         $institutos = Instituto::select('id', 'siglas')->get();
 
-        return inertia('Users/Profile/Show', [
+        return inertia('Users/Edit', [
             'user' => $user,
             'institutos' => $institutos,
+        ]);
+    }
+
+    public function show(User $user)
+    {
+        $user->load('instituto');
+        return inertia('Users/Show', [
+            'user' => $user,
         ]);
     }
 
@@ -131,7 +139,7 @@ class UserController extends Controller
             return back()->with('error', 'Hubo un problema al actualizar el usuario.');
         }
 
-        return Inertia::render('Users/Profile/Show', [
+        return Inertia::render('Users/Edit', [
             'user' => $user,
             'institutos' => Instituto::select('id','siglas')->get(),
             'flash' => ['success' => 'Usuario actualizado correctamente.'],

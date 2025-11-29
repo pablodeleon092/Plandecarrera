@@ -7,7 +7,7 @@ import TextInput from '@/Components/TextInput';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 
-export default function Show({ institutos, flash }) {
+export default function Edit({ institutos, flash }) {
     const { props } = usePage();
     const { user } = props;
 

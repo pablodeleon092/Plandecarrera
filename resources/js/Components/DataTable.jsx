@@ -14,7 +14,8 @@ export default function DataTable({
     hover = true,
     containerClassName = '',
     dense = false,
-    statusKey = 'estado'
+    statusKey = 'estado',
+    disableScroll = false
 }) {
     const EmptyIcon = () => (
         emptyIcon || (
@@ -99,7 +100,7 @@ export default function DataTable({
 
     return (
         <div className={`bg-white rounded-lg shadow overflow-hidden ${containerClassName}`}>
-            <div className="overflow-x-auto">
+            <div className={disableScroll ? '' : 'overflow-x-auto'}>
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
