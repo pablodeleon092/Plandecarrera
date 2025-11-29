@@ -206,10 +206,14 @@ export default function Dashboard({ user, institutos, materias, docentes, select
 
                     </div>
                     <PaginatorButtons
-                        meta={materias.meta}
-                        paginator={materias}
+                        meta={currentView === 'materias' ? materias.meta : docentes.meta}
+                        paginator={currentView === 'materias' ? materias : docentes}
                         routeName={'dashboard'}
-                        routeParams={{ instituto_id: selectedInstitutoId, carrera_id: selectedCarreraId }}
+                        routeParams={{
+                            instituto_id: selectedInstitutoId,
+                            carrera_id: selectedCarreraId,
+                            view: currentView
+                        }}
                     />
                 </div>
             </div>

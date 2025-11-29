@@ -10,21 +10,21 @@ use App\Models\Docente;
 use App\Models\Dicta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
     public function home(Request $request)
-    {   
+    {
         $user = Auth::user();
         $selectedInstitutoId = $request->input('instituto_id');
-        $selectedCarreraId = $request->input('carrera_id'); 
+        $selectedCarreraId = $request->input('carrera_id');
         $currentView = $request->input('view', 'materias'); // Default view
 
         // 1. Obtener Institutos disponibles
-        $institutosDisponibles = $this->getInstitutosPorRol($user); 
-        
+        $institutosDisponibles = $this->getInstitutosPorRol($user);
+
         // 2. Determinar el Instituto Seleccionado
         if (!$selectedInstitutoId) {
             $selectedInstitutoId = $institutosDisponibles->first()?->id;
@@ -45,14 +45,14 @@ class DashboardController extends Controller
         return Inertia::render('Gestion/Dashboard', [
             'user' => $user,
             'institutos' => $institutosDisponibles,
-            'selectedInstitutoId' => (int)$selectedInstitutoId,
+            'selectedInstitutoId' => (int) $selectedInstitutoId,
             'selectedCarreraId' => $selectedCarreraId ?: 'all',
             'currentView' => $currentView,
             'materias' => $materiasFiltradas,
             'docentes' => $docentesFiltrados,
         ]);
     }
-    
+
     private function getDocentesFiltrados($selectedInstitutoId, $selectedCarreraId)
     {
         if (!$selectedInstitutoId) {
@@ -70,9 +70,12 @@ class DashboardController extends Controller
         $docentes = $query->with([
             'cargos.dedicacion',
             'comisiones.materia',
-        ])->get();
+        ])
+            ->orderBy('apellido')
+            ->paginate(15)
+            ->withQueryString();
 
-        return $docentes->map(function ($doc) {
+        $docentes->through(function ($doc) {
 
             return [
                 'id' => $doc->id,
@@ -88,10 +91,12 @@ class DashboardController extends Controller
                 })->values(),
 
                 'materias' => $doc->comisiones->map(fn($c) => $c->materia->nombre)
-                                            ->unique()
-                                            ->values(),
+                    ->unique()
+                    ->values(),
             ];
         });
+
+        return $docentes;
     }
 
 
@@ -101,33 +106,37 @@ class DashboardController extends Controller
         $rol = $user->cargo;
 
         if (in_array($rol, ['Administrador', 'Administrativo de Secretaria Academica'])) {
-   
+
             return Instituto::with('carreras.planActual')->get(['id', 'nombre']);
-                    
+
         } elseif (in_array($rol, ['Administrativo de instituto', 'Director de instituto', 'Coordinador Academico', 'Consejero'])) {
-            
-            $user->instituto->load(['carreras' => function ($query) {
-                        $query->with('planActual');
-                    }]);
+
+            $user->instituto->load([
+                'carreras' => function ($query) {
+                    $query->with('planActual');
+                }
+            ]);
             return collect([$user->instituto]);
 
         } elseif ($rol === 'Coordinador de Carrera') {
 
-            $user->instituto->load(['carreras' => function ($query) use ($user) {
+            $user->instituto->load([
+                'carreras' => function ($query) use ($user) {
 
-                $carreraIds = $user->carreras()->pluck('carrera_id');
-                
-                $query->whereIn('id', $carreraIds) 
-                    ->with('planActual'); 
-            }]);
+                    $carreraIds = $user->carreras()->pluck('carrera_id');
 
-            
+                    $query->whereIn('id', $carreraIds)
+                        ->with('planActual');
+                }
+            ]);
+
+
 
             return collect([$user->instituto]);
 
         } else {
 
-            return collect(); 
+            return collect();
         }
 
     }
@@ -135,30 +144,30 @@ class DashboardController extends Controller
     private function getMateriasDisponibles(User $user, $institutosDisponibles)
     {
 
-        $materiasAsignadas = $user->materias; 
+        $materiasAsignadas = $user->materias;
 
         if ($materiasAsignadas->isNotEmpty()) {
-            
-            $materiasAsignadas->load('comisiones'); 
-            
+
+            $materiasAsignadas->load('comisiones');
+
             return $materiasAsignadas;
 
         } else {
-            
+
             $todasLasMaterias = collect();
-            
+
             $institutosDisponibles->load([
-                    'carreras.planActual.materias.comisiones' 
-                ]);
+                'carreras.planActual.materias.comisiones'
+            ]);
 
             foreach ($institutosDisponibles as $instituto) {
-                
+
                 foreach ($instituto->carreras as $carrera) {
-                    $todasLasMaterias = $todasLasMaterias->merge($carrera->planActual->materias); 
+                    $todasLasMaterias = $todasLasMaterias->merge($carrera->planActual->materias);
                 }
             }
-            
-            return $todasLasMaterias->unique('id'); 
+
+            return $todasLasMaterias->unique('id');
         }
     }
 
@@ -196,9 +205,9 @@ class DashboardController extends Controller
                         ->with([
                             'dictas' => function ($d) use ($cargosDisponibles) {
                                 $d->with('cargo', 'docente')
-                                  ->whereHas('cargo', function ($c) use ($cargosDisponibles) {
-                                      $c->whereIn('nombre', $cargosDisponibles);
-                                  });
+                                    ->whereHas('cargo', function ($c) use ($cargosDisponibles) {
+                                        $c->whereIn('nombre', $cargosDisponibles);
+                                    });
                             }
                         ]);
                 }

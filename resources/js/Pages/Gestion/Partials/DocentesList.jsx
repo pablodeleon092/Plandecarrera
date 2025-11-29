@@ -1,4 +1,5 @@
 export default function DocentesList({ docentes }) {
+    // Force HMR update
     return (
         <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -14,7 +15,7 @@ export default function DocentesList({ docentes }) {
                 </thead>
 
                 <tbody className="bg-white divide-y divide-gray-200">
-                    {docentes.map((doc) => (
+                    {docentes?.data?.map((doc) => (
                         <tr key={doc.id}>
                             <td className="px-6 py-4">{doc.nombre}</td>
 
