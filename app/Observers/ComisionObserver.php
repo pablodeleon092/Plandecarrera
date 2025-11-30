@@ -20,7 +20,7 @@ class ComisionObserver
      */
     public function updated(Comision $comision)
     {
-        if ($comision->isDirty('estado') && $comision->estado == false) {
+        if ($comision->isDirty('estado')) {
 
             // Obtener todos los Dicta asociados a la comisión
             $dictas = $comision->dictas()->get();

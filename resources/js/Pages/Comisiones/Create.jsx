@@ -1,19 +1,21 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
+import PrimaryButton from '@/Components/PrimaryButton';
+import DangerButton from '@/Components/DangerButton';
 
 export default function Create({ auth, materias, materia, flash }) {
-    
-    
+
+
     const { data, setData, post, processing, errors } = useForm({
-        codigo: '', 
+        codigo: '',
         nombre: '',
         turno: 'Mañana',
-        modalidad: 'presencial', 
-        sede: 'Ushuaia', 
+        modalidad: 'presencial',
+        sede: 'Ushuaia',
         cuatrimestre: '1ro',
         anio: '',
         horas_teoricas: '',
-        horas_practicas: '',  
+        horas_practicas: '',
         horas_totales: 0,
         id_materia: materia.id || '',
     });
@@ -23,7 +25,7 @@ export default function Create({ auth, materias, materia, flash }) {
     const submit = (e) => {
         e.preventDefault();
 
-        post(route('comisiones.store')); 
+        post(route('comisiones.store'));
     };
 
     return (
@@ -32,7 +34,7 @@ export default function Create({ auth, materias, materia, flash }) {
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Crear Nuevo Comision</h2>}
         >
             <Head title="Crear Comision" />
-            
+
             {flash?.error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                     {flash?.error}
@@ -48,7 +50,7 @@ export default function Create({ auth, materias, materia, flash }) {
                                     <label htmlFor="codigo" className="block text-sm font-medium text-gray-700">Codigo</label>
                                     <input
                                         id="codigo"
-                                        type="text" 
+                                        type="text"
                                         value={data.codigo}
                                         onChange={(e) => setData('codigo', e.target.value)}
                                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
@@ -94,7 +96,7 @@ export default function Create({ auth, materias, materia, flash }) {
                                     {errors.turno && <div className="text-red-600 mt-1 text-sm">{errors.turno}</div>}
                                 </div>
                             </div>
-                            
+
                             {/* Modalidad Desempeño (ENUM) y Carga Horaria (Integer) */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
@@ -193,19 +195,18 @@ export default function Create({ auth, materias, materia, flash }) {
                             </div>
 
                             <div className="flex justify-end space-x-4">
-                                <Link
+                                <DangerButton
+                                    as={Link}
                                     href={route('comisiones.index')}
-                                    className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >
                                     Cancelar
-                                </Link>
-                                <button
+                                </DangerButton>
+                                <PrimaryButton
                                     type="submit"
                                     disabled={processing}
-                                    className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                                 >
-                                    {processing ? 'Guardando...' : 'Guardar Comision'}
-                                </button>
+                                    {processing ? 'Guardando...' : 'Crear Comisión'}
+                                </PrimaryButton>
                             </div>
                         </form>
                     </div>

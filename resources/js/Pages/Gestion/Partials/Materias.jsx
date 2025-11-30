@@ -1,12 +1,11 @@
 import React from 'react';
+import PaginatorButtons from '@/Components/PaginatorButtons';
 
-// Este componente recibe la lista de materias ya filtrada por el Dashboard
-// y se encarga únicamente de renderizar la tabla de resultados.
 export default function Materias({ materias }) {
     return (
         <>
             <h3 className="text-lg font-semibold border-b pb-2 mb-4">
-                Materias Disponibles ({materias.length})
+                Materias Disponibles
             </h3>
 
             <div className="overflow-x-auto">
@@ -30,8 +29,8 @@ export default function Materias({ materias }) {
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {materias.length > 0 ? (
-                            materias.map((materia) => (
+                        {materias.data?.length > 0 ? (
+                            materias.data.map((materia) => (
                                 <tr key={materia.id}>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{materia.codigo}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{materia.nombre}</td>
@@ -69,6 +68,7 @@ export default function Materias({ materias }) {
                     </tbody>
                 </table>
             </div>
+
         </>
     );
 }

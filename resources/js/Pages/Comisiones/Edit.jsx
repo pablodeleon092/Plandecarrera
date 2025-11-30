@@ -1,9 +1,13 @@
+
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, useForm, Link } from '@inertiajs/react';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
 
 export default function Edit({ auth, materias, comision, flash }) {
-    
-    
+
+
     const { data, setData, put, processing, errors } = useForm({
         codigo: comision?.codigo || '',
         nombre: comision?.nombre || '',
@@ -20,7 +24,7 @@ export default function Edit({ auth, materias, comision, flash }) {
 
     const submit = (e) => {
         e.preventDefault();
-        put(route('comisiones.update', comision.id)); 
+        put(route('comisiones.update', comision.id));
     };
 
     return (
@@ -29,7 +33,7 @@ export default function Edit({ auth, materias, comision, flash }) {
             header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Crear Nuevo Comision</h2>}
         >
             <Head title="Crear Comision" />
-            
+
             {flash?.error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                     {flash?.error}
@@ -45,7 +49,7 @@ export default function Edit({ auth, materias, comision, flash }) {
                                     <label htmlFor="codigo" className="block text-sm font-medium text-gray-700">Codigo</label>
                                     <input
                                         id="codigo"
-                                        type="text" 
+                                        type="text"
                                         value={data.codigo}
                                         onChange={(e) => setData('codigo', e.target.value)}
                                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
@@ -100,7 +104,7 @@ export default function Edit({ auth, materias, comision, flash }) {
                                     {errors.turno && <div className="text-red-600 mt-1 text-sm">{errors.turno}</div>}
                                 </div>
                             </div>
-                            
+
                             {/* Modalidad Desempeño (ENUM) y Carga Horaria (Integer) */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
@@ -199,19 +203,18 @@ export default function Edit({ auth, materias, comision, flash }) {
                             </div>
 
                             <div className="flex justify-end space-x-4">
-                                <Link
+                                <DangerButton
+                                    as={Link}
                                     href={route('comisiones.index')}
-                                    className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >
                                     Cancelar
-                                </Link>
-                                <button
+                                </DangerButton>
+                                <PrimaryButton
                                     type="submit"
                                     disabled={processing}
-                                    className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                                 >
-                                    {processing ? 'Guardando...' : 'Guardar Comision'}
-                                </button>
+                                    {processing ? 'Guardando...' : 'Guardar Cambios'}
+                                </PrimaryButton>
                             </div>
                         </form>
                     </div>

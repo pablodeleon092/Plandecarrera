@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
 
 export default function CreateDicta({ auth, comision, flash, docente, funcionesAulicas }) {
     const { data, setData, post, errors } = useForm({
@@ -26,22 +29,22 @@ export default function CreateDicta({ auth, comision, flash, docente, funcionesA
         >
             <Head title={`Comisión: ${comision.nombre}`} />
 
-                    {flash?.success && (
-                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                            {flash.success}
-                        </div>
-                    )}
-                    {flash?.error && (
-                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                            {flash.error}
-                        </div>
-                    )}
+            {flash?.success && (
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                    {flash.success}
+                </div>
+            )}
+            {flash?.error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    {flash.error}
+                </div>
+            )}
 
             <div className="py-8">
                 <div className="container mx-auto px-4 max-w-lg bg-white rounded-lg shadow-lg p-6">
                     <div className="mb-6">
                         <h3 className="text-2xl font-bold mb-6">Asignar Docente a la Comisión</h3>
-                        <p className="mb-4">Docente seleccionado: <strong>{docente.nombre} {docente.apellido} (Legajo: {docente.legajo})</strong></p>   
+                        <p className="mb-4">Docente seleccionado: <strong>{docente.nombre} {docente.apellido} (Legajo: {docente.legajo})</strong></p>
                         <p>Horas Teoricas: {comision.horas_teoricas}</p>
                         <p>Horas Practicas: {comision.horas_practicas}</p>
                     </div>
@@ -135,18 +138,21 @@ export default function CreateDicta({ auth, comision, flash, docente, funcionesA
                         </div>
 
                         <div className="flex justify-between items-center">
-                            <Link
-                                href={route('comisiones.show', comision.id)}
-                                className="text-gray-600 hover:text-gray-800"
+                            <DangerButton
+                                as={Link}
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    window.history.back();
+                                }}
                             >
                                 Cancelar
-                            </Link>
-                            <button
+                            </DangerButton>
+                            <PrimaryButton
                                 type="submit"
-                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-semibold"
                             >
                                 Guardar
-                            </button>
+                            </PrimaryButton>
                         </div>
                     </form>
                 </div>

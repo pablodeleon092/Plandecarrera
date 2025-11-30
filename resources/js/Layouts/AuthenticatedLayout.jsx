@@ -66,26 +66,27 @@ export default function AuthenticatedLayout({ header, children }) {
                                                     </button>
                                                 </span>
                                             </Dropdown.Trigger>
-                                                <Dropdown.Content>
-                                                    <Dropdown.Link href={route('carreras.index')}>
-                                                        Carreras
-                                                    </Dropdown.Link>                                                
-                                                    <Dropdown.Link href={route('materias.index')}>
-                                                        Materias
-                                                    </Dropdown.Link>
-                                                    <Dropdown.Link href={route('comisiones.index')}>
-                                                        Comisiones
-                                                    </Dropdown.Link>
-                                                </Dropdown.Content>
+                                            <Dropdown.Content>
+                                                <Dropdown.Link href={route('carreras.index')}>
+                                                    Carreras
+                                                </Dropdown.Link>
+                                                <Dropdown.Link href={route('materias.index')}>
+                                                    Materias
+                                                </Dropdown.Link>
+                                                <Dropdown.Link href={route('comisiones.index')}>
+                                                    Comisiones
+                                                </Dropdown.Link>
+
+                                            </Dropdown.Content>
                                         </Dropdown>
                                     </div>
                                 </div>
-                            {canViewUsers && (
-                                <NavLink href={route('users.index')} active={route().current('users.index')}>
-                                    Usuarios
-                                </NavLink>
-                            )}  
-                            </div>                       
+                                {canViewUsers && (
+                                    <NavLink href={route('users.index')} active={route().current('users.index')}>
+                                        Usuarios
+                                    </NavLink>
+                                )}
+                            </div>
                         </div>
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
@@ -117,6 +118,9 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
+                                        <Dropdown.Link href={route('profile.show')}>
+                                            Perfil
+                                        </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route('logout')}
                                             method="post"
@@ -179,25 +183,25 @@ export default function AuthenticatedLayout({ header, children }) {
                     }
                 >
                     <div className="space-y-1 pb-3 pt-2">
-                            <ResponsiveNavLink
-                                href={route('dashboard')}
-                                active={route().current('dashboard')}
-                            >
-                                Dashboard
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                href={route('materias.index')}
-                                active={route().current('materias.index')}
-                            >
-                                Materias
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                href={route('carreras.index')}
-                                active={route().current('carreras.index')}
-                            >
-                                Carreras
-                            </ResponsiveNavLink>
-                        </div>
+                        <ResponsiveNavLink
+                            href={route('dashboard')}
+                            active={route().current('dashboard')}
+                        >
+                            Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('materias.index')}
+                            active={route().current('materias.index')}
+                        >
+                            Materias
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('carreras.index')}
+                            active={route().current('carreras.index')}
+                        >
+                            Carreras
+                        </ResponsiveNavLink>
+                    </div>
 
                     <div className="border-t border-gray-200 pb-1 pt-4">
                         <div className="px-4">
@@ -210,8 +214,8 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
-                                Profile
+                            <ResponsiveNavLink href={route('profile.show')}>
+                                Perfil
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 method="post"

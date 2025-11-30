@@ -3,9 +3,11 @@ import { Head, useForm, Link } from '@inertiajs/react';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
 
 export default function Create({ auth, docente, dedicaciones, flash }) {
-    
+
     const { data, setData, post, processing, errors } = useForm({
         cargo: '',
         dedicacion_id: '',
@@ -14,8 +16,8 @@ export default function Create({ auth, docente, dedicaciones, flash }) {
 
     const submit = (e) => {
         e.preventDefault();
-   
-        post(route('cargos.addCargo', { docente: docente.id }));
+
+        post(route('cargos.store', { docente: docente.id }));
     };
 
     return (
@@ -85,19 +87,18 @@ export default function Create({ auth, docente, dedicaciones, flash }) {
                             </div>
 
                             <div className="flex justify-end space-x-4">
-                                <Link
+                                <DangerButton
+                                    as={Link}
                                     href={route('docentes.edit', docente.id)}
-                                    className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >
                                     Cancelar
-                                </Link>
-                                <button
+                                </DangerButton>
+                                <PrimaryButton
                                     type="submit"
                                     disabled={processing}
-                                    className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                                 >
                                     {processing ? 'Guardando...' : 'Agregar Cargo'}
-                                </button>
+                                </PrimaryButton>
                             </div>
                         </form>
                     </div>

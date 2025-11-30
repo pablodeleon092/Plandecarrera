@@ -14,8 +14,8 @@ export default function Show({ auth, cargo, docente }) {
                 <div className="container mx-auto px-4 max-w-5xl">
                     <div className="mb-6">
                         <Link 
-                            href={route('docentes.index')} 
-                            className="text-blue-600 hover:text-blue-800 flex items-center gap-2 transition"
+                            href="#"
+                            onClick={() => window.history.back()}
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />

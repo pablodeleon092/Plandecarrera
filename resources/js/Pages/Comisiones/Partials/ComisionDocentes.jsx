@@ -3,6 +3,7 @@ import React, { useState, useMemo } from "react";
 import { Link, router } from "@inertiajs/react";
 import TableFilters from "@/Components/TableFilters";
 import DataTable from "@/Components/DataTable";
+import DangerButton from "@/Components/DangerButton";
 
 export default function ComisionDocentes({ comision, docentes, allDocentes, filters: initialFilters = {} }) {
     const [filters, setFilters] = useState({
@@ -54,16 +55,16 @@ export default function ComisionDocentes({ comision, docentes, allDocentes, filt
                         Ver
                     </Link>
 
-                    <button
+                    <DangerButton
                         onClick={() => {
                             if (confirm("¿Eliminar docente de esta comisión?")) {
                                 router.delete(route("dictas.destroy", d.dicta_id));
                             }
                         }}
-                        className="bg-red-600 text-white px-3 py-1 rounded-full hover:bg-red-700 transition"
+                        className="px-3 py-1 text-xs"
                     >
                         Eliminar
-                    </button>
+                    </DangerButton>
                 </div>
             ),
         },
@@ -92,10 +93,10 @@ export default function ComisionDocentes({ comision, docentes, allDocentes, filt
                                 key={docente.id}
                                 className="p-2 hover:bg-blue-50 cursor-pointer flex justify-between items-center"
                                 onClick={() =>
-                                    (window.location.href = route("dictas.create", {
-                                        comision_id: comision.id,
-                                        docente_id: docente.id,
-                                    }))
+                                (window.location.href = route("dictas.create", {
+                                    comision_id: comision.id,
+                                    docente_id: docente.id,
+                                }))
                                 }
                             >
                                 <span>

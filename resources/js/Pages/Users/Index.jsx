@@ -51,7 +51,7 @@ export default function Index({ auth, users }) {
 
     const filteredData = useMemo(() => {
         return users.data.filter(user => {
-            const matchSearch = !filters.search || 
+            const matchSearch = !filters.search ||
                 user.nombre.toLowerCase().includes(filters.search.toLowerCase());
             const matchInstituto = !filters.instituto || user.instituto?.siglas === filters.instituto;
             const matchCargo = !filters.cargo || user.cargo === filters.cargo;
@@ -126,27 +126,28 @@ export default function Index({ auth, users }) {
                 />
 
                 <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <TableFilters 
-                    filters={filterConfig}
-                    onChange={handleFilterChange}
-                />
+                    <TableFilters
+                        filters={filterConfig}
+                        onChange={handleFilterChange}
+                    />
                 </div>
                 <DataTable
                     columns={columns}
                     data={filteredData}
-                    onEdit={canEditusers 
-                        ? (user) => router.visit(route('users.show', user.id))
-                        : null 
+                    onShow={(user) => router.visit(route('users.show', user.id))}
+                    onEdit={canEditusers
+                        ? (user) => router.visit(route('users.edit', user.id))
+                        : null
                     }
-                    onDelete={canEditusers 
-                            ? (user) => {
-                                if (confirm('¿Eliminar usuario?')) {
-                                    // Asumo que `inertiaDelete` es una función/hook de Inertia para DELETE (como `router.delete`)
-                                    inertiaDelete(route('users.destroy', user.id)); 
-                                }
+                    onDelete={canEditusers
+                        ? (user) => {
+                            if (confirm('¿Eliminar usuario?')) {
+                                // Asumo que `inertiaDelete` es una función/hook de Inertia para DELETE (como `router.delete`)
+                                inertiaDelete(route('users.destroy', user.id));
                             }
-                            : null 
                         }
+                        : null
+                    }
                     hover={true}
                     emptyMessage="No hay usuarios para mostrar."
                     emptyIcon={
@@ -154,6 +155,7 @@ export default function Index({ auth, users }) {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                     }
+                    disableScroll={true}
                 />
             </div>
         </AuthenticatedLayout>

@@ -34,9 +34,36 @@ class Docente extends Model
     // --- NUEVA RELACIÓN AGREGADA (Soluciona el error 500) ---
     public function comisiones()
     {
-        // Asumiendo que la tabla intermedia se llama 'dictas' (por tu DictaController)
+
         // Parámetros: Modelo Destino, Tabla Pivot, FK Local, FK Foránea
         return $this->belongsToMany(Comision::class, 'dictas', 'docente_id', 'comision_id')
-                    ->withPivot('id'); // Opcional: trae el ID de la relación dicta
+                    ->withPivot('id'); // Opcional:
+                    //  trae el ID de la relación dicta
     }
+
+    public function scopeDeInstitutoYCarrera($query, $institutoId, $carreraId)
+    {
+        return $query->whereHas('comisiones.materia.planes', function ($q) use ($institutoId, $carreraId) {
+
+            $q->whereNull('anio_fin')               // plan activo
+            ->where('carrera_id', $carreraId)     // misma carrera
+            ->whereHas('carrera', function ($c) use ($institutoId) {
+                $c->where('instituto_id', $institutoId); // instituto al que pertenece la carrera
+            });
+
+        });
+    }
+    
+    public function scopeDeInstituto($query, $institutoId)
+    {
+        return $query->whereHas('comisiones.materia.planes', function ($q) use ($institutoId) {
+
+            $q->whereNull('anio_fin') // solo planes activos
+            ->whereHas('carrera', function ($c) use ($institutoId) {
+                $c->where('instituto_id', $institutoId);
+            });
+
+        });
+    }
+
 }

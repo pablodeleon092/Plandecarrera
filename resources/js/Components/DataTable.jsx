@@ -1,18 +1,21 @@
 import { Link } from '@inertiajs/react';
 import ToggleStatusButton from './ToggleStatusButton'; // Asegúrate de que la importación esté
 
-export default function DataTable({ 
-    columns = [], 
-    data = [], 
-    onShow, 
-    onEdit, 
+export default function DataTable({
+    columns = [],
+    data = [],
+    onShow,
+    onEdit,
     onDelete,
     onToggleStatus,
     emptyMessage = 'Sin registros.',
     emptyIcon,
     actions = true,
     hover = true,
-    containerClassName = ''
+    containerClassName = '',
+    dense = false,
+    statusKey = 'estado',
+    disableScroll = false
 }) {
     const EmptyIcon = () => (
         emptyIcon || (
@@ -85,29 +88,32 @@ export default function DataTable({
             )}
             {onToggleStatus && (
                 <ToggleStatusButton
-                    isActive={item.estado === 'activa'}
+                    isActive={!!item[statusKey]}
                     onClick={() => onToggleStatus(item)}
                 />
             )}
         </div>
     );
 
+    const paddingClass = dense ? 'px-3 py-2' : 'px-6 py-4';
+    const headerPaddingClass = dense ? 'px-3 py-2' : 'px-6 py-3';
+
     return (
         <div className={`bg-white rounded-lg shadow overflow-hidden ${containerClassName}`}>
-            <div className="overflow-x-auto">
+            <div className={disableScroll ? '' : 'overflow-x-auto'}>
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
                             {columns.map((col, index) => (
                                 <th
                                     key={index}
-                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                    className={`${headerPaddingClass} text-left text-xs font-medium text-gray-500 uppercase tracking-wider`}
                                 >
                                     {col.label}
                                 </th>
                             ))}
                             {actions && (onShow || onEdit || onDelete || onToggleStatus) && (
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className={`${headerPaddingClass} text-right text-xs font-medium text-gray-500 uppercase tracking-wider`}>
                                     Acciones
                                 </th>
                             )}
@@ -116,8 +122,8 @@ export default function DataTable({
                     <tbody className="bg-white divide-y divide-gray-200">
                         {data.length === 0 ? (
                             <tr>
-                                <td 
-                                    colSpan={columns.length + (actions && (onShow || onEdit || onDelete || onToggleStatus) ? 1 : 0)} 
+                                <td
+                                    colSpan={columns.length + (actions && (onShow || onEdit || onDelete || onToggleStatus) ? 1 : 0)}
                                     className="px-6 py-8 text-center text-gray-500"
                                 >
                                     <div className="flex flex-col items-center">
@@ -132,15 +138,14 @@ export default function DataTable({
                                     {columns.map((col, index) => (
                                         <td
                                             key={index}
-                                            className={`px-6 py-4 ${col.nowrap !== false ? 'whitespace-nowrap' : ''} ${
-                                                col.className || 'text-sm text-gray-900'
-                                            }`}
+                                            className={`${paddingClass} ${col.nowrap !== false ? 'whitespace-nowrap' : ''} ${col.className || 'text-sm text-gray-900'
+                                                }`}
                                         >
                                             {col.render ? col.render(item) : item[col.key]}
                                         </td>
                                     ))}
                                     {actions && (onShow || onEdit || onDelete || onToggleStatus) && (
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <td className={`${paddingClass} whitespace-nowrap text-right text-sm font-medium`}>
                                             <ActionButtons item={item} />
                                         </td>
                                     )}

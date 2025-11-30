@@ -63,16 +63,15 @@ export default function Index({ auth, carreras, filters: initialFilters }) {
                 </span>
             )
         },
-        ,
+
         {
             key: 'estado',
             label: 'Estado',
             render: (carrera) => (
-                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    carrera.estado
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                }`}>
+                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${carrera.estado
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                    }`}>
                     {carrera.estado ? 'Activa' : 'Inactiva'}
                 </span>
             )
@@ -87,7 +86,8 @@ export default function Index({ auth, carreras, filters: initialFilters }) {
 
     const handleToggleStatus = (carrera) => {
         // Realiza la petición para cambiar el estado directamente, sin confirmación.
-        router.patch(route('carreras.toggleStatus', carrera.id), {}, { preserveScroll: true });
+        router.patch(route('carreras.toggleStatus', carrera.id), {},
+            { preserveScroll: true });
     };
 
     return (
@@ -96,7 +96,7 @@ export default function Index({ auth, carreras, filters: initialFilters }) {
             header={<h2 className="text-xl font-semibold leading-tight text-gray-800">Gestión de Carreras</h2>}
         >
             <Head title="Carreras" />
-            
+
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <ListHeader
@@ -105,14 +105,14 @@ export default function Index({ auth, carreras, filters: initialFilters }) {
                         buttonRoute={route('carreras.create')}
                     />
                     <div className="bg-white rounded-lg shadow p-6 mb-6">
-                        <TableFilters 
+                        <TableFilters
                             filters={filterConfig}
                             onChange={handleFilterChange}
                         />
                     </div>
 
                     <div className="bg-white rounded-lg shadow overflow-hidden">
-                        <DataTable 
+                        <DataTable
                             columns={columns}
                             data={carreras.data}
                             onShow={(carrera) => router.visit(route('carreras.show', carrera.id))}

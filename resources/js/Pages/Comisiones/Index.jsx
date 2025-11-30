@@ -27,7 +27,7 @@ export default function Index({ auth, comisiones, modalidades, sedes, flash, fil
         router.patch(route('comisiones.toggleStatus', comision), {}, {
             preserveScroll: true
         });
-    };    
+    };
 
     const filterConfig = [
         {
@@ -64,10 +64,11 @@ export default function Index({ auth, comisiones, modalidades, sedes, flash, fil
             key: 'id_materia',
             label: 'Materia',
             render: (comision) => (
-                <span className="text-sm text-gray-900">
+                <span className="text-sm text-gray-900 block min-w-[150px] whitespace-normal">
                     {comision.materia?.nombre || '-'}
                 </span>
-            )
+            ),
+            nowrap: false
         },
         {
             key: 'turno',
@@ -90,33 +91,32 @@ export default function Index({ auth, comisiones, modalidades, sedes, flash, fil
             className: 'text-sm font-medium text-gray-900',
         },
         {
-            key: 'horas_teoricas',
-            label: 'Horas Teoria',
-            className: 'text-sm font-medium text-gray-900',
+            key: 'horas',
+            label: 'Horas (T/P)',
+            render: (c) => (
+                <div className="text-xs">
+                    <span className="font-semibold">{c.horas_teoricas}</span> / <span className="font-semibold">{c.horas_practicas}</span>
+                </div>
+            )
         },
-        {
-            key: 'horas_practicas',
-            label: 'Horas Practica',
-            className: 'text-sm font-medium text-gray-900',
-        },
+
         {
             key: 'estado',
             label: 'Estado',
             render: (comision) => (
-            <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                comision.estado
-                ? 'bg-green-100 text-green-800'
-                : 'bg-red-100 text-red-800'
-            }`}>
-                {comision.estado ? 'Activa' : 'Inactiva'}
-            </span>
+                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${comision.estado
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                    }`}>
+                    {comision.estado ? 'Activa' : 'Inactiva'}
+                </span>
             )
         }
     ];
 
     const activeFilters = Object.fromEntries(
-            Object.entries(filters).filter(([key, value]) => value !== '' && value !== null)
-    );   
+        Object.entries(filters).filter(([key, value]) => value !== '' && value !== null)
+    );
 
 
     const handleDelete = (comision) => {
@@ -132,34 +132,33 @@ export default function Index({ auth, comisiones, modalidades, sedes, flash, fil
         >
             <Head title="Comisiones" />
 
-                    {flash?.success && (
-                        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                            {flash.success}
-                        </div>
-                    )}
-                    {flash?.error && (
-                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                            {flash.error}
-                        </div>
-                    )}
+            {flash?.success && (
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                    {flash.success}
+                </div>
+            )}
+            {flash?.error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    {flash.error}
+                </div>
+            )}
 
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <ListHeader
                         title="Listado de Comisiones"
-                        buttonLabel="Agregar Comisión"
-                        buttonRoute={route('comisiones.create')}
                     />
                     <div className="bg-white rounded-lg shadow p-6 mb-6">
-                        <TableFilters 
+                        <TableFilters
                             filters={filterConfig}
                             onChange={handleFilterChange}
                         />
                     </div>
 
                     <div className="bg-white rounded-lg shadow overflow-hidden">
-                        <DataTable 
+                        <DataTable
+                            dense={true}
                             columns={columns}
                             data={comisiones.data}
                             onShow={(comision) => router.visit(route('comisiones.show', comision.id))}
@@ -176,7 +175,7 @@ export default function Index({ auth, comisiones, modalidades, sedes, flash, fil
                         />
                     </div>
 
-                    <PaginatorButtons meta={comisiones?.meta} paginator={comisiones} routeName={'comisiones.index'} routeParams={activeFilters}/>
+                    <PaginatorButtons meta={comisiones?.meta} paginator={comisiones} routeName={'comisiones.index'} routeParams={activeFilters} />
 
                     <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="bg-white rounded-lg shadow p-4">

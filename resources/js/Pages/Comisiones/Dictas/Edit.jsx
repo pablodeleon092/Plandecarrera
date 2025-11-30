@@ -1,18 +1,21 @@
 import React from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
 
 export default function EditDicta({ auth, flash, dicta, funcionesAulicas, cargos }) {
-    
- 
+
+
     const comision = dicta.comision;
     const docente = dicta.docente
-    
+
     // Función de ayuda para asegurar que las fechas se muestren correctamente en el input 'date'
     const formatYearDate = (dateString) => {
         if (!dateString) return '';
         // Asume que la cadena es 'YYYY-MM-DD HH:MM:SS' y toma solo la parte de la fecha
-        return dateString.substring(0, 10); 
+        return dateString.substring(0, 10);
     };
 
     const { data, setData, put, processing, errors } = useForm({
@@ -29,7 +32,7 @@ export default function EditDicta({ auth, flash, dicta, funcionesAulicas, cargos
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        
+
         // CLAVE: Usar 'put' y la ruta 'update' con el ID del dicta a editar
         put(route('dictas.update', dicta.id), {
             preserveScroll: true,
@@ -53,7 +56,7 @@ export default function EditDicta({ auth, flash, dicta, funcionesAulicas, cargos
 
             <div className="py-8">
                 <div className="container mx-auto px-4 max-w-lg bg-white rounded-lg shadow-xl p-8">
-                    
+
                     {/* Mensajes Flash */}
                     {flash?.success && (
                         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
@@ -70,15 +73,15 @@ export default function EditDicta({ auth, flash, dicta, funcionesAulicas, cargos
                         <h3 className="text-2xl font-bold mb-6 text-gray-800">Editar Asignación Docente</h3>
                         <p className="text-lg mb-2">
                             Docente: <strong>{docente.nombre} {docente.apellido} (Legajo: {docente.legajo})</strong>
-                        </p>   
+                        </p>
                         <p className="text-sm text-gray-600">Comisión: {comision.codigo} - {comision.nombre}</p>
                         <p className="text-sm text-gray-600">Horas Totales de la Comisión: {comision.horas_totales}</p>
                         <p className="text-sm text-gray-600">Horas de Practica: {comision.horas_practicas}</p>
                         <p className="text-sm text-gray-600">Horas Totales de Teoria: {comision.horas_teoricas}</p>
                     </div>
-                    
+
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        
+
                         {/* Selector de Cargo (Usamos la lista de cargos del docente, asumiendo que viene en la prop 'cargos' o 'docente.cargos') */}
                         <div>
                             <label className="block text-gray-700 font-semibold mb-2" htmlFor="cargo_id">Cargo</label>
@@ -177,20 +180,22 @@ export default function EditDicta({ auth, flash, dicta, funcionesAulicas, cargos
                         </div>
 
                         <div className="flex justify-end items-center pt-4 space-x-4">
-                            <Link
-
-                                href={route('comisiones.show', comision.id)}
-                                className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition duration-150 ease-in-out"
+                            <DangerButton
+                                as={Link}
+                                href="#"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    window.history.back();
+                                }}
                             >
                                 Cancelar
-                            </Link>
-                            <button
+                            </DangerButton>
+                            <PrimaryButton
                                 type="submit"
                                 disabled={processing}
-                                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out disabled:opacity-50"
                             >
                                 {processing ? 'Actualizando...' : 'Actualizar Asignación'}
-                            </button>
+                            </PrimaryButton>
                         </div>
                     </form>
                 </div>

@@ -3,6 +3,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import MateriaInfo from './Partials/MateriaInfo';
 import MateriaComisiones from './Partials/MateriaComisiones';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
 
 export default function Show({ auth, materia, comisiones }) {
 
@@ -30,11 +33,16 @@ export default function Show({ auth, materia, comisiones }) {
 
                     {/* Botón Volver */}
                     <div className="mb-4">
-                        <Link
-                            href={route('materias.index')}
-                            className="text-blue-600 hover:text-blue-800 flex items-center gap-2 transition"
+                        <SecondaryButton
+                            as={Link}
+                            href="#"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                window.history.back();
+                            }}
+                            className="flex items-center gap-2"
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
@@ -42,8 +50,8 @@ export default function Show({ auth, materia, comisiones }) {
                                     d="M10 19l-7-7m0 0l7-7m-7 7h18"
                                 />
                             </svg>
-                            Volver al Listado
-                        </Link>
+                            Volver
+                        </SecondaryButton>
                     </div>
 
                     {/* ENCABEZADO estilo Docente */}
@@ -71,20 +79,19 @@ export default function Show({ auth, materia, comisiones }) {
 
                                 {/* Botones */}
                                 <div className="flex gap-3">
-                                    <Link
+                                    <PrimaryButton
+                                        as={Link}
                                         href={route('materias.edit', materia.id)}
-                                        className="bg-white text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50 transition font-semibold"
                                     >
                                         Editar
-                                    </Link>
+                                    </PrimaryButton>
 
                                     {/* Solo si querés eliminar materias */}
-                                    <button
+                                    <DangerButton
                                         onClick={handleDelete}
-                                        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition font-semibold"
                                     >
                                         Eliminar
-                                    </button>
+                                    </DangerButton>
                                 </div>
                             </div>
 
@@ -100,22 +107,20 @@ export default function Show({ auth, materia, comisiones }) {
 
                                 <button
                                     onClick={() => setCurrentTab('informacion')}
-                                    className={`px-4 py-2 font-semibold transition border-b-2 ${
-                                        currentTab === 'informacion'
-                                            ? 'border-blue-600 text-blue-600'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                    }`}
+                                    className={`px-4 py-2 font-semibold transition border-b-2 ${currentTab === 'informacion'
+                                        ? 'border-blue-600 text-blue-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                        }`}
                                 >
                                     Información
                                 </button>
 
                                 <button
                                     onClick={() => setCurrentTab('comisiones')}
-                                    className={`px-4 py-2 font-semibold transition border-b-2 ${
-                                        currentTab === 'comisiones'
-                                            ? 'border-blue-600 text-blue-600'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                    }`}
+                                    className={`px-4 py-2 font-semibold transition border-b-2 ${currentTab === 'comisiones'
+                                        ? 'border-blue-600 text-blue-600'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                        }`}
                                 >
                                     Comisiones
                                 </button>

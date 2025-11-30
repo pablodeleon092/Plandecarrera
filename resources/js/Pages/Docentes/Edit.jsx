@@ -1,8 +1,10 @@
 // resources/js/Pages/Docentes/Edit.jsx
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import PrimaryButton from '@/Components/PrimaryButton';
+import DangerButton from '@/Components/DangerButton';
 
-export default function Edit({ auth, docente,flash }) {
+export default function Edit({ auth, docente, flash }) {
     const { data, setData, put, processing, errors } = useForm({
         legajo: docente.legajo ?? '',
         nombre: docente.nombre ?? '',
@@ -26,11 +28,11 @@ export default function Edit({ auth, docente,flash }) {
         >
             <Head title="Editar Docente" />
             {flash?.success && (
-                    <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                        {flash?.success}
-                    </div>
+                <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                    {flash?.success}
+                </div>
             )}
-            
+
             {flash?.error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                     {flash?.error}
@@ -132,24 +134,23 @@ export default function Edit({ auth, docente,flash }) {
                                 <div className="flex items-center justify-between space-x-3">
                                     <Link
                                         href={route('docentes.cargo.create', docente.id)}
-                                        className="px-4 py-2 rounded-md border border-gray-300 text-gray-700"
+                                        className="px-4 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white"
                                     >
                                         Agregar Cargo
                                     </Link>
-                                    <div className="flex space-x-3">
-                                        <Link
+                                    <div className="flex justify-end space-x-4">
+                                        <DangerButton
+                                            as={Link}
                                             href={route('docentes.index')}
-                                            className="px-4 py-2 rounded-md border border-gray-300 text-gray-700"
                                         >
                                             Cancelar
-                                        </Link>
-                                        <button
+                                        </DangerButton>
+                                        <PrimaryButton
                                             type="submit"
                                             disabled={processing}
-                                            className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
                                         >
-                                            Guardar cambios
-                                        </button>                                        
+                                            {processing ? 'Guardando...' : 'Guardar Cambios'}
+                                        </PrimaryButton>
                                     </div>
                                 </div>
                             </form>
