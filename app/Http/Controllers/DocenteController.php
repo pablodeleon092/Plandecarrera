@@ -40,7 +40,10 @@ class DocenteController extends Controller
             $query->where('es_activo', $request->input('es_activo') == '1');
         }
 
-        $docentes = $query->with('cargos')->orderBy('apellido')->paginate(15)->withQueryString();
+        $docentes = $query->with('cargos')
+            ->orderBy('apellido')
+            ->paginate(15)
+            ->withQueryString();
 
         return Inertia::render('Docentes/Index', [
             'docentes' => $docentes,
@@ -63,7 +66,7 @@ class DocenteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreDocenteRequest  $request)
+    public function store(StoreDocenteRequest $request)
     {
         Docente::create($request->validated());
         return redirect()->route('docentes.index')->with('success', 'Docente creado exitosamente.');
@@ -72,7 +75,7 @@ class DocenteController extends Controller
     /**
      * Display the specified resource.
      */
-  /**
+    /**
      * Display the specified resource.
      */
     public function show(Docente $docente)
@@ -83,7 +86,7 @@ class DocenteController extends Controller
         return Inertia::render('Docentes/Show', [
             'docente' => $docente,
             // Pasamos las comisiones por separado para usarlas fácil en el frontend
-            'comisiones' => $docente->comisiones 
+            'comisiones' => $docente->comisiones
         ]);
     }
 
@@ -100,7 +103,7 @@ class DocenteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreDocenteRequest  $request, Docente $docente)
+    public function update(StoreDocenteRequest $request, Docente $docente)
     {
         $docente->update($request->validated());
 
@@ -128,7 +131,7 @@ class DocenteController extends Controller
      */
     public function createCargo(Docente $docente)
     {
-        
+
         if ($docente->modalidad_desempeño === 'Desarrollo') {
 
 

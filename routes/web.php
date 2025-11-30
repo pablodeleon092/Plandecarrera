@@ -4,7 +4,7 @@ use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\DictaController;
 use App\Http\Controllers\CargoController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\CarreraController; 
+use App\Http\Controllers\CarreraController;
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\ComisionController;
 use App\Http\Controllers\DashboardController;
@@ -13,7 +13,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', [DashboardController::class, 'home']) 
+Route::get('/', [DashboardController::class, 'home'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
@@ -23,6 +23,7 @@ Route::get('/', [DashboardController::class, 'home'])
 Route::middleware('auth')->group(function () {
     #UsuariusCrud
     Route::resource('users', UserController::class);
+    Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
     Route::get('users/{user}/carreras', [UserController::class, 'carrerasCoordinador'])->name('coordinadores.carreras.edit');
     Route::patch('users/{user}/carreras', [UserController::class, 'updateCarrerasCoordinador'])->name('coordinadores.carreras.update');
 
@@ -52,7 +53,7 @@ Route::middleware('auth')->group(function () {
 
 });
 
-Route::get('/test', fn () => Inertia::render('Test'))->name('test');
+Route::get('/test', fn() => Inertia::render('Test'))->name('test');
 
 /*
 Route::get('/', function () {
@@ -65,4 +66,4 @@ Route::get('/', function () {
 });
 */
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
