@@ -6,7 +6,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import ListHeader from '@/Components/ListHeader';
 import DataTable from '@/Components/DataTable';
 import TableFilters from '@/Components/TableFilters';
-import PaginatorButtons from '@/Components/PaginatorButtons';
+import PaginatorButtons from '@/Components/Buttons/PaginatorButtons';
 
 export default function Index({ auth, docentes, flash, filters: initialFilters = {} }) {
     const [filters, setFilters] = useState({

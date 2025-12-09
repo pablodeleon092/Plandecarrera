@@ -1,8 +1,8 @@
 // resources/js/Pages/Docentes/Edit.jsx
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import PrimaryButton from '@/Components/PrimaryButton';
-import DangerButton from '@/Components/DangerButton';
+import PrimaryButton from '@/Components/Buttons/PrimaryButton';
+import DangerButton from '@/Components/Buttons/DangerButton';
 
 export default function Edit({ auth, docente, flash }) {
     const { data, setData, put, processing, errors } = useForm({

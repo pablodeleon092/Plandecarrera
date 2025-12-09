@@ -5,7 +5,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import ListHeader from '@/Components/ListHeader';
 import DataTable from '@/Components/DataTable';
 import TableFilters from '@/Components/TableFilters';
-import PaginatorButtons from '@/Components/PaginatorButtons';
+import PaginatorButtons from '@/Components/Buttons/PaginatorButtons';
 
 export default function Index({ auth, materias, filters: initialFilters = {} }) {
 
@@ -137,8 +137,8 @@ export default function Index({ auth, materias, filters: initialFilters = {} }) 
                                     label: 'Estado',
                                     render: (m) => (
                                         <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${m.estado
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-red-100 text-red-800'
+                                            ? 'bg-green-100 text-green-800'
+                                            : 'bg-red-100 text-red-800'
                                             }`}>
                                             {m.estado ? 'Activa' : 'Inactiva'}
                                         </span>

@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, router } from '@inertiajs/react';
 import { useState, useMemo } from 'react';
 import Materias from './Partials/Materias';
-import PaginatorButtons from '@/Components/PaginatorButtons';
+import PaginatorButtons from '@/Components/Buttons/PaginatorButtons';
 import DocentesList from './Partials/DocentesList';
 
 export default function Dashboard({ user, institutos, materias, docentes, selectedInstitutoId: initialInstitutoId, selectedCarreraId: initialCarreraId, currentView: initialView }) {
