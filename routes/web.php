@@ -8,6 +8,7 @@ use App\Http\Controllers\CarreraController;
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\ComisionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DashboardConsejeroController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,11 @@ use Inertia\Inertia;
 Route::get('/', [DashboardController::class, 'home'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+Route::get('/dashboard/consejero', [DashboardConsejeroController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard.consejero');
+
 
 
 
