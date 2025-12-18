@@ -35,6 +35,14 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Dashboard
                                 </NavLink>
+                                {user.cargo === 'Consejero' && (
+                                    <NavLink
+                                        href={route('dashboard.consejero')}
+                                        active={route().current('dashboard.consejero')}
+                                    >
+                                        Dashboard Consejero
+                                    </NavLink>
+                                )}
                                 <NavLink
                                     href={route('docentes.index')}
                                 >
@@ -189,6 +197,14 @@ export default function AuthenticatedLayout({ header, children }) {
                         >
                             Dashboard
                         </ResponsiveNavLink>
+                        {user.cargo === 'Consejero' && (
+                            <ResponsiveNavLink
+                                href={route('dashboard.consejero')}
+                                active={route().current('dashboard.consejero')}
+                            >
+                                Dashboard Consejero
+                            </ResponsiveNavLink>
+                        )}
                         <ResponsiveNavLink
                             href={route('materias.index')}
                             active={route().current('materias.index')}
