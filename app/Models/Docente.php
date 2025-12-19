@@ -23,12 +23,18 @@ class Docente extends Model
         'email',
     ];
 
-    protected $table = 'docentes'; 
+    protected $table = 'docentes';
 
     // Relación con Cargos
     public function cargos()
     {
         return $this->hasMany(Cargo::class, 'docente_id');
+    }
+
+    // Relación con Dictas
+    public function dictas()
+    {
+        return $this->hasMany(Dicta::class, 'docente_id');
     }
 
     // --- NUEVA RELACIÓN AGREGADA (Soluciona el error 500) ---
@@ -37,8 +43,8 @@ class Docente extends Model
 
         // Parámetros: Modelo Destino, Tabla Pivot, FK Local, FK Foránea
         return $this->belongsToMany(Comision::class, 'dictas', 'docente_id', 'comision_id')
-                    ->withPivot('id'); // Opcional:
-                    //  trae el ID de la relación dicta
+            ->withPivot('id'); // Opcional:
+        //  trae el ID de la relación dicta
     }
 
     public function scopeDeInstitutoYCarrera($query, $institutoId, $carreraId)
@@ -46,22 +52,22 @@ class Docente extends Model
         return $query->whereHas('comisiones.materia.planes', function ($q) use ($institutoId, $carreraId) {
 
             $q->whereNull('anio_fin')               // plan activo
-            ->where('carrera_id', $carreraId)     // misma carrera
-            ->whereHas('carrera', function ($c) use ($institutoId) {
-                $c->where('instituto_id', $institutoId); // instituto al que pertenece la carrera
-            });
+                ->where('carrera_id', $carreraId)     // misma carrera
+                ->whereHas('carrera', function ($c) use ($institutoId) {
+                    $c->where('instituto_id', $institutoId); // instituto al que pertenece la carrera
+                });
 
         });
     }
-    
+
     public function scopeDeInstituto($query, $institutoId)
     {
         return $query->whereHas('comisiones.materia.planes', function ($q) use ($institutoId) {
 
             $q->whereNull('anio_fin') // solo planes activos
-            ->whereHas('carrera', function ($c) use ($institutoId) {
-                $c->where('instituto_id', $institutoId);
-            });
+                ->whereHas('carrera', function ($c) use ($institutoId) {
+                    $c->where('instituto_id', $institutoId);
+                });
 
         });
     }
