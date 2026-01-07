@@ -8,9 +8,11 @@ use App\Models\Carrera;
 use App\Models\User;
 use App\Models\Docente;
 use App\Models\Dicta;
+use App\Models\Comision;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -18,9 +20,348 @@ class DashboardController extends Controller
     public function home(Request $request)
     {
         $user = Auth::user();
+        
+        // Dashboard para Administrativo de instituto
+        if ($user->cargo === 'Administrativo de instituto') {
+            return $this->administrativoHome($request);
+        }
+        
+        // Dashboard original para otros roles
+        return $this->originalHome($request);
+    }
+
+    /**
+     * Dashboard específico para Administrativos de Instituto
+     */
+    private function administrativoHome(Request $request)
+    {
+        $user = Auth::user();
+        $institutoId = $user->instituto_id;
+        
+        // Calcular año y cuatrimestre actual
+        $currentYear = date('Y');
+        $currentMonth = (int)date('m');
+        $currentSemester = ($currentMonth >= 1 && $currentMonth <= 7) ? 1 : 2;
+        
+        // Obtener todos los datos necesarios
+        $datosIncompletos = $this->getDocentesConDatosIncompletos($institutoId);
+        $comisionesActuales = $this->getComisionesCuatrimestreActual($institutoId, $currentYear, $currentSemester);
+        $docentesActivos = $this->getDocentesActivos($institutoId);
+        $tareasPendientes = $this->getTareasPendientes($institutoId, $currentYear, $currentSemester);
+        $cambiosRecientes = $this->getCambiosRecientes($institutoId);
+        $kpis = $this->calculateKPIs($institutoId, $currentYear, $currentSemester);
+        
+        return Inertia::render('Gestion/DashboardAdministrativo', [
+            'user' => $user,
+            'instituto' => $user->instituto,
+            'datosIncompletos' => $datosIncompletos,
+            'comisionesActuales' => $comisionesActuales,
+            'docentesActivos' => $docentesActivos,
+            'tareasPendientes' => $tareasPendientes,
+            'cambiosRecientes' => $cambiosRecientes,
+            'kpis' => $kpis,
+            'currentYear' => $currentYear,
+            'currentSemester' => $currentSemester,
+        ]);
+    }
+
+    /**
+     * Obtener docentes con datos incompletos
+     */
+    private function getDocentesConDatosIncompletos($institutoId)
+    {
+        $docentes = Docente::query()
+            ->deInstituto($institutoId)
+            ->where(function($q) {
+                $q->whereNull('email')
+                  ->orWhereNull('telefono')
+                  ->orWhere('email', '')
+                  ->orWhere('telefono', '');
+            })
+            ->select('id', 'nombre', 'apellido', 'email', 'telefono', 'legajo')
+            ->orderBy('apellido')
+            ->limit(20)
+            ->get()
+            ->map(function($docente) {
+                $camposFaltantes = [];
+                if (empty($docente->email)) $camposFaltantes[] = 'Email';
+                if (empty($docente->telefono)) $camposFaltantes[] = 'Teléfono';
+                
+                return [
+                    'id' => $docente->id,
+                    'nombre_completo' => $docente->apellido . ', ' . $docente->nombre,
+                    'legajo' => $docente->legajo,
+                    'email' => $docente->email,
+                    'telefono' => $docente->telefono,
+                    'campos_faltantes' => $camposFaltantes,
+                ];
+            });
+
+        return [
+            'total' => $docentes->count(),
+            'docentes' => $docentes,
+        ];
+    }
+
+    /**
+     * Obtener comisiones del cuatrimestre actual
+     */
+    private function getComisionesCuatrimestreActual($institutoId, $year, $semester)
+    {
+        $comisiones = Comision::query()
+            ->where('anio', $year)
+            ->where('cuatrimestre', $semester)
+            ->whereHas('materia.planes.carrera', function($q) use ($institutoId) {
+                $q->where('instituto_id', $institutoId);
+            })
+            ->with([
+                'materia:id,nombre,codigo',
+                'dictas' => function($q) {
+                    $q->with(['docente:id,nombre,apellido', 'cargo:id,nombre']);
+                }
+            ])
+            ->orderBy('id_materia')
+            ->limit(30)
+            ->get()
+            ->map(function($comision) {
+                $docentes = $comision->dictas->map(function($dicta) {
+                    return [
+                        'nombre' => $dicta->docente->apellido . ', ' . $dicta->docente->nombre,
+                        'cargo' => $dicta->cargo->nombre ?? 'Sin cargo',
+                    ];
+                });
+
+                return [
+                    'id' => $comision->id,
+                    'codigo' => $comision->codigo,
+                    'nombre' => $comision->nombre,
+                    'materia' => $comision->materia->nombre,
+                    'turno' => $comision->turno,
+                    'modalidad' => $comision->modalidad,
+                    'docentes' => $docentes,
+                    'total_docentes' => $docentes->count(),
+                ];
+            });
+
+        return [
+            'total' => $comisiones->count(),
+            'comisiones' => $comisiones,
+        ];
+    }
+
+    /**
+     * Obtener docentes activos del instituto
+     */
+    private function getDocentesActivos($institutoId)
+    {
+        $docentes = Docente::query()
+            ->where('es_activo', true)
+            ->deInstituto($institutoId)
+            ->with([
+                'cargos.dedicacion',
+                'comisiones' => function($q) {
+                    $q->where('anio', date('Y'))
+                      ->with('materia:id,nombre');
+                }
+            ])
+            ->orderBy('apellido')
+            ->limit(20)
+            ->get()
+            ->map(function($docente) {
+                $materias = $docente->comisiones
+                    ->pluck('materia.nombre')
+                    ->unique()
+                    ->values();
+
+                return [
+                    'id' => $docente->id,
+                    'nombre_completo' => $docente->apellido . ', ' . $docente->nombre,
+                    'email' => $docente->email,
+                    'telefono' => $docente->telefono,
+                    'carga_horaria' => $docente->carga_horaria,
+                    'modalidad' => $docente->modalidad_desempeño,
+                    'materias' => $materias,
+                    'total_materias' => $materias->count(),
+                ];
+            });
+
+        return [
+            'total' => $docentes->count(),
+            'docentes' => $docentes,
+        ];
+    }
+
+    /**
+     * Obtener tareas pendientes
+     */
+    private function getTareasPendientes($institutoId, $year, $semester)
+    {
+        // Materias del plan activo sin comisiones para el período actual
+        $materiasSinComision = Materia::query()
+            ->where('estado', true)
+            ->where('cuatrimestre', $semester)
+            ->whereHas('planes', function($q) use ($institutoId) {
+                $q->whereNull('anio_fin')
+                  ->whereHas('carrera', function($c) use ($institutoId) {
+                      $c->where('instituto_id', $institutoId);
+                  });
+            })
+            ->whereDoesntHave('comisiones', function($q) use ($year, $semester) {
+                $q->where('anio', $year)
+                  ->where('cuatrimestre', $semester);
+            })
+            ->select('id', 'nombre', 'codigo', 'cuatrimestre')
+            ->orderBy('nombre')
+            ->limit(15)
+            ->get()
+            ->map(function($materia) {
+                return [
+                    'id' => $materia->id,
+                    'nombre' => $materia->nombre,
+                    'codigo' => $materia->codigo,
+                    'tipo' => 'Sin comisión creada',
+                ];
+            });
+
+        // Comisiones sin docentes asignados
+        $comisionesSinDocentes = Comision::query()
+            ->where('anio', $year)
+            ->where('cuatrimestre', $semester)
+            ->whereHas('materia.planes.carrera', function($q) use ($institutoId) {
+                $q->where('instituto_id', $institutoId);
+            })
+            ->whereDoesntHave('dictas')
+            ->with('materia:id,nombre,codigo')
+            ->orderBy('id_materia')
+            ->limit(15)
+            ->get()
+            ->map(function($comision) {
+                return [
+                    'id' => $comision->id,
+                    'nombre' => $comision->materia->nombre . ' - ' . $comision->nombre,
+                    'codigo' => $comision->codigo,
+                    'tipo' => 'Sin docentes asignados',
+                ];
+            });
+
+        $tareas = $materiasSinComision->concat($comisionesSinDocentes);
+
+        return [
+            'total' => $tareas->count(),
+            'tareas' => $tareas,
+        ];
+    }
+
+    /**
+     * Obtener cambios recientes
+     */
+    private function getCambiosRecientes($institutoId)
+    {
+        $cambios = Dicta::query()
+            ->whereHas('comision.materia.planes.carrera', function($q) use ($institutoId) {
+                $q->where('instituto_id', $institutoId);
+            })
+            ->with([
+                'docente:id,nombre,apellido',
+                'comision.materia:id,nombre',
+                'cargo:id,nombre'
+            ])
+            ->orderBy('updated_at', 'desc')
+            ->limit(20)
+            ->get()
+            ->map(function($dicta) {
+                return [
+                    'id' => $dicta->id,
+                    'docente' => $dicta->docente->apellido . ', ' . $dicta->docente->nombre,
+                    'materia' => $dicta->comision->materia->nombre,
+                    'comision' => $dicta->comision->nombre,
+                    'cargo' => $dicta->cargo->nombre ?? 'Sin cargo',
+                    'fecha' => $dicta->updated_at->format('d/m/Y H:i'),
+                    'fecha_relativa' => $dicta->updated_at->diffForHumans(),
+                ];
+            });
+
+        return [
+            'total' => $cambios->count(),
+            'cambios' => $cambios,
+        ];
+    }
+
+    /**
+     * Calcular KPIs
+     */
+    private function calculateKPIs($institutoId, $year, $semester)
+    {
+        // Total de docentes del instituto
+        $totalDocentes = Docente::deInstituto($institutoId)->count();
+        
+        // Docentes con datos incompletos
+        $docentesIncompletos = Docente::deInstituto($institutoId)
+            ->where(function($q) {
+                $q->whereNull('email')
+                  ->orWhereNull('telefono')
+                  ->orWhere('email', '')
+                  ->orWhere('telefono', '');
+            })
+            ->count();
+        
+        $porcentajeIncompletos = $totalDocentes > 0 
+            ? round(($docentesIncompletos / $totalDocentes) * 100, 1) 
+            : 0;
+
+        // Comisiones del período actual
+        $comisionesCreadas = Comision::where('anio', $year)
+            ->where('cuatrimestre', $semester)
+            ->whereHas('materia.planes.carrera', function($q) use ($institutoId) {
+                $q->where('instituto_id', $institutoId);
+            })
+            ->count();
+
+        // Materias que deberían tener comisión
+        $materiasDelPeriodo = Materia::where('estado', true)
+            ->where('cuatrimestre', $semester)
+            ->whereHas('planes', function($q) use ($institutoId) {
+                $q->whereNull('anio_fin')
+                  ->whereHas('carrera', function($c) use ($institutoId) {
+                      $c->where('instituto_id', $institutoId);
+                  });
+            })
+            ->count();
+
+        $comisionesPendientes = max(0, $materiasDelPeriodo - $comisionesCreadas);
+
+        // Docentes activos
+        $docentesActivos = Docente::where('es_activo', true)
+            ->deInstituto($institutoId)
+            ->count();
+
+        return [
+            'registros_incompletos' => [
+                'valor' => $docentesIncompletos,
+                'total' => $totalDocentes,
+                'porcentaje' => $porcentajeIncompletos,
+            ],
+            'comisiones' => [
+                'creadas' => $comisionesCreadas,
+                'pendientes' => $comisionesPendientes,
+                'total_materias' => $materiasDelPeriodo,
+            ],
+            'docentes_activos' => [
+                'valor' => $docentesActivos,
+                'total' => $totalDocentes,
+            ],
+        ];
+    }
+
+    /**
+     * Dashboard original para otros roles
+     */
+    private function originalHome(Request $request)
+    {
+        $user = Auth::user();
         $selectedInstitutoId = $request->input('instituto_id');
         $selectedCarreraId = $request->input('carrera_id');
-        $currentView = $request->input('view', 'materias'); // Default view
+        $currentView = $request->input('view', 'materias');
 
         // 1. Obtener Institutos disponibles
         $institutosDisponibles = $this->getInstitutosPorRol($user);
@@ -41,7 +382,7 @@ class DashboardController extends Controller
         } elseif ($currentView === 'docentes') {
             $docentesFiltrados = $this->getDocentesFiltrados($selectedInstitutoId, $selectedCarreraId);
         }
-        #dd($docentesFiltrados);
+
         return Inertia::render('Gestion/Dashboard', [
             'user' => $user,
             'institutos' => $institutosDisponibles,
@@ -99,8 +440,6 @@ class DashboardController extends Controller
         return $docentes;
     }
 
-
-
     private function getInstitutosPorRol(User $user)
     {
         $rol = $user->cargo;
@@ -129,8 +468,6 @@ class DashboardController extends Controller
                         ->with('planActual');
                 }
             ]);
-
-
 
             return collect([$user->instituto]);
 
